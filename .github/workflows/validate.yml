@@ -1,1 +1,34 @@
+name: Validar reglas Sigma
 
+on:
+  push:
+    paths:
+      - 'rules/**'
+      - 'tools/**'
+      - '.github/workflows/validate.yml'
+  pull_request:
+    paths:
+      - 'rules/**'
+      - 'tools/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Validar reglas y medir cobertura ATT&CK
+        run: python tools/validate.py
+
+      - name: Publicar la capa de cobertura (ATT&CK Navigator)
+        uses: actions/upload-artifact@v4
+        with:
+          name: attack-navigator-coverage
+          path: navigator/coverage-layer.json
