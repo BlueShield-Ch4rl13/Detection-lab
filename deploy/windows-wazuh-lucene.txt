@@ -1,0 +1,35 @@
+EventID:1 AND (Image:*\\mshta.exe AND (CommandLine:(*http* OR *javascript\:* OR *vbscript\:*)))
+
+EventID:1 AND (Image:*\\powershell.exe AND (CommandLine:(*DownloadString* OR *DownloadFile* OR *Net.WebClient* OR *Invoke\-WebRequest* OR *IEX* OR *Invoke\-Expression*)))
+
+EventID:1 AND (CommandLine:(*sekurlsa* OR *logonpasswords* OR *lsadump* OR *privilege\:\:debug* OR *kerberos\:\:*))
+
+EventID:3 AND ((Image:(*\\rundll32.exe OR *\\regsvr32.exe OR *\\mshta.exe)) AND Initiated:true)
+
+EventID:1 AND (CommandLine:(*wevtutil\ cl* OR *wevtutil\ clear\-log* OR *Clear\-EventLog*))
+
+EventID:1 AND (CommandLine:*comsvcs.dll* AND CommandLine:*MiniDump*)
+
+EventID:1 AND (CommandLine:(*Set\-MpPreference* OR *DisableRealtimeMonitoring* OR *DisableAntiSpyware* OR *MpPreference\ \-Exclusion* OR *Add\-MpPreference*))
+
+EventID:1 AND (Image:*\\sc.exe AND CommandLine:*create* AND (CommandLine:(*binPath* OR *binpath\=*)))
+
+EventID:1 AND (Image:*\\schtasks.exe AND CommandLine:*\/create*)
+
+EventID:1 AND (Image:*\\regsvr32.exe AND (CommandLine:(*\/i\:http* OR *scrobj.dll*)))
+
+EventID:1 AND (Image:*\\bitsadmin.exe AND (CommandLine:(*\/transfer* OR *\/create* OR *\/addfile*)))
+
+EventID:1 AND ((ParentImage:(*\\winword.exe OR *\\excel.exe OR *\\powerpnt.exe OR *\\outlook.exe)) AND (Image:(*\\cmd.exe OR *\\powershell.exe OR *\\wscript.exe OR *\\cscript.exe OR *\\mshta.exe)))
+
+EventID:1 AND (CommandLine:(*delete\ shadows* OR *shadowcopy\ delete* OR *resize\ shadowstorage*))
+
+EventID:1 AND (Image:*\\powershell.exe AND (CommandLine:(*\-enc* OR *\-EncodedCommand* OR *\ \-e\ *)))
+
+EventID:1 AND (Image:*\\wmic.exe AND (CommandLine:*process* AND CommandLine:*call* AND CommandLine:*create*))
+
+EventID:1 AND ((CommandLine:*net* AND CommandLine:*user*) AND CommandLine:*\/add*)
+
+EventID:1 AND (Image:*\\certutil.exe AND (CommandLine:(*urlcache* OR *\-decode* OR *\-decodehex* OR *split*)))
+
+EventID:13 AND (TargetObject:(*\\CurrentVersion\\Run\\* OR *\\CurrentVersion\\RunOnce\\*))

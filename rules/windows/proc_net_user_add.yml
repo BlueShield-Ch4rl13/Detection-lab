@@ -1,0 +1,25 @@
+title: Creacion de cuenta local
+id: 067a60fd-e20d-53ed-83d6-c1101487e1e3
+status: experimental
+description: net user /add y net localgroup administrators /add.
+references:
+- https://attack.mitre.org/techniques/001
+author: C. Villalba
+date: 2026/07/16
+tags:
+- attack.persistence
+- attack.t1136.001
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection:
+    CommandLine|contains|all:
+    - net
+    - user
+    CommandLine|contains:
+    - /add
+  condition: selection
+falsepositives:
+- Alta legitima de usuarios por IT
+level: medium

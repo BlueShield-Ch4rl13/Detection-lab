@@ -1,0 +1,19 @@
+Image:(*\/useradd OR *\/usermod OR *\/adduser)
+
+CommandLine:(*unset\ HISTFILE* OR *HISTFILE\=\/dev\/null* OR *HISTSIZE\=0* OR *export\ HISTSIZE\=0*)
+
+CommandLine:*authorized_keys* AND (CommandLine:(*echo* OR *tee* OR *\>\>* OR *\>* OR *cat*))
+
+(CommandLine:(*curl* OR *wget*)) AND (CommandLine:(*\|bash* OR *\|\ bash* OR *\|sh* OR *\|\ sh*))
+
+CommandLine:*\/etc\/shadow*
+
+CommandLine:(*\/dev\/tcp\/* OR *\/dev\/udp\/* OR *bash\ \-i* OR *sh\ \-i*)
+
+(CommandLine:(*base64\ \-d* OR *base64\ \-\-decode* OR *base64\ \-di*)) AND (CommandLine:(*\|bash* OR *\|\ bash* OR *\|sh* OR *\|\ sh* OR *eval*))
+
+(CommandLine:*chmod* AND (CommandLine:(*\/tmp\/* OR *\/dev\/shm\/* OR *\/var\/tmp\/*))) AND (CommandLine:(*\+x* OR *0755* OR *777*))
+
+CommandLine:(*crontab\ \-* OR *\/etc\/cron.d\/* OR *\/etc\/crontab* OR *\/var\/spool\/cron*)
+
+CommandLine:*\/etc\/ld.so.preload*

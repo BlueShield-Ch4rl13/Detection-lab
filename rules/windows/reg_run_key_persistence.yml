@@ -1,0 +1,23 @@
+title: Persistencia por clave Run (registro)
+id: 014da360-79a8-5026-8fe0-cad92f9e4958
+status: experimental
+description: Escritura en CurrentVersion\Run/RunOnce para autoarranque.
+references:
+- https://attack.mitre.org/techniques/001
+author: C. Villalba
+date: 2026/07/16
+tags:
+- attack.persistence
+- attack.t1547.001
+logsource:
+  category: registry_set
+  product: windows
+detection:
+  selection:
+    TargetObject|contains:
+    - \CurrentVersion\Run\
+    - \CurrentVersion\RunOnce\
+  condition: selection
+falsepositives:
+- Software legitimo que se registra para autoarranque
+level: medium

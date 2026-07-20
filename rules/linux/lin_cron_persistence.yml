@@ -1,0 +1,25 @@
+title: Persistencia por cron
+id: 9f783794-6644-5a53-8f89-77dca1717c53
+status: experimental
+description: Edicion de crontab o escritura en /etc/cron*.
+references:
+- https://attack.mitre.org/techniques/003
+author: C. Villalba
+date: 2026/07/16
+tags:
+- attack.persistence
+- attack.t1053.003
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection:
+    CommandLine|contains:
+    - crontab -
+    - /etc/cron.d/
+    - /etc/crontab
+    - /var/spool/cron
+  condition: selection
+falsepositives:
+- Tareas programadas legitimas
+level: medium

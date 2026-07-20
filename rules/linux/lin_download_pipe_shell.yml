@@ -1,0 +1,31 @@
+title: Descarga tuberia a shell (curl|bash)
+id: 1ff0c388-d765-5870-8c84-3ecc40a1881c
+status: experimental
+description: curl/wget de un script ejecutado directamente por la shell.
+references:
+- https://attack.mitre.org/techniques/004
+author: C. Villalba
+date: 2026/07/16
+tags:
+- attack.command_and_control
+- attack.t1105
+- attack.execution
+- attack.t1059.004
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection:
+    CommandLine|contains:
+    - curl
+    - wget
+  selection_pipe:
+    CommandLine|contains:
+    - '|bash'
+    - '| bash'
+    - '|sh'
+    - '| sh'
+  condition: selection and selection_pipe
+falsepositives:
+- Instaladores oficiales que usan este patron (evaluar contexto)
+level: high

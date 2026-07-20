@@ -1,0 +1,19 @@
+Image IN ("*/useradd", "*/usermod", "*/adduser")
+
+CommandLine IN ("*unset HISTFILE*", "*HISTFILE=/dev/null*", "*HISTSIZE=0*", "*export HISTSIZE=0*")
+
+CommandLine="*authorized_keys*" CommandLine IN ("*echo*", "*tee*", "*>>*", "*>*", "*cat*")
+
+CommandLine IN ("*curl*", "*wget*") CommandLine IN ("*|bash*", "*| bash*", "*|sh*", "*| sh*")
+
+CommandLine="*/etc/shadow*"
+
+CommandLine IN ("*/dev/tcp/*", "*/dev/udp/*", "*bash -i*", "*sh -i*")
+
+CommandLine IN ("*base64 -d*", "*base64 --decode*", "*base64 -di*") CommandLine IN ("*|bash*", "*| bash*", "*|sh*", "*| sh*", "*eval*")
+
+CommandLine="*chmod*" CommandLine IN ("*/tmp/*", "*/dev/shm/*", "*/var/tmp/*") CommandLine IN ("*+x*", "*0755*", "*777*")
+
+CommandLine IN ("*crontab -*", "*/etc/cron.d/*", "*/etc/crontab*", "*/var/spool/cron*")
+
+CommandLine="*/etc/ld.so.preload*"

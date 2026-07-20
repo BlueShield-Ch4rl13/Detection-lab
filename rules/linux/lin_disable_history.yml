@@ -1,0 +1,25 @@
+title: Deshabilitar historial de shell (anti-forense)
+id: 08fecbad-072d-5720-af42-a5fc54a420a7
+status: experimental
+description: unset HISTFILE / HISTSIZE=0 / ln -sf /dev/null ~/.bash_history.
+references:
+- https://attack.mitre.org/techniques/003
+author: C. Villalba
+date: 2026/07/16
+tags:
+- attack.defense_evasion
+- attack.t1070.003
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection:
+    CommandLine|contains:
+    - unset HISTFILE
+    - HISTFILE=/dev/null
+    - HISTSIZE=0
+    - export HISTSIZE=0
+  condition: selection
+falsepositives:
+- Preferencias legitimas de usuarios avanzados
+level: medium

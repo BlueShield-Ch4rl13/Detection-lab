@@ -1,0 +1,26 @@
+title: Manipulacion de Windows Defender
+id: db77b6c5-eda7-56ed-8ef0-0f766ede0bcf
+status: experimental
+description: Set-MpPreference -Disable... o exclusiones, evasion de defensas.
+references:
+- https://attack.mitre.org/techniques/001
+author: C. Villalba
+date: 2026/07/16
+tags:
+- attack.defense_evasion
+- attack.t1562.001
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection:
+    CommandLine|contains:
+    - Set-MpPreference
+    - DisableRealtimeMonitoring
+    - DisableAntiSpyware
+    - MpPreference -Exclusion
+    - Add-MpPreference
+  condition: selection
+falsepositives:
+- Administradores que ajustan Defender puntualmente
+level: high

@@ -1,0 +1,24 @@
+title: Creacion o modificacion de cuenta
+id: 94df057c-ecd2-521c-8166-3ca59630c868
+status: experimental
+description: useradd/usermod para persistencia o escalada.
+references:
+- https://attack.mitre.org/techniques/001
+author: C. Villalba
+date: 2026/07/16
+tags:
+- attack.persistence
+- attack.t1136.001
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection:
+    Image|endswith:
+    - /useradd
+    - /usermod
+    - /adduser
+  condition: selection
+falsepositives:
+- Alta legitima de usuarios
+level: medium

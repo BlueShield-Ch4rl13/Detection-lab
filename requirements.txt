@@ -1,0 +1,7 @@
+sigma-cli>=1.0                       # CLI de conversion Sigma
+pysigma>=0.11                        # motor de validacion Sigma
+pysigma-backend-splunk>=1.0          # backend Splunk
+pysigma-backend-elasticsearch>=1.0   # backend Elastic (Lucene / ES|QL) - tambien Wazuh/OpenSearch
+pysigma-pipeline-sysmon>=1.0         # mapeo de campos a Sysmon
+pysigma-pipeline-windows>=1.0        # mapeo de logs de Windows
+pyyaml>=6.0

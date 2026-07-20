@@ -1,0 +1,203 @@
+{
+  "name": "Cobertura de deteccion - detection-lab",
+  "versions": {
+    "attack": "14",
+    "navigator": "4.9.1",
+    "layer": "4.5"
+  },
+  "domain": "enterprise-attack",
+  "description": "Tecnicas cubiertas por el catalogo de reglas Sigma de detection-lab (complemento de Infra-SocAnalyst).",
+  "sorting": 3,
+  "techniques": [
+    {
+      "techniqueID": "T1003.001",
+      "score": 2,
+      "color": "",
+      "comment": "2 regla(s) Sigma",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1003.008",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s) Sigma",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1047",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s) Sigma",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1053.003",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s) Sigma",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1053.005",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s) Sigma",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1059.001",
+      "score": 2,
+      "color": "",
+      "comment": "2 regla(s) Sigma",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1059.004",
+      "score": 3,
+      "color": "",
+      "comment": "3 regla(s) Sigma",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1070.001",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s) Sigma",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1070.003",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s) Sigma",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1071.001",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s) Sigma",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1098.004",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s) Sigma",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1105",
+      "score": 3,
+      "color": "",
+      "comment": "3 regla(s) Sigma",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1136.001",
+      "score": 2,
+      "color": "",
+      "comment": "2 regla(s) Sigma",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1140",
+      "score": 2,
+      "color": "",
+      "comment": "2 regla(s) Sigma",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1197",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s) Sigma",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1204.002",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s) Sigma",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1218.005",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s) Sigma",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1218.010",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s) Sigma",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1222.002",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s) Sigma",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1490",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s) Sigma",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1543.003",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s) Sigma",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1547.001",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s) Sigma",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1562.001",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s) Sigma",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1566.001",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s) Sigma",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1574.006",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s) Sigma",
+      "enabled": true
+    }
+  ],
+  "gradient": {
+    "colors": [
+      "#12171F",
+      "#4FD6C4"
+    ],
+    "minValue": 0,
+    "maxValue": 3
+  },
+  "legendItems": [
+    {
+      "label": "Nº de reglas que cubren la tecnica",
+      "color": "#4FD6C4"
+    }
+  ],
+  "hideDisabled": false
+}

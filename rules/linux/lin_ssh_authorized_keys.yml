@@ -1,0 +1,28 @@
+title: Adicion de clave SSH (authorized_keys)
+id: 91efd863-d033-552f-9f65-782761f7ccbc
+status: experimental
+description: Escritura en authorized_keys para acceso persistente.
+references:
+- https://attack.mitre.org/techniques/004
+author: C. Villalba
+date: 2026/07/16
+tags:
+- attack.persistence
+- attack.t1098.004
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection:
+    CommandLine|contains: authorized_keys
+  selection_write:
+    CommandLine|contains:
+    - echo
+    - tee
+    - '>>'
+    - '>'
+    - cat
+  condition: selection and selection_write
+falsepositives:
+- Aprovisionamiento legitimo de claves
+level: high

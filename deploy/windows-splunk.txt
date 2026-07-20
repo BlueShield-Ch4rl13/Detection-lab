@@ -1,0 +1,35 @@
+EventID=1 Image="*\\mshta.exe" CommandLine IN ("*http*", "*javascript:*", "*vbscript:*")
+
+EventID=1 Image="*\\powershell.exe" CommandLine IN ("*DownloadString*", "*DownloadFile*", "*Net.WebClient*", "*Invoke-WebRequest*", "*IEX*", "*Invoke-Expression*")
+
+EventID=1 CommandLine IN ("*sekurlsa*", "*logonpasswords*", "*lsadump*", "*privilege::debug*", "*kerberos::*")
+
+EventID=3 Image IN ("*\\rundll32.exe", "*\\regsvr32.exe", "*\\mshta.exe") Initiated=true
+
+EventID=1 CommandLine IN ("*wevtutil cl*", "*wevtutil clear-log*", "*Clear-EventLog*")
+
+EventID=1 CommandLine="*comsvcs.dll*" CommandLine="*MiniDump*"
+
+EventID=1 CommandLine IN ("*Set-MpPreference*", "*DisableRealtimeMonitoring*", "*DisableAntiSpyware*", "*MpPreference -Exclusion*", "*Add-MpPreference*")
+
+EventID=1 Image="*\\sc.exe" CommandLine="*create*" CommandLine IN ("*binPath*", "*binpath=*")
+
+EventID=1 Image="*\\schtasks.exe" CommandLine="*/create*"
+
+EventID=1 Image="*\\regsvr32.exe" CommandLine IN ("*/i:http*", "*scrobj.dll*")
+
+EventID=1 Image="*\\bitsadmin.exe" CommandLine IN ("*/transfer*", "*/create*", "*/addfile*")
+
+EventID=1 ParentImage IN ("*\\winword.exe", "*\\excel.exe", "*\\powerpnt.exe", "*\\outlook.exe") Image IN ("*\\cmd.exe", "*\\powershell.exe", "*\\wscript.exe", "*\\cscript.exe", "*\\mshta.exe")
+
+EventID=1 CommandLine IN ("*delete shadows*", "*shadowcopy delete*", "*resize shadowstorage*")
+
+EventID=1 Image="*\\powershell.exe" CommandLine IN ("*-enc*", "*-EncodedCommand*", "* -e *")
+
+EventID=1 Image="*\\wmic.exe" CommandLine="*process*" CommandLine="*call*" CommandLine="*create*"
+
+EventID=1 CommandLine="*net*" CommandLine="*user*" CommandLine="*/add*"
+
+EventID=1 Image="*\\certutil.exe" CommandLine IN ("*urlcache*", "*-decode*", "*-decodehex*", "*split*")
+
+EventID=13 TargetObject IN ("*\\CurrentVersion\\Run\\*", "*\\CurrentVersion\\RunOnce\\*")

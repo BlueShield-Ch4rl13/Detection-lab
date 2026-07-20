@@ -1,0 +1,34 @@
+title: Documento de Office lanzando shell
+id: 86a9cd62-a27b-55eb-892c-223a8f532cad
+status: experimental
+description: 'Word/Excel/Outlook creando cmd/powershell/wscript: tipico de phishing
+  con macros.'
+references:
+- https://attack.mitre.org/techniques/001
+author: C. Villalba
+date: 2026/07/16
+tags:
+- attack.execution
+- attack.t1204.002
+- attack.initial_access
+- attack.t1566.001
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection:
+    ParentImage|endswith:
+    - \winword.exe
+    - \excel.exe
+    - \powerpnt.exe
+    - \outlook.exe
+    Image|endswith:
+    - \cmd.exe
+    - \powershell.exe
+    - \wscript.exe
+    - \cscript.exe
+    - \mshta.exe
+  condition: selection
+falsepositives:
+- Plantillas corporativas con macros legitimas
+level: high

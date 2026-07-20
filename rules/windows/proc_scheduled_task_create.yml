@@ -1,0 +1,22 @@
+title: Creacion de tarea programada via schtasks
+id: 57587758-e670-5dde-a47d-826c48669f3b
+status: experimental
+description: schtasks /create, tecnica comun de persistencia y ejecucion.
+references:
+- https://attack.mitre.org/techniques/005
+author: C. Villalba
+date: 2026/07/16
+tags:
+- attack.persistence
+- attack.t1053.005
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection:
+    Image|endswith: \schtasks.exe
+    CommandLine|contains: /create
+  condition: selection
+falsepositives:
+- Software legitimo que crea tareas
+level: medium

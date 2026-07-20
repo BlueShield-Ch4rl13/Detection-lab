@@ -1,0 +1,33 @@
+title: Ejecucion de payload codificado en base64
+id: 200e7a04-2cc7-5824-8fa7-b103e2a599ca
+status: experimental
+description: base64 -d tuberia a shell, ofuscacion de comandos.
+references:
+- https://attack.mitre.org/techniques/004
+author: C. Villalba
+date: 2026/07/16
+tags:
+- attack.defense_evasion
+- attack.t1140
+- attack.execution
+- attack.t1059.004
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection:
+    CommandLine|contains:
+    - base64 -d
+    - base64 --decode
+    - base64 -di
+  selection_pipe:
+    CommandLine|contains:
+    - '|bash'
+    - '| bash'
+    - '|sh'
+    - '| sh'
+    - eval
+  condition: selection and selection_pipe
+falsepositives:
+- Scripts legitimos que decodifican datos
+level: high

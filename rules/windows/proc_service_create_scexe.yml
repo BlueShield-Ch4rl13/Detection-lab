@@ -1,0 +1,26 @@
+title: Creacion de servicio via sc.exe
+id: 8097a5f5-4800-546d-a736-d3e5dae18db9
+status: experimental
+description: sc.exe create, usado para persistencia y movimiento lateral.
+references:
+- https://attack.mitre.org/techniques/003
+author: C. Villalba
+date: 2026/07/16
+tags:
+- attack.persistence
+- attack.t1543.003
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection:
+    Image|endswith: \sc.exe
+    CommandLine|contains|all:
+    - create
+    CommandLine|contains:
+    - binPath
+    - binpath=
+  condition: selection
+falsepositives:
+- Instalacion legitima de servicios
+level: medium
