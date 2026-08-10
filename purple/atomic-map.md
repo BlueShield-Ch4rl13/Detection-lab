@@ -61,7 +61,7 @@ Invoke-AtomicTest T1059.004 -ShowDetailsBrief
 
 ## Registro de resultados (rellena al validar)
 
-| Fecha | Técnica | ¿Detectó? | Regla | Notas de tuning |
+| Fecha | Técnica | ¿Detectó? | Regla | Notas |
 |---|---|---|---|---|
 | | T1059.001 | ⬜ | proc_powershell_encoded | |
 | | T1003.001 | ⬜ | proc_lsass_comsvcs_minidump | |
