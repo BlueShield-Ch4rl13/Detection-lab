@@ -110,7 +110,7 @@ Valida todas las reglas, imprime la cobertura por táctica y genera
 `navigator/coverage-layer.json`. Súbelo a **https://mitre-attack.github.io/attack-navigator/**
 (Open Existing Layer) para ver el **heatmap** de lo que detectas y dónde tienes huecos.
 
-## Encaje con el resto de tu portfolio
+## Encaje con el resto del portfolio
 
 - **News CTI** aporta IOCs → se pueden convertir en reglas de detección.
 - **detection-lab** (este repo) escribe y valida las detecciones.
