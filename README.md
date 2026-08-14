@@ -1,26 +1,38 @@
-# 🛡️ detection-lab — Detection Engineering + Purple Team
+# 🛡️ Detection-lab + Purple Team
 
-Catálogo de detecciones **como código** (Sigma) con validación automática,
-conversión multi-SIEM y un bucle **purple team** (Atomic Red Team) que mide la
-cobertura **MITRE ATT&CK**. Complementa a
-[Infra-SocAnalyst](https://github.com/BlueShield-Ch4rl13/Infra-SocAnalyst): aquel
-es la *plataforma* SOC (Wazuh, sensores, SOAR); **este es el contenido de
-detección y su validación**.
+![Sigma](https://img.shields.io/badge/rules-Sigma-4FD6C4)
+![Coverage](https://img.shields.io/badge/ATT%26CK-25%20técnicas-E0A34A)
+![CI](https://github.com/BlueShield-Ch4rl13/Detection-lab/actions/workflows/validate.yml/badge.svg)
+![License](https://img.shields.io/badge/license-MIT-blue)
 
-## Por qué existe (y qué NO repite)
+Catálogo de detecciones **como código** (Sigma) con validación automática por CI, conversión multi-SIEM y un bucle **purple team** (Atomic Red Team) que mide la cobertura **MITRE ATT&CK**.
 
-`Infra-SocAnalyst` ya aporta la infraestructura (Proxmox, pfSense, Wazuh XDR,
-Tetragon/Falco/Suricata, SOAR) y una cadena de ataque Linux. Su "trabajo futuro"
-pedía **emulación de adversario (Atomic Red Team)**. Este proyecto lo entrega y
-además:
+Complementa a **[Infra-SocAnalyst](https://github.com/BlueShield-Ch4rl13/Infra-SocAnalyst)**: aquel es la *plataforma* SOC (Wazuh, sensores, SOAR); este es el **contenido de detección y su validación**.
 
-- Escribe las detecciones en **Sigma** (portable, no atado a un SIEM) en vez de
-  reglas Wazuh sueltas.
-- Amplía la cobertura a **Windows/Sysmon** (la demo actual es solo Linux).
-- Añade **medición de cobertura ATT&CK** (heatmap en Navigator).
-- Formaliza el ciclo **detection-as-code**: validar → convertir → emular → afinar.
+<!-- CAPTURA 1: el heatmap de ATT&CK Navigator con coverage-layer.json cargado -->
+![Cobertura MITRE ATT&CK](docs/img/attack-navigator.png)
 
-## Qué hay dentro
+> **28 reglas → 25 técnicas ATT&CK en 7 tácticas**, validadas en cada commit y convertidas a Wazuh / Splunk / Elastic.
+
+---
+
+## 🎯 Decisiones técnicas (el porqué)
+
+- **Sigma en vez de reglas nativas de Wazuh.** Las reglas se escriben una vez en formato portable y se convierten a cualquier SIEM (Wazuh, Splunk, Elastic). No quedan atadas a un despliegue, que es justo lo que se espera de un catálogo de detección reutilizable.
+- **Detection-as-code con CI.** Un GitHub Action valida las 28 reglas con pySigma en cada push y publica la capa de cobertura como artefacto. Una regla rota no llega a `main`.
+- **Purple team medible, no anecdótico.** Cada técnica se enlaza con su prueba de Atomic Red Team y con la regla que debe detectarla, y la cobertura se cuantifica en un heatmap — se ve qué se detecta y, más importante, dónde están los huecos.
+- **Se apoya en infra existente, no la duplica.** Aporta lo que a Infra-SocAnalyst le faltaba: detección **Windows/Sysmon** (su demo es solo Linux) y la emulación de adversario que su propio "trabajo futuro" pedía.
+
+---
+
+## 📸 En acción
+
+<!-- CAPTURA 2: la salida de validate.py en la terminal (cobertura por táctica) -->
+![Validación y cobertura](docs/img/validate-output.png)
+
+---
+
+## 📂 Qué hay dentro
 
 | Carpeta | Contenido |
 |---|---|
@@ -28,14 +40,14 @@ además:
 | `rules/linux/` | Reglas Sigma para **auditd/Falco** (10) |
 | `tools/validate.py` | Valida las reglas, mide cobertura y genera la capa Navigator |
 | `navigator/` | Capa JSON de cobertura para **ATT&CK Navigator** |
-| `deploy/` | Reglas ya convertidas a **Wazuh(Lucene)/Splunk/ES\|QL** |
+| `deploy/` | Reglas ya convertidas a **Wazuh (Lucene) / Splunk / ES\|QL** |
 | `purple/atomic-map.md` | Mapeo técnica ↔ **Atomic Red Team** ↔ regla ↔ telemetría |
 | `LAB.md` | Cómo montar el bucle purple team sobre tu Wazuh |
+| `.github/workflows/` | CI que valida las reglas en cada commit |
 
-**Cobertura actual**: 28 reglas → **25 técnicas ATT&CK** en 7 tácticas
-(ejecución, persistencia, evasión, acceso a credenciales, C2, impacto, acceso inicial).
+---
 
-## Uso
+## 🚀 Uso
 
 ```bash
 pip install -r requirements.txt          # sigma-cli + pySigma + backends
@@ -52,10 +64,11 @@ sigma convert -t esql   -p sysmon rules/windows/    # Elastic ES|QL
 Invoke-AtomicTest T1059.001
 ```
 
-Sube `navigator/coverage-layer.json` a
-[ATT&CK Navigator](https://mitre-attack.github.io/attack-navigator/) para ver el heatmap.
+Sube `navigator/coverage-layer.json` a [ATT&CK Navigator](https://mitre-attack.github.io/attack-navigator/) (Open Existing Layer) para ver el heatmap.
 
-## Formato de una regla (ejemplo)
+---
+
+## 🧩 Formato de una regla
 
 ```yaml
 title: PowerShell con comando codificado
@@ -69,18 +82,23 @@ detection:
 level: high
 ```
 
-## El ciclo completo del portfolio
+---
+
+## 🔗 El ecosistema
 
 ```
-News CTI (IOCs) → detection-lab (detecciones) → Infra-SocAnalyst (Wazuh+SOAR) → ftriage (DFIR)
+News CTI (IOCs) → Detection-lab (detecciones) → Infra-SocAnalyst (Wazuh + SOAR) → ftriage (DFIR)
 ```
 
-## Seguridad
+- **[News CTI](https://github.com/BlueShield-Ch4rl13/ScriptNewsCTI)** — inteligencia de amenazas (IOCs).
+- **[Infra-SocAnalyst](https://github.com/BlueShield-Ch4rl13/Infra-SocAnalyst)** — la plataforma SOC donde corren las detecciones.
 
-Las pruebas de Atomic Red Team se ejecutan **solo en el laboratorio aislado** y se
-revierten con `-Cleanup`. Las reglas son de detección (defensivas). Uso académico
-y de respuesta a incidentes.
+---
 
-## Licencia
+## 🔒 Seguridad
+
+Las pruebas de Atomic Red Team se ejecutan **solo en el laboratorio aislado** y se revierten con `-Cleanup`. Las reglas son de detección (defensivas). Uso académico y de respuesta a incidentes.
+
+## 📄 Licencia
 
 MIT.
