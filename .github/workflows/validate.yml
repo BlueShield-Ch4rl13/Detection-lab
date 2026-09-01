@@ -5,12 +5,16 @@ on:
     paths:
       - 'rules/**'
       - 'tools/**'
+      - 'respuesta/**'
+      - 'integracion/**'
       - 'requirements.txt'
       - '.github/workflows/validate.yml'
   pull_request:
     paths:
       - 'rules/**'
       - 'tools/**'
+      - 'respuesta/**'
+      - 'integracion/**'
       - 'requirements.txt'
   workflow_dispatch:
 
@@ -42,14 +46,44 @@ jobs:
       - name: Regenerar el contenido de los cuatro SIEM
         run: python tools/build.py
 
-      - name: Comprobar que deploy/ estaba al dia
+      # Solo se compara deploy/*/reglas/: las listas de inteligencia cambian en
+      # cada sincronizacion con News CTI y compararlas haria fallar el CI a
+      # diario por un motivo que no es un error.
+      - name: Comprobar que las reglas generadas estaban al dia
         run: |
-          if ! git diff --quiet -- deploy/; then
-            echo "::error::deploy/ no coincide con rules/. Ejecuta 'python tools/build.py' y haz commit del resultado."
-            git diff --stat -- deploy/
+          if ! git diff --quiet -- 'deploy/*/reglas/' purple/atomic-map.md docs/fusion-de-bibliotecas.md; then
+            echo "::error::Las reglas generadas no coinciden con rules/. Ejecuta 'python tools/build.py' y haz commit del resultado."
+            git diff --stat -- 'deploy/*/reglas/' purple/atomic-map.md docs/fusion-de-bibliotecas.md
             exit 1
           fi
-          echo "deploy/ esta sincronizado con rules/"
+          echo "deploy/*/reglas/ esta sincronizado con rules/"
+
+      - name: Comprobar que el mapeo a NIST e ISO esta al dia
+        run: |
+          python tools/mapear_marcos.py
+          if ! git diff --quiet -- rules/ marcos/matriz_controles.csv; then
+            echo "::error::El mapeo a controles no coincide. Ejecuta 'python tools/mapear_marcos.py' y haz commit."
+            git diff --stat -- rules/ marcos/matriz_controles.csv
+            exit 1
+          fi
+          echo "El mapeo a NIST 800-53 e ISO 27001 esta sincronizado"
+
+      - name: Validar la capa de respuesta
+        run: python tools/validar_respuesta.py
+
+      # El nodo de Shuffle lleva la tabla de playbooks embebida, porque un nodo
+      # Python de Shuffle no lee ficheros del repositorio. Si se toca un
+      # playbook y no se regenera, lo desplegado deja de coincidir con lo que
+      # dice el repositorio, que es el fallo que este paso existe para atrapar.
+      - name: Comprobar que el nodo de Shuffle esta al dia
+        run: |
+          python tools/generar_enrutador.py
+          if ! git diff --quiet -- respuesta/tabla_decision.json integracion/shuffle/; then
+            echo "::error::El nodo de Shuffle no coincide con los playbooks. Ejecuta 'python tools/generar_enrutador.py', haz commit y vuelve a pegarlo en Shuffle."
+            git diff --stat -- respuesta/tabla_decision.json integracion/shuffle/
+            exit 1
+          fi
+          echo "El nodo de Shuffle esta sincronizado con los playbooks"
 
       - name: Validar la biblioteca y medir la cobertura ATT&CK
         run: python tools/validate.py --estricto
@@ -65,3 +99,9 @@ jobs:
         with:
           name: contenido-multi-siem
           path: deploy/
+
+      - name: Publicar la matriz de controles
+        uses: actions/upload-artifact@v7
+        with:
+          name: matriz-nist-iso
+          path: marcos/matriz_controles.csv
