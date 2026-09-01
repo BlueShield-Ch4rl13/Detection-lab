@@ -9,6 +9,10 @@ date: 2026/07/16
 tags:
 - attack.defense-evasion
 - attack.t1562.001
+- iso27001-2022.a-8-7
+- nist.au-9
+- nist.cm-7
+- nist.si-3
 logsource:
   category: process_creation
   product: windows

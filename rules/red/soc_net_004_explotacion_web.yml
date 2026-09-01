@@ -12,6 +12,11 @@ date: 2026/08/27
 tags:
     - attack.initial-access
     - attack.t1190
+    - iso27001-2022.a-8-28
+    - iso27001-2022.a-8-8
+    - nist.ra-5
+    - nist.sc-7
+    - nist.si-10
 logsource:
     category: webserver
 detection:

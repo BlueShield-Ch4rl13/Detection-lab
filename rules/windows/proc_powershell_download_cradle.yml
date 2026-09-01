@@ -11,6 +11,10 @@ tags:
 - attack.t1059.001
 - attack.command-and-control
 - attack.t1105
+- iso27001-2022.a-8-7
+- nist.cm-7
+- nist.sc-7
+- nist.si-3
 logsource:
   category: process_creation
   product: windows

@@ -54,6 +54,7 @@ mac_volcado_llavero,macos,Acceso o volcado del llavero de macOS,critical,T1555,I
 soc_net_001_beaconing,red,Patron de beaconing hacia un destino externo,medium,T1071,"SC-7,SI-4","A.8.20,A.8.23",T1071: canal de mando y control
 soc_net_002_c2_servicio_legitimo,red,Canal de mando sobre un servicio legitimo,high,T1102,SC-7,A.8.23,T1102: servicio web como canal
 soc_net_003_dns_tunel,red,Tunelizacion o exfiltracion por DNS,high,T1071,"SC-7,SI-4","A.8.20,A.8.23",T1071: canal de mando y control
+soc_net_004_explotacion_web,red,Explotacion de vulnerabilidad web contra un servicio publicado,high,T1190,"RA-5,SC-7,SI-10","A.8.28,A.8.8",T1190: explotacion de aplicacion publicada
 soc_net_005_webshell,red,Interaccion con webshell,critical,T1505,"CM-5,SI-7",A.8.9,T1505: componente de software del servidor
 soc_net_006_exfiltracion_volumen,red,Volumen de subida anomalo hacia el exterior,medium,T1048,"AC-4,SC-7",A.8.12,T1048: exfiltracion por protocolo alternativo
 web_001_inyeccion_sql,web,Inyeccion SQL en parametros de la peticion HTTP,high,T1190,"RA-5,SC-7,SI-10","A.8.28,A.8.8",T1190: explotacion de aplicacion publicada
@@ -84,10 +85,23 @@ cred_005_credenciales_nube_ssh,windows,Robo de ficheros de credenciales de nube 
 cred_006_gestores_contrasenas,windows,Acceso a bases de datos de gestores de contrasenas,high,T1555,IA-5,"A.5.17,A.8.5",T1555: credenciales almacenadas
 cred_007_credenciales_cacheadas_vault,windows,Volcado de credenciales cacheadas y del Administrador de credenciales de Windows,high,"T1003,T1555","AC-6,IA-5","A.5.17,A.8.5",T1003: volcado de credenciales: proteccion del autenticador | T1555: credenciales almacenadas
 net_rare_process_external_conn,windows,Proceso del sistema con conexion saliente inusual,medium,T1071,"SC-7,SI-4","A.8.20,A.8.23",T1071: canal de mando y control
+proc_bitsadmin_transfer,windows,Descarga con BITSAdmin,medium,T1197,CM-7,A.8.7,T1197: transferencia por servicio del sistema
+proc_certutil_download_decode,windows,Certutil usado para descargar o decodificar,high,"T1105,T1140","SC-7,SI-3",A.8.7,T1105: transferencia de herramientas al interior | T1140: desofuscacion de carga util
+proc_defender_tamper,windows,Manipulacion de Windows Defender,high,T1562,"AU-9,CM-7,SI-3",A.8.7,T1562: deterioro de las defensas
+proc_lsass_comsvcs_minidump,windows,Volcado de LSASS via comsvcs MiniDump,critical,T1003,"AC-6,IA-5","A.5.17,A.8.5",T1003: volcado de credenciales: proteccion del autenticador
+proc_mimikatz_cmdline,windows,Indicadores de Mimikatz en linea de comandos,critical,T1003,"AC-6,IA-5","A.5.17,A.8.5",T1003: volcado de credenciales: proteccion del autenticador
+proc_mshta_execution,windows,Ejecucion sospechosa de mshta,high,T1218,"CM-7,SI-3",A.8.7,T1218: binario firmado usado como proxy
 proc_net_user_add,windows,Creacion de cuenta local,medium,T1136,AC-2,A.5.16,T1136: alta de cuenta
 proc_office_spawning_shell,windows,Documento de Office lanzando shell,high,"T1204,T1566","AT-2,SI-3,SI-8","A.6.3,A.8.23,A.8.7",T1204: ejecucion inducida al usuario | T1566: phishing
+proc_powershell_download_cradle,windows,Cradle de descarga en PowerShell,high,"T1059,T1105","CM-7,SC-7,SI-3",A.8.7,T1059: interprete de comandos | T1105: transferencia de herramientas al interior
+proc_powershell_encoded,windows,PowerShell con comando codificado,high,T1059,"CM-7,SI-3",A.8.7,T1059: interprete de comandos
+proc_regsvr32_scriptlet,windows,Regsvr32 ejecutando scriptlet remoto (Squiblydoo),high,T1218,"CM-7,SI-3",A.8.7,T1218: binario firmado usado como proxy
+proc_scheduled_task_create,windows,Creacion de tarea programada via schtasks,medium,T1053,"CM-5,CM-7",A.8.9,T1053: tarea programada
 proc_service_create_scexe,windows,Creacion de servicio via sc.exe,medium,T1543,"CM-5,CM-6",A.8.9,T1543: creacion o modificacion de servicio
+proc_vssadmin_delete_shadows,windows,Borrado de instantaneas (anti-recuperacion),critical,T1490,"CP-10,CP-9",A.8.13,T1490: inhibicion de la recuperacion
+proc_wevtutil_clear_logs,windows,Borrado de registros de eventos,high,T1070,"AU-11,AU-9",A.8.15,T1070: borrado de rastro en el registro
 proc_wmic_process_call_create,windows,Ejecucion via WMIC process call create,medium,T1047,"AC-17,CM-7",A.8.20,T1047: instrumental de gestion de Windows
+reg_run_key_persistence,windows,Persistencia por clave Run (registro),medium,T1547,"CM-5,CM-6",A.8.9,T1547: ejecucion automatica en el arranque
 soc_ad_001_kerberoasting,windows,Kerberoasting - solicitud masiva de tickets de servicio con RC4,high,T1558,"IA-2,IA-5",A.8.5,T1558: abuso de tiquetes Kerberos
 soc_ad_002_asrep_roasting,windows,AS-REP Roasting - peticion sin preautenticacion Kerberos,high,T1558,"IA-2,IA-5",A.8.5,T1558: abuso de tiquetes Kerberos
 soc_ad_003_dcsync,windows,DCSync - replicacion de directorio desde un equipo que no es DC,critical,T1003,"AC-6,IA-5","A.5.17,A.8.5",T1003: volcado de credenciales: proteccion del autenticador

@@ -25,7 +25,7 @@ Invoke-AtomicTest T1003.001 -Cleanup        # revierte
 | Técnica ATT&CK | Atomic Red Team | Regla(s) Sigma | Telemetría |
 |---|---|---|---|
 | T1003 | `Invoke-AtomicTest T1003` | `soc_ad_005_herramientas_kerberos` | Sysmon EID 1 |
-| T1003.001 | `Invoke-AtomicTest T1003.001` | `cred_004_descenso_wdigest` · `soc_edr_001_volcado_lsass` · `soc_edr_002_acceso_lsass_sysmon` | Sysmon EID 12/13/14 |
+| T1003.001 | `Invoke-AtomicTest T1003.001` | `cred_004_descenso_wdigest` · `proc_lsass_comsvcs_minidump` · `proc_mimikatz_cmdline` · y 2 mas | Sysmon EID 12/13/14 |
 | T1003.002 | `Invoke-AtomicTest T1003.002` | `cred_001_volcado_colmenas_registro` | Sysmon EID 1 |
 | T1003.003 | `Invoke-AtomicTest T1003.003` | `ad_018_extraccion_ntds` | Sysmon EID 1 |
 | T1003.004 | `Invoke-AtomicTest T1003.004` | `cred_001_volcado_colmenas_registro` · `cred_003_abuso_dpapi` | Sysmon EID 1 |
@@ -34,35 +34,35 @@ Invoke-AtomicTest T1003.001 -Cleanup        # revierte
 | T1021.006 | `Invoke-AtomicTest T1021.006` | `soc_ad_009_wmi_winrm_remoto` | Sysmon EID 1 |
 | T1027 | `Invoke-AtomicTest T1027` | `soc_edr_006_powershell_ofuscado` | Sysmon EID 1 |
 | T1047 | `Invoke-AtomicTest T1047` | `proc_wmic_process_call_create` · `soc_ad_009_wmi_winrm_remoto` | Sysmon EID 1 |
-| T1053.005 | `Invoke-AtomicTest T1053.005` | `soc_edr_008_persistencia_tarea` | Sysmon EID 1 |
+| T1053.005 | `Invoke-AtomicTest T1053.005` | `proc_scheduled_task_create` · `soc_edr_008_persistencia_tarea` | Sysmon EID 1 |
 | T1055 | `Invoke-AtomicTest T1055` | `soc_edr_010_inyeccion_procesos` | Sysmon EID 8 |
-| T1059.001 | `Invoke-AtomicTest T1059.001` | `soc_edr_006_powershell_ofuscado` | Sysmon EID 1 |
+| T1059.001 | `Invoke-AtomicTest T1059.001` | `proc_powershell_download_cradle` · `proc_powershell_encoded` · `soc_edr_006_powershell_ofuscado` | Sysmon EID 1 |
 | T1069.002 | `Invoke-AtomicTest T1069.002` | `soc_ad_007_enumeracion_dominio` | Sysmon EID 1 |
-| T1070.001 | `Invoke-AtomicTest T1070.001` | `soc_edr_004_defensas_deshabilitadas` | Sysmon EID 1 |
+| T1070.001 | `Invoke-AtomicTest T1070.001` | `proc_wevtutil_clear_logs` · `soc_edr_004_defensas_deshabilitadas` | Sysmon EID 1 |
 | T1071 | `Invoke-AtomicTest T1071` | `soc_edr_011_pipe_c2` | Sysmon EID 17/18 |
 | T1071.001 | `Invoke-AtomicTest T1071.001` | `net_rare_process_external_conn` | Sysmon EID 3 |
 | T1087.002 | `Invoke-AtomicTest T1087.002` | `ad_017_lectura_laps` · `soc_ad_007_enumeracion_dominio` | Sysmon EID 1 |
 | T1098 | `Invoke-AtomicTest T1098` | `ad_015_delegacion_kerberos` · `ad_016_adminsdholder` | Canal Security / System de Windows |
-| T1105 | `Invoke-AtomicTest T1105` | `soc_edr_005_lolbins_descarga` | Sysmon EID 1 |
+| T1105 | `Invoke-AtomicTest T1105` | `proc_certutil_download_decode` · `proc_powershell_download_cradle` · `soc_edr_005_lolbins_descarga` | Sysmon EID 1 |
 | T1112 | `Invoke-AtomicTest T1112` | `cred_004_descenso_wdigest` | Sysmon EID 12/13/14 |
 | T1134.005 | `Invoke-AtomicTest T1134.005` | `ad_014_sid_history` | Canal Security / System de Windows |
 | T1136.001 | `Invoke-AtomicTest T1136.001` | `proc_net_user_add` | Sysmon EID 1 |
 | T1136.002 | `Invoke-AtomicTest T1136.002` | `soc_ad_011_cuenta_equipo_creada` | Canal Security / System de Windows |
-| T1140 | `Invoke-AtomicTest T1140` | `soc_edr_005_lolbins_descarga` | Sysmon EID 1 |
+| T1140 | `Invoke-AtomicTest T1140` | `proc_certutil_download_decode` · `soc_edr_005_lolbins_descarga` | Sysmon EID 1 |
 | T1187 | `Invoke-AtomicTest T1187` | `ad_019_coercion_ntlm` | Canal Security / System de Windows |
-| T1197 | `Invoke-AtomicTest T1197` | `soc_edr_005_lolbins_descarga` | Sysmon EID 1 |
+| T1197 | `Invoke-AtomicTest T1197` | `proc_bitsadmin_transfer` · `soc_edr_005_lolbins_descarga` | Sysmon EID 1 |
 | T1204.002 | `Invoke-AtomicTest T1204.002` | `proc_office_spawning_shell` · `soc_edr_012_ejecucion_desde_temp` | Sysmon EID 1 |
 | T1207 | `Invoke-AtomicTest T1207` | `ad_013_dcshadow` | Canal Security / System de Windows |
 | T1218 | `Invoke-AtomicTest T1218` | `soc_edr_005_lolbins_descarga` | Sysmon EID 1 |
-| T1218.005 | `Invoke-AtomicTest T1218.005` | `soc_edr_005_lolbins_descarga` | Sysmon EID 1 |
-| T1218.010 | `Invoke-AtomicTest T1218.010` | `soc_edr_005_lolbins_descarga` | Sysmon EID 1 |
+| T1218.005 | `Invoke-AtomicTest T1218.005` | `proc_mshta_execution` · `soc_edr_005_lolbins_descarga` | Sysmon EID 1 |
+| T1218.010 | `Invoke-AtomicTest T1218.010` | `proc_regsvr32_scriptlet` · `soc_edr_005_lolbins_descarga` | Sysmon EID 1 |
 | T1222 | `Invoke-AtomicTest T1222` | `ad_016_adminsdholder` | Canal Security / System de Windows |
 | T1484.001 | `Invoke-AtomicTest T1484.001` | `soc_ad_010_abuso_gpo` | Sysmon EID 1 |
 | T1486 | `Invoke-AtomicTest T1486` | `soc_edr_007_cifrado_masivo` | Sysmon EID 11 |
-| T1490 | `Invoke-AtomicTest T1490` | `soc_edr_003_borrado_copias_sombra` | Sysmon EID 1 |
+| T1490 | `Invoke-AtomicTest T1490` | `proc_vssadmin_delete_shadows` · `soc_edr_003_borrado_copias_sombra` | Sysmon EID 1 |
 | T1539 | — Robo de token de sesion: requiere un proxy AitM tipo Evilginx en laboratorio aislado | `cred_002_credenciales_navegador` | Sysmon EID 1 |
 | T1543.003 | `Invoke-AtomicTest T1543.003` | `proc_service_create_scexe` | Sysmon EID 1 |
-| T1547.001 | `Invoke-AtomicTest T1547.001` | `soc_edr_009_persistencia_registro` | Sysmon EID 12/13/14 |
+| T1547.001 | `Invoke-AtomicTest T1547.001` | `reg_run_key_persistence` · `soc_edr_009_persistencia_registro` | Canal Security / System de Windows |
 | T1550.002 | `Invoke-AtomicTest T1550.002` | `soc_ad_006_pass_the_hash` | Canal Security / System de Windows |
 | T1550.003 | `Invoke-AtomicTest T1550.003` | `ad_015_delegacion_kerberos` | Canal Security / System de Windows |
 | T1552.001 | `Invoke-AtomicTest T1552.001` | `cred_005_credenciales_nube_ssh` | Sysmon EID 1 |
@@ -76,7 +76,7 @@ Invoke-AtomicTest T1003.001 -Cleanup        # revierte
 | T1558.001 | `Invoke-AtomicTest T1558.001` | `soc_ad_004_golden_ticket` | Canal Security / System de Windows |
 | T1558.003 | `Invoke-AtomicTest T1558.003` | `soc_ad_001_kerberoasting` | Canal Security / System de Windows |
 | T1558.004 | `Invoke-AtomicTest T1558.004` | `soc_ad_002_asrep_roasting` | Canal Security / System de Windows |
-| T1562.001 | `Invoke-AtomicTest T1562.001` | `soc_edr_004_defensas_deshabilitadas` | Sysmon EID 1 |
+| T1562.001 | `Invoke-AtomicTest T1562.001` | `proc_defender_tamper` · `soc_edr_004_defensas_deshabilitadas` | Sysmon EID 1 |
 | T1566.001 | — Entrega de phishing: se emula enviando un correo de prueba al tenant | `proc_office_spawning_shell` | Sysmon EID 1 |
 | T1569.002 | `Invoke-AtomicTest T1569.002` | `soc_ad_008_psexec_remoto` | Canal Security / System de Windows |
 | T1649 | `Invoke-AtomicTest T1649` | `soc_ad_012_abuso_adcs` | Sysmon EID 1 |
@@ -157,6 +157,7 @@ Invoke-AtomicTest T1003.001 -Cleanup        # revierte
 | T1071.001 | `Invoke-AtomicTest T1071.001` | `soc_net_001_beaconing` | Registro del proxy |
 | T1071.004 | `Invoke-AtomicTest T1071.004` | `soc_net_003_dns_tunel` | Suricata eve / DNS del resolutor |
 | T1102 | `Invoke-AtomicTest T1102` | `soc_net_002_c2_servicio_legitimo` | Registro del proxy |
+| T1190 | `Invoke-AtomicTest T1190` | `soc_net_004_explotacion_web` | Acceso de nginx / apache |
 | T1505.003 | `Invoke-AtomicTest T1505.003` | `soc_net_005_webshell` | Acceso de nginx / apache |
 
 ## Arquitectura Zero Trust

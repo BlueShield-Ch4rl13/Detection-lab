@@ -10,6 +10,9 @@ from * metadata _id, _index, _version | where `c-uri` like "*discord.com/api/web
 # Tunelizacion o exfiltracion por DNS  [high]
 from * metadata _id, _index, _version | where query_type in ("TXT", "NULL") or query rlike "^[A-Za-z0-9+/=_-]{45,}\\..*"
 
+# Explotacion de vulnerabilidad web contra un servicio publicado  [high]
+from * metadata _id, _index, _version | where `c-uri` like "*${jndi:*" or `c-uri` like "*%24%7Bjndi*" or `c-uri` like "*${lower:j}*" or `c-uri` like "*../../*" or `c-uri` like "*..%2f..%2f*" or `c-uri` like "*%2e%2e%2f*" or `c-uri` like "*/etc/passwd*" or `c-uri` like "*c:\\windows\\win.ini*" or `c-uri` like "* union select*" or `c-uri` like "*union+select*" or `c-uri` like "*' or 1=1*" or `c-uri` like "*sleep(5)*" or `c-uri` like "*benchmark(*" or `c-uri` like "*waitfor delay*" or `c-uri` like "*rO0AB*" or `c-uri` like "*aced0005*" or `c-uri` like "*__proto__*" or `c-uri` like "*${T(java.lang.Runtime)*" or `c-uri` like "*{{7*7}}*" or `c-uri` like "*<%= *"
+
 # Interaccion con webshell  [critical]
 from * metadata _id, _index, _version | where (`c-uri` like "*.php*" or `c-uri` like "*.jsp*" or `c-uri` like "*.jspx*" or `c-uri` like "*.aspx*" or `c-uri` like "*.ashx*") and (`c-uri` like "*cmd=*" or `c-uri` like "*exec=*" or `c-uri` like "*shell=*" or `c-uri` like "*passthru(*" or `c-uri` like "*system(*" or `c-uri` like "*whoami*" or `c-uri` like "*net user*" or `c-uri` like "*powershell*" or `c-uri` like "*/bin/bash*" or `c-uri` like "*eval(*")
 

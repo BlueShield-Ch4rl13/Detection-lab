@@ -46,17 +46,56 @@ from * metadata _id, _index, _version | where EventID==1 and (ends_with(Image, "
 # Proceso del sistema con conexion saliente inusual  [medium]
 from * metadata _id, _index, _version | where EventID==3 and (ends_with(Image, "\\rundll32.exe") or ends_with(Image, "\\regsvr32.exe") or ends_with(Image, "\\mshta.exe")) and Initiated==true
 
+# Descarga con BITSAdmin  [medium]
+from * metadata _id, _index, _version | where EventID==1 and ends_with(Image, "\\bitsadmin.exe") and (CommandLine like "*/transfer*" or CommandLine like "*/create*" or CommandLine like "*/addfile*")
+
+# Certutil usado para descargar o decodificar  [high]
+from * metadata _id, _index, _version | where EventID==1 and ends_with(Image, "\\certutil.exe") and (CommandLine like "*urlcache*" or CommandLine like "*-decode*" or CommandLine like "*-decodehex*" or CommandLine like "*split*")
+
+# Manipulacion de Windows Defender  [high]
+from * metadata _id, _index, _version | where EventID==1 and (CommandLine like "*Set-MpPreference*" or CommandLine like "*DisableRealtimeMonitoring*" or CommandLine like "*DisableAntiSpyware*" or CommandLine like "*MpPreference -Exclusion*" or CommandLine like "*Add-MpPreference*")
+
+# Volcado de LSASS via comsvcs MiniDump  [critical]
+from * metadata _id, _index, _version | where EventID==1 and CommandLine like "*comsvcs.dll*" and CommandLine like "*MiniDump*"
+
+# Indicadores de Mimikatz en linea de comandos  [critical]
+from * metadata _id, _index, _version | where EventID==1 and (CommandLine like "*sekurlsa*" or CommandLine like "*logonpasswords*" or CommandLine like "*lsadump*" or CommandLine like "*privilege::debug*" or CommandLine like "*kerberos::*")
+
+# Ejecucion sospechosa de mshta  [high]
+from * metadata _id, _index, _version | where EventID==1 and ends_with(Image, "\\mshta.exe") and (CommandLine like "*http*" or CommandLine like "*javascript:*" or CommandLine like "*vbscript:*")
+
 # Creacion de cuenta local  [medium]
 from * metadata _id, _index, _version | where EventID==1 and CommandLine like "*net*" and CommandLine like "*user*" and CommandLine like "*/add*"
 
 # Documento de Office lanzando shell  [high]
 from * metadata _id, _index, _version | where EventID==1 and (ends_with(ParentImage, "\\winword.exe") or ends_with(ParentImage, "\\excel.exe") or ends_with(ParentImage, "\\powerpnt.exe") or ends_with(ParentImage, "\\outlook.exe")) and (ends_with(Image, "\\cmd.exe") or ends_with(Image, "\\powershell.exe") or ends_with(Image, "\\wscript.exe") or ends_with(Image, "\\cscript.exe") or ends_with(Image, "\\mshta.exe"))
 
+# Cradle de descarga en PowerShell  [high]
+from * metadata _id, _index, _version | where EventID==1 and ends_with(Image, "\\powershell.exe") and (CommandLine like "*DownloadString*" or CommandLine like "*DownloadFile*" or CommandLine like "*Net.WebClient*" or CommandLine like "*Invoke-WebRequest*" or CommandLine like "*IEX*" or CommandLine like "*Invoke-Expression*")
+
+# PowerShell con comando codificado  [high]
+from * metadata _id, _index, _version | where EventID==1 and ends_with(Image, "\\powershell.exe") and (CommandLine like "*-enc*" or CommandLine like "*-EncodedCommand*" or CommandLine like "* -e *")
+
+# Regsvr32 ejecutando scriptlet remoto (Squiblydoo)  [high]
+from * metadata _id, _index, _version | where EventID==1 and ends_with(Image, "\\regsvr32.exe") and (CommandLine like "*/i:http*" or CommandLine like "*scrobj.dll*")
+
+# Creacion de tarea programada via schtasks  [medium]
+from * metadata _id, _index, _version | where EventID==1 and ends_with(Image, "\\schtasks.exe") and CommandLine like "*/create*"
+
 # Creacion de servicio via sc.exe  [medium]
 from * metadata _id, _index, _version | where EventID==1 and ends_with(Image, "\\sc.exe") and CommandLine like "*create*" and (CommandLine like "*binPath*" or CommandLine like "*binpath=*")
 
+# Borrado de instantaneas (anti-recuperacion)  [critical]
+from * metadata _id, _index, _version | where EventID==1 and (CommandLine like "*delete shadows*" or CommandLine like "*shadowcopy delete*" or CommandLine like "*resize shadowstorage*")
+
+# Borrado de registros de eventos  [high]
+from * metadata _id, _index, _version | where EventID==1 and (CommandLine like "*wevtutil cl*" or CommandLine like "*wevtutil clear-log*" or CommandLine like "*Clear-EventLog*")
+
 # Ejecucion via WMIC process call create  [medium]
 from * metadata _id, _index, _version | where EventID==1 and ends_with(Image, "\\wmic.exe") and CommandLine like "*process*" and CommandLine like "*call*" and CommandLine like "*create*"
+
+# Persistencia por clave Run (registro)  [medium]
+from * metadata _id, _index, _version | where EventID==13 and (TargetObject like "*\\CurrentVersion\\Run\\*" or TargetObject like "*\\CurrentVersion\\RunOnce\\*")
 
 # Kerberoasting - solicitud masiva de tickets de servicio con RC4  [high]
 from * metadata _id, _index, _version | where EventID==4769 and TicketOptions=="0x40810000" and TicketEncryptionType=="0x17" and not (ends_with(ServiceName, "$") or ServiceName=="krbtgt")
