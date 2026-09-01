@@ -50,6 +50,7 @@ RE_TECNICA = re.compile(r"^attack\.(t\d{4})(?:\.(\d{3}))?$", re.I)
 RE_REF_ATTACK = re.compile(r"attack\.mitre\.org/techniques/(\S*)")
 
 ORDEN_TACTICAS = [
+    "reconnaissance", "resource-development",
     "initial-access", "execution", "persistence", "privilege-escalation",
     "defense-evasion", "credential-access", "discovery", "lateral-movement",
     "collection", "command-and-control", "exfiltration", "impact",
@@ -209,7 +210,7 @@ def revisar_deploy(reglas) -> list[str]:
     if not deploy.exists():
         return ["deploy/ no existe: ejecuta tools/build.py"]
 
-    conf = deploy / "splunk" / "savedsearches.conf"
+    conf = deploy / "splunk" / "reglas" / "savedsearches.conf"
     if conf.exists():
         texto = conf.read_text(encoding="utf-8")
         faltan = [r["title"] for r in reglas if f"[DL - {r['title']}]" not in texto]
@@ -217,13 +218,13 @@ def revisar_deploy(reglas) -> list[str]:
             problemas.append(f"savedsearches.conf: faltan {len(faltan)} reglas "
                              f"(la primera: {faltan[0]})")
     else:
-        problemas.append("falta deploy/splunk/savedsearches.conf")
+        problemas.append("falta deploy/splunk/reglas/savedsearches.conf")
 
     # EventID conservado alli donde es una columna real y no un implicito de la tabla.
     for r in reglas:
         if not re.search(r"^\s+EventID:", r["file"].read_text(encoding="utf-8"), re.M):
             continue
-        kql = deploy / "sentinel" / f"{r['dominio']}.kql"
+        kql = deploy / "sentinel" / "reglas" / f"{r['dominio']}.kql"
         if not kql.exists():
             continue
         cuerpo = kql.read_text(encoding="utf-8")
@@ -237,7 +238,7 @@ def revisar_deploy(reglas) -> list[str]:
     # Las correlaciones manuales siguen sincronizadas con su regla Sigma.
     # Se lee el valor de los dos lados y se comparan: cambiar solo uno es
     # exactamente el fallo que esta comprobacion existe para atrapar.
-    manual = deploy / "sentinel" / "correlaciones.kql"
+    manual = deploy / "sentinel" / "consultas" / "correlaciones.kql"
     if manual.exists():
         kql = manual.read_text(encoding="utf-8")
         for nombre, (re_umbral, re_ventana) in CORRELACIONES_MANUALES.items():
@@ -263,7 +264,48 @@ def revisar_deploy(reglas) -> list[str]:
                         f"{nombre}: {etiqueta} descuadrado — Sigma dice "
                         f"{en_sigma.group(1)} y correlaciones.kql dice {en_kql.group(1)}")
     else:
-        problemas.append("falta deploy/sentinel/correlaciones.kql")
+        problemas.append("falta deploy/sentinel/consultas/correlaciones.kql")
+
+    # Cada SIEM tiene que tener su guia y su carpeta de consultas: sin ellas el
+    # contenido esta pero nadie sabe como cargarlo, que en la practica es lo
+    # mismo que no tenerlo.
+    for siem in ("wazuh", "splunk", "sentinel", "elastic"):
+        base = deploy / siem
+        if not (base / "INSTALAR.md").exists():
+            problemas.append(f"falta deploy/{siem}/INSTALAR.md")
+        if not (base / "consultas").is_dir() or not any((base / "consultas").iterdir()):
+            problemas.append(f"deploy/{siem}/consultas/ vacia o inexistente")
+
+    # La capa de respuesta: que exista, y que el nodo compilado no este viejo.
+    pbs = RAIZ / "respuesta" / "playbooks"
+    if pbs.is_dir():
+        nodo = RAIZ / "integracion" / "shuffle" / "enrutador.py"
+        if not nodo.exists():
+            problemas.append("falta integracion/shuffle/enrutador.py "
+                             "(ejecuta tools/generar_enrutador.py)")
+        else:
+            mas_nuevo = max(f.stat().st_mtime for f in pbs.glob("*.yml"))
+            if mas_nuevo > nodo.stat().st_mtime:
+                problemas.append("el nodo de Shuffle es mas viejo que los playbooks: "
+                                 "regeneralo con tools/generar_enrutador.py y "
+                                 "vuelve a pegarlo en Shuffle")
+
+    # Las listas de inteligencia caducan; si estan, se avisa de su antiguedad.
+    resumen = RAIZ / "intel" / "listas" / "RESUMEN.md"
+    if resumen.exists():
+        m = re.search(r"\*\*Listas generadas:\*\* (\S+)", resumen.read_text(encoding="utf-8"))
+        if m:
+            from datetime import datetime, timezone
+            try:
+                gen = datetime.strptime(m.group(1), "%Y-%m-%dT%H:%M:%SZ").replace(
+                    tzinfo=timezone.utc)
+                dias = (datetime.now(timezone.utc) - gen).days
+                if dias > 7:
+                    problemas.append(
+                        f"las listas de inteligencia tienen {dias} dias: "
+                        f"ejecuta tools/sync_cti.py (los indicadores caducan)")
+            except ValueError:
+                pass
 
     return problemas
 

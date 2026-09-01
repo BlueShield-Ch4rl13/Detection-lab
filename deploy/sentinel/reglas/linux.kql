@@ -1,0 +1,72 @@
+// Generado por tools/build.py — no editar a mano
+// Dominio: linux  ·  pipeline: tools/pipelines/sentinel.yml + sentinel_asim
+
+// ─────────────────────────────────────────────────────────
+// Ejecucion de payload codificado en base64
+// Severidad: high  ·  ATT&CK: T1059.004, T1140
+// Origen: rules/linux/lin_base64_decode_exec.yml
+imProcessCreate
+| where (TargetProcessCommandLine contains "base64 -d" or TargetProcessCommandLine contains "base64 --decode" or TargetProcessCommandLine contains "base64 -di") and (TargetProcessCommandLine contains "|bash" or TargetProcessCommandLine contains "| bash" or TargetProcessCommandLine contains "|sh" or TargetProcessCommandLine contains "| sh" or TargetProcessCommandLine contains "eval")
+
+// ─────────────────────────────────────────────────────────
+// Permisos de ejecucion en /tmp o /dev/shm
+// Severidad: medium  ·  ATT&CK: T1222.002
+// Origen: rules/linux/lin_chmod_tmp_exec.yml
+imProcessCreate
+| where (TargetProcessCommandLine contains "chmod" and (TargetProcessCommandLine contains "/tmp/" or TargetProcessCommandLine contains "/dev/shm/" or TargetProcessCommandLine contains "/var/tmp/")) and (TargetProcessCommandLine contains "+x" or TargetProcessCommandLine contains "0755" or TargetProcessCommandLine contains "777")
+
+// ─────────────────────────────────────────────────────────
+// Persistencia por cron
+// Severidad: medium  ·  ATT&CK: T1053.003
+// Origen: rules/linux/lin_cron_persistence.yml
+imProcessCreate
+| where TargetProcessCommandLine contains "crontab -" or TargetProcessCommandLine contains "/etc/cron.d/" or TargetProcessCommandLine contains "/etc/crontab" or TargetProcessCommandLine contains "/var/spool/cron"
+
+// ─────────────────────────────────────────────────────────
+// Deshabilitar historial de shell (anti-forense)
+// Severidad: medium  ·  ATT&CK: T1070.003
+// Origen: rules/linux/lin_disable_history.yml
+imProcessCreate
+| where TargetProcessCommandLine contains "unset HISTFILE" or TargetProcessCommandLine contains "HISTFILE=/dev/null" or TargetProcessCommandLine contains "HISTSIZE=0" or TargetProcessCommandLine contains "export HISTSIZE=0"
+
+// ─────────────────────────────────────────────────────────
+// Descarga tuberia a shell (curl|bash)
+// Severidad: high  ·  ATT&CK: T1059.004, T1105
+// Origen: rules/linux/lin_download_pipe_shell.yml
+imProcessCreate
+| where (TargetProcessCommandLine contains "curl" or TargetProcessCommandLine contains "wget") and (TargetProcessCommandLine contains "|bash" or TargetProcessCommandLine contains "| bash" or TargetProcessCommandLine contains "|sh" or TargetProcessCommandLine contains "| sh")
+
+// ─────────────────────────────────────────────────────────
+// Modificacion de ld.so.preload (rootkit)
+// Severidad: critical  ·  ATT&CK: T1574.006
+// Origen: rules/linux/lin_ld_preload.yml
+imProcessCreate
+| where TargetProcessCommandLine contains "/etc/ld.so.preload"
+
+// ─────────────────────────────────────────────────────────
+// Lectura de /etc/shadow
+// Severidad: high  ·  ATT&CK: T1003.008
+// Origen: rules/linux/lin_read_shadow.yml
+imProcessCreate
+| where TargetProcessCommandLine contains "/etc/shadow"
+
+// ─────────────────────────────────────────────────────────
+// Shell inversa (bash /dev/tcp)
+// Severidad: high  ·  ATT&CK: T1059.004
+// Origen: rules/linux/lin_reverse_shell.yml
+imProcessCreate
+| where TargetProcessCommandLine contains "/dev/tcp/" or TargetProcessCommandLine contains "/dev/udp/" or TargetProcessCommandLine contains "bash -i" or TargetProcessCommandLine contains "sh -i"
+
+// ─────────────────────────────────────────────────────────
+// Adicion de clave SSH (authorized_keys)
+// Severidad: high  ·  ATT&CK: T1098.004
+// Origen: rules/linux/lin_ssh_authorized_keys.yml
+imProcessCreate
+| where TargetProcessCommandLine contains "authorized_keys" and (TargetProcessCommandLine contains "echo" or TargetProcessCommandLine contains "tee" or TargetProcessCommandLine contains ">>" or TargetProcessCommandLine contains ">" or TargetProcessCommandLine contains "cat")
+
+// ─────────────────────────────────────────────────────────
+// Creacion o modificacion de cuenta
+// Severidad: medium  ·  ATT&CK: T1136.001
+// Origen: rules/linux/lin_useradd.yml
+imProcessCreate
+| where TargetProcessName endswith "/useradd" or TargetProcessName endswith "/usermod" or TargetProcessName endswith "/adduser"

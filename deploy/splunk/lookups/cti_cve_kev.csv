@@ -1,0 +1,21 @@
+cve,vendor,product,name,date_added,ransomware
+CVE-2023-49105,ownCloud,ownCloud,ownCloud Improper Authentication Vulnerability,2026-08-27,Unknown
+CVE-2026-53362,Linux,Kernel,Linux Kernel Unspecified Vulnerability,2026-08-27,Unknown
+CVE-2026-66384,JFrog,Artifactory,JFrog Artifactory Improper Limitation of a Pathname to a Restricted Directory Vulnerability,2026-08-27,Unknown
+CVE-2021-23758,Ajax.NET Professional,Ajax.NET Professional,Ajax.NET Professional Deserialization of Untrusted Data Vulnerability,2026-08-26,Unknown
+CVE-2015-3246,Red Hat,Libuser,Red Hat Libuser Race Condition Vulnerability,2026-08-26,Unknown
+CVE-2015-5287,Red Hat,Automatic Bug Reporting Tool,Red Hat Automatic Bug Reporting Tool Privilege Escalation Vulnerability,2026-08-26,Unknown
+CVE-2022-0995,Linux,Kernel,Linux Kernel Out-of-Bounds Write Vulnerability,2026-08-26,Unknown
+CVE-2026-8452,Citrix,NetScaler ADC and NetScaler Gateway,Citrix NetScaler ADC and NetScaler Gateway Improper Restriction of Operations within the Bounds of a Memory Buffer Vulnerability,2026-08-26,Unknown
+CVE-2019-1068,Microsoft,SQL Server,Microsoft SQL Server Remote Code Execution Vulnerability,2026-08-26,Unknown
+CVE-2026-60004,Gitea,Gitea,Gitea Code Injection Vulnerability,2026-08-25,Unknown
+CVE-2026-21962,Oracle,HTTP Server and Oracle Weblogic Server Proxy Plug-in,Oracle HTTP Server and Oracle Weblogic Server Proxy Plug-in Improper Access Control Vulnerability,2026-08-24,Unknown
+CVE-2026-73570,Synacor,Zimbra Collaboration Suite (ZCS),Zimbra Collaboration Suite (ZCS) OS Command Injection Vulnerability,2026-08-21,Unknown
+CVE-2026-72530,TrueConf,Server,TrueConf Server Code Injection Vulnerability,2026-08-20,Unknown
+CVE-2026-72529,TrueConf,Server,TrueConf Server Missing Authentication for Critical Function Vulnerability,2026-08-20,Unknown
+CVE-2026-64849,MLflow,MLflow,MLflow Server-Side Request Forgery Vulnerability,2026-08-19,Unknown
+CVE-2026-33824,Microsoft,Internet Key Exchange (IKE) Service Extensions,Microsoft Internet Key Exchange (IKE) Service Extensions Double Free Vulnerability,2026-08-18,Unknown
+CVE-2026-59310,Broadcom,VMware vCenter,Broadcom VMware vCenter Path Traversal Vulnerability,2026-08-18,Unknown
+CVE-2026-55040,Microsoft,SharePoint,Microsoft SharePoint Weak Authentication Vulnerability,2026-08-18,Unknown
+CVE-2026-65400,Apple,macOS,Apple macOS Improper Authentication Vulnerability,2026-08-18,Unknown
+CVE-2025-62593,Ray-Project,Ray,Ray-Project Ray Code Injection Vulnerability,2026-08-17,Unknown

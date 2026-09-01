@@ -1,0 +1,195 @@
+<!--
+  ZTA Detection Pack - Librerias y cadena de suministro software
+  Marco: NIST SP 800-207 + CISA ZTMM 2.0
+  Rango de IDs: 100500-100599
+
+  Encaje en el modelo: CISA situa este bloque en dos funciones,
+    - Devices > Asset & Supply Chain Risk Management
+    - Applications and Workloads > Secure Application Development and
+      Deployment Workflow
+  El principio Zero Trust aplicable es el Tenet 1 de NIST 800-207: toda
+  fuente de datos y servicio informatico es un recurso, tambien las
+  dependencias de terceros que se cargan en tiempo de ejecucion.
+
+  Listas CDB necesarias:
+      etc/lists/zta_allowed_registries  (registros de contenedor aprobados)
+-->
+<group name="zta,zta_supply_chain,">
+
+  <!-- ================================================================
+       ZTA-SUP-001 | Carga de libreria desde una ruta no estandar
+       CISA: Devices > Asset & Supply Chain Risk Management | Advanced
+       Requiere Sysmon (EventID 7) en Windows o auditd en Linux.
+       ================================================================ -->
+  <rule id="100500" level="12">
+    <if_group>sysmon_event7</if_group>
+    <field name="win.eventdata.imageLoaded" type="pcre2">(?i)\\(users|programdata|temp|appdata|public|windows\\temp)\\.*\.dll$</field>
+    <description>ZTA-SUP-001: Libreria cargada desde una ruta no estandar en $(hostname): $(win.eventdata.imageLoaded). Posible DLL sideloading.</description>
+    <mitre>
+      <id>T1574.002</id>
+    </mitre>
+    <nist_800_53>SI.7,SR.4</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_supply_chain,zta_SUP-001,cisa_asset_supply_chain,ztmm_advanced,</group>
+    <info type="text">playbook=zta; severidad_thehive=3; origen=0940-zta_supplychain_rules.xml</info>
+  </rule>
+
+  <rule id="100501" level="10">
+    <if_group>audit</if_group>
+    <field name="audit.file.name" type="pcre2">^/(tmp|dev/shm|home/[^/]+/\.cache)/.*\.so(\.[0-9]+)*$</field>
+    <description>ZTA-SUP-001: Objeto compartido cargado desde una ruta no confiable en $(hostname): $(audit.file.name)</description>
+    <mitre>
+      <id>T1574.006</id>
+    </mitre>
+    <nist_800_53>SI.7,SR.4</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_supply_chain,zta_SUP-001,cisa_asset_supply_chain,ztmm_advanced,</group>
+    <info type="text">playbook=zta; severidad_thehive=2; origen=0940-zta_supplychain_rules.xml</info>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-SUP-002 | Instalacion de paquete desde un repositorio no aprobado
+       CISA: Devices > Asset & Supply Chain Risk Management | Advanced
+       ================================================================ -->
+  <rule id="100502" level="10">
+    <if_group>syslog|audit</if_group>
+    <regex type="pcre2">(?i)(pip|pip3)\s+install\s+.*(--index-url|--extra-index-url|-i\s+https?://|git\+https?://)</regex>
+    <description>ZTA-SUP-002: Instalacion de paquete Python desde un indice externo en $(hostname). Dependencia fuera de la cadena de suministro aprobada.</description>
+    <mitre>
+      <id>T1195.001</id>
+    </mitre>
+    <nist_800_53>SR.3,CM.7</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_supply_chain,zta_SUP-002,cisa_asset_supply_chain,ztmm_advanced,</group>
+    <info type="text">playbook=zta; severidad_thehive=2; origen=0940-zta_supplychain_rules.xml</info>
+  </rule>
+
+  <rule id="100503" level="10">
+    <if_group>syslog|audit</if_group>
+    <regex type="pcre2">(?i)npm\s+(install|i)\s+.*(--registry|git\+|https?://)</regex>
+    <description>ZTA-SUP-002: Instalacion de paquete npm desde un registro no aprobado en $(hostname).</description>
+    <mitre>
+      <id>T1195.001</id>
+    </mitre>
+    <nist_800_53>SR.3,CM.7</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_supply_chain,zta_SUP-002,cisa_asset_supply_chain,ztmm_advanced,</group>
+    <info type="text">playbook=zta; severidad_thehive=2; origen=0940-zta_supplychain_rules.xml</info>
+  </rule>
+
+  <rule id="100504" level="12">
+    <if_group>syslog|audit</if_group>
+    <regex type="pcre2">(?i)curl\s+[^|]*\|\s*(sudo\s+)?(bash|sh)|wget\s+[^|]*\|\s*(sudo\s+)?(bash|sh)</regex>
+    <description>ZTA-SUP-002: Ejecucion directa de un script descargado de Internet en $(hostname). Instalacion sin verificacion de integridad.</description>
+    <mitre>
+      <id>T1195.002</id>
+    </mitre>
+    <nist_800_53>SR.4,CM.7</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_supply_chain,zta_SUP-002,cisa_asset_supply_chain,ztmm_advanced,</group>
+    <info type="text">playbook=zta; severidad_thehive=3; origen=0940-zta_supplychain_rules.xml</info>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-SUP-003 | Patron de explotacion de libreria vulnerable
+       CISA: Applications > Application Threat Protections | Initial
+       Cubre las familias mas explotadas: JNDI (Log4Shell), deserializacion
+       Java, expresiones SpEL/OGNL y prototype pollution.
+       ================================================================ -->
+  <rule id="100505" level="14">
+    <if_group>web|web_log|suricata</if_group>
+    <regex type="pcre2">(?i)\$\{jndi:(ldap|ldaps|rmi|dns|iiop|corba|nis|nds)://</regex>
+    <description>ZTA-SUP-003: Intento de explotacion JNDI (tipo Log4Shell) contra $(hostname) desde $(srcip).</description>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+    <nist_800_53>SI.3,SR.4</nist_800_53>
+    <group>detectionlab,auto_contener,zta_supply_chain,zta_SUP-003,cisa_application_threat_protections,ztmm_initial,</group>
+    <info type="text">playbook=zta; severidad_thehive=4; origen=0940-zta_supplychain_rules.xml</info>
+  </rule>
+
+  <rule id="100506" level="13">
+    <if_group>web|web_log|suricata</if_group>
+    <regex type="pcre2">(?i)(rO0AB[A-Za-z0-9+/=]{20,}|aced0005|%24%7Bjndi|__proto__|constructor\[prototype\])</regex>
+    <description>ZTA-SUP-003: Patron de explotacion de libreria de terceros (deserializacion o prototype pollution) desde $(srcip).</description>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+    <nist_800_53>SI.3,SR.4</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_supply_chain,zta_SUP-003,cisa_application_threat_protections,ztmm_initial,</group>
+    <info type="text">playbook=zta; severidad_thehive=3; origen=0940-zta_supplychain_rules.xml</info>
+  </rule>
+
+  <rule id="100507" level="13">
+    <if_group>web|web_log|suricata</if_group>
+    <regex type="pcre2">(?i)(\$\{\s*T\(java\.lang\.Runtime\)|%\{\(#|\@java\.lang\.Runtime\@)</regex>
+    <description>ZTA-SUP-003: Intento de inyeccion de expresiones (SpEL/OGNL) contra una libreria de aplicacion desde $(srcip).</description>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+    <nist_800_53>SI.3,SR.4</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_supply_chain,zta_SUP-003,cisa_application_threat_protections,ztmm_initial,</group>
+    <info type="text">playbook=zta; severidad_thehive=3; origen=0940-zta_supplychain_rules.xml</info>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-SUP-004 | Componente con CVE critico en el inventario
+       CISA: Devices > Asset & Supply Chain Risk Management | Advanced
+       Se apoya en Syscollector + Vulnerability Detector.
+       ================================================================ -->
+  <rule id="100508" level="12">
+    <if_group>vulnerability-detector</if_group>
+    <field name="data.vulnerability.severity">^Critical$|^High$</field>
+    <field name="data.vulnerability.package.name" type="pcre2">(?i)(log4j|openssl|struts|spring|jackson|commons-|libxml|glibc|zlib|curl|node|python3|openssh)</field>
+    <description>ZTA-SUP-004: Componente de terceros vulnerable en $(hostname): $(data.vulnerability.package.name) - $(data.vulnerability.cve)</description>
+    <mitre>
+      <id>T1195</id>
+    </mitre>
+    <nist_800_53>SR.3,RA.5</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_supply_chain,zta_SUP-004,cisa_asset_supply_chain,ztmm_advanced,</group>
+    <info type="text">playbook=zta; severidad_thehive=3; origen=0940-zta_supplychain_rules.xml</info>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-SUP-005 | Modificacion de fichero de dependencias o lockfile
+       CISA: Applications > Secure Application Development and Deployment | Advanced
+       Un cambio de lockfile en produccion rompe la integridad del artefacto.
+       ================================================================ -->
+  <rule id="100509" level="12">
+    <if_group>syscheck</if_group>
+    <field name="file" type="pcre2">(requirements\.txt|package-lock\.json|yarn\.lock|pnpm-lock\.yaml|Pipfile\.lock|poetry\.lock|go\.sum|Gemfile\.lock|pom\.xml|composer\.lock)$</field>
+    <description>ZTA-SUP-005: Fichero de dependencias modificado en $(hostname): $(file). Verificar que procede de un despliegue aprobado.</description>
+    <mitre>
+      <id>T1195.001</id>
+    </mitre>
+    <nist_800_53>CM.3,SR.4</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_supply_chain,zta_SUP-005,cisa_secure_app_dev,ztmm_advanced,</group>
+    <info type="text">playbook=zta; severidad_thehive=3; origen=0940-zta_supplychain_rules.xml</info>
+  </rule>
+
+  <rule id="100510" level="13">
+    <if_group>syscheck</if_group>
+    <field name="file" type="pcre2">(site-packages|node_modules|/usr/lib/python3|vendor/)/.*\.(py|js|so)$</field>
+    <description>ZTA-SUP-005: Fichero de una libreria instalada modificado en tiempo de ejecucion en $(hostname): $(file). Posible manipulacion de dependencia.</description>
+    <mitre>
+      <id>T1574</id>
+    </mitre>
+    <nist_800_53>SI.7,SR.4</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_supply_chain,zta_SUP-005,cisa_secure_app_dev,ztmm_advanced,</group>
+    <info type="text">playbook=zta; severidad_thehive=3; origen=0940-zta_supplychain_rules.xml</info>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-SUP-006 | Imagen de contenedor desde un registro no aprobado
+       CISA: Devices > Asset & Supply Chain Risk Management | Advanced
+       ================================================================ -->
+  <rule id="100511" level="10">
+    <if_group>docker</if_group>
+    <field name="data.Type">^image$</field>
+    <field name="data.Action">^pull$</field>
+    <list field="data.Actor.ID" lookup="not_match_key">etc/lists/zta_allowed_registries</list>
+    <description>ZTA-SUP-006: Descarga de la imagen $(data.Actor.ID) desde un registro no aprobado.</description>
+    <mitre>
+      <id>T1610</id>
+    </mitre>
+    <nist_800_53>SR.3,CM.7</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_supply_chain,zta_SUP-006,cisa_asset_supply_chain,ztmm_advanced,</group>
+    <info type="text">playbook=zta; severidad_thehive=2; origen=0940-zta_supplychain_rules.xml</info>
+  </rule>
+
+</group>

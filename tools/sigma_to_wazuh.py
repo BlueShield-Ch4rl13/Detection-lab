@@ -47,10 +47,65 @@ import yaml
 
 RAIZ = Path(__file__).resolve().parent.parent
 SIGMA = RAIZ / "rules"
-SALIDA = RAIZ / "deploy" / "wazuh" / "0970-detection_lab_sigma.xml"
+SALIDA = RAIZ / "deploy" / "wazuh" / "reglas" / "0970-detection_lab_sigma.xml"
 
 ID_BASE = 101000          # rango reservado a las reglas generadas
 ID_TOPE = 101999
+
+# ---------------------------------------------------------------------------
+# Nivel de automatizacion (contrato con Infra-SocAnalyst)
+#
+# El pipeline SOAR del SOC decide que hace con una alerta segun este grupo. Va
+# en el XML porque el script de integracion solo ve la alerta de Wazuh: no
+# puede volver a leer la regla Sigma para saber su severidad original.
+#
+# El mapeo NO es "severidad alta = mas automatizacion". Es al reves de lo que
+# parece: cuanto mas grave es la deteccion, mas cara es una accion automatica
+# equivocada. Por eso lo critico contiene solo lo reversible y despierta a una
+# persona, en vez de actuar por su cuenta.
+#
+#   auto_cierre  -> se registra y se cierra. Sin analista, sin LLM.
+#   auto_enriq   -> se enriquece y se encola. Sin LLM, sin notificacion.
+#   auto_analisis-> pipeline completo con Ollama y caso en TheHive.
+#   auto_contener-> lo anterior mas contencion reversible y aviso inmediato.
+AUTOMATIZACION = {
+    "informational": "auto_cierre",
+    "low": "auto_enriq",
+    "medium": "auto_analisis",
+    "high": "auto_analisis",
+    "critical": "auto_contener",
+}
+
+# Severidad de TheHive (1-4) derivada del nivel SIGMA, no del nivel Wazuh.
+#
+# Por que hace falta: el pipeline del SOC mapea nivel de Wazuh a severidad, y
+# su umbral superior es >=12. Como aqui high tambien es 12, el 75% de estas
+# reglas aterrizaria como severidad 4 y la cola dejaria de estar priorizada.
+# Llevando la severidad ya calculada en la alerta, cada regla cae donde debe.
+SEVERIDAD_THEHIVE = {
+    "informational": 1, "low": 1, "medium": 2, "high": 3, "critical": 4,
+}
+
+
+def familia_playbook(ruta) -> str:
+    """Familia de playbook de una regla, para que el SOAR sepa que hacer.
+
+    Sale de la CARPETA, no del nombre del fichero. Derivarla del nombre
+    funcionaba mientras todas las reglas se llamaban soc_XX_NNN, y se rompio en
+    cuanto entraron web_001, cred_001 o mac_tcc: producia familias como '001',
+    'osascript' o 'usuario', y el enrutador de respuesta no encontraba playbook.
+    La carpeta es estable y significa algo.
+    """
+    dominio = ruta.parent.name
+    if dominio != "windows":
+        return dominio
+    # rules/windows/ mezcla tres familias con playbooks muy distintos.
+    n = ruta.stem
+    if n.startswith(("soc_ad_", "ad_")):
+        return "ad"
+    if n.startswith("cred_"):
+        return "credenciales"
+    return "endpoint"
 
 NIVEL = {                 # nivel Sigma -> nivel Wazuh
     # Nivel 0 en Wazuh significa "no generes alerta". Es lo correcto para las
@@ -395,8 +450,20 @@ def convertir(ruta: Path, ident: int) -> tuple[list[str], int, list[str]]:
                     partes.append(f"      <id>{t}</id>")
                 partes.append("    </mitre>")
             grupo = soc_id.lower().replace("-", "_")
-            familia = soc_id.split("-")[1].lower()
-            partes.append(f"    <group>soc_sigma,soc_{familia},{grupo},</group>")
+            familia = familia_playbook(ruta)
+            sev_sigma = doc.get("level", "medium")
+            # 'detectionlab' es el grupo por el que filtra la integracion del SOC.
+            # Sin el, estas reglas disparan en Wazuh y no llegan al SOAR: se ven
+            # en el dashboard y no abren caso, que es el peor sitio donde estar.
+            grupos = ["detectionlab", "soc_sigma", f"soc_{familia}", grupo,
+                      AUTOMATIZACION.get(sev_sigma, "auto_analisis"),
+                      f"sev_{sev_sigma}"]
+            partes.append(f"    <group>{','.join(grupos)},</group>")
+            # El campo de informacion viaja en la alerta y es lo que lee el
+            # enrutador de respuesta para elegir playbook.
+            partes.append(f'    <info type="text">playbook={familia}; '
+                          f'severidad_thehive={SEVERIDAD_THEHIVE.get(sev_sigma, 2)}; '
+                          f'origen={ruta.name}</info>')
             partes.append("  </rule>")
             xml.append("\n".join(partes))
             ident += 1
@@ -436,7 +503,7 @@ def main() -> int:
 
   Reglas generadas: {len(bloques)}  |  desde {len(ficheros)} ficheros Sigma
 -->
-<group name="soc,soc_sigma,">
+<group name="soc,soc_sigma,detectionlab,">
 
 """
     contenido = cabecera + "\n\n".join(bloques) + "\n\n</group>\n"

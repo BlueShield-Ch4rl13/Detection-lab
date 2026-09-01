@@ -1,0 +1,186 @@
+<!--
+  ZTA Detection Pack - Pilares 4 y 5: Aplicaciones/Cargas y Datos
+  Marco: NIST SP 800-207 + CISA ZTMM 2.0
+  Rango de IDs: 100400-100499 (aplicaciones 100400-100449, datos 100450-100499)
+
+  Listas CDB necesarias:
+      etc/lists/zta_pep_sources          (IPs del proxy ZTNA / PEP)
+      etc/lists/zta_data_classification  (rutas de datos clasificados)
+-->
+<group name="zta,zta_applications,zta_data,">
+
+  <!-- ================================================================
+       ZTA-APP-001 | Acceso a la aplicacion sin pasar por el PEP
+       CISA: Applications and Workloads > Application Access | Advanced
+       NIST 800-207 seccion 3.1: todo acceso debe atravesar el Policy
+       Enforcement Point. Un acceso directo al backend lo invalida.
+       ================================================================ -->
+  <rule id="100400" level="12">
+    <if_group>web|web_log</if_group>
+    <list field="srcip" lookup="not_address_match_key">etc/lists/zta_pep_sources</list>
+    <description>ZTA-APP-001: Acceso a la aplicacion desde $(srcip) sin atravesar el Policy Enforcement Point. Bypass del PEP.</description>
+    <mitre>
+      <id>T1133</id>
+    </mitre>
+    <nist_800_53>AC.3,AC.17</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_applications,zta_APP-001,cisa_application_access,ztmm_advanced,</group>
+    <info type="text">playbook=zta; severidad_thehive=3; origen=0930-zta_apps_data_rules.xml</info>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-APP-002 | Explotacion web contra una aplicacion publicada
+       CISA: Applications and Workloads > Application Threat Protections | Initial
+       ================================================================ -->
+  <rule id="100401" level="12">
+    <if_group>suricata</if_group>
+    <field name="data.alert.category">Web Application Attack|Attempted Administrator Privilege Gain|Attempted User Privilege Gain</field>
+    <description>ZTA-APP-002: Intento de explotacion web contra $(data.dest_ip): $(data.alert.signature)</description>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+    <nist_800_53>SI.3,SI.10</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_applications,zta_APP-002,cisa_application_threat_protections,ztmm_initial,</group>
+    <info type="text">playbook=zta; severidad_thehive=3; origen=0930-zta_apps_data_rules.xml</info>
+  </rule>
+
+  <rule id="100402" level="10">
+    <if_group>web|web_log</if_group>
+    <field name="url" type="pcre2">(?i)(\.\./\.\./|union\s+select|&lt;script&gt;|/etc/passwd|cmd\.exe|base64_decode)</field>
+    <description>ZTA-APP-002: Patron de explotacion en la peticion web desde $(srcip): $(url)</description>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+    <nist_800_53>SI.3,SI.10</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_applications,zta_APP-002,cisa_application_threat_protections,ztmm_initial,</group>
+    <info type="text">playbook=zta; severidad_thehive=2; origen=0930-zta_apps_data_rules.xml</info>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-APP-003 | Escritura de posible webshell
+       CISA: Applications > Secure Application Development and Deployment | Advanced
+       Requiere syscheck en modo realtime sobre el docroot.
+       ================================================================ -->
+  <rule id="100403" level="13">
+    <if_group>syscheck</if_group>
+    <field name="file" type="pcre2">(/var/www/|/usr/share/nginx/html/|inetpub.wwwroot).*\.(php|jsp|jspx|asp|aspx|ashx|phtml)$</field>
+    <description>ZTA-APP-003: Fichero ejecutable web creado o modificado en el directorio de publicacion de $(hostname): $(file). Posible webshell.</description>
+    <mitre>
+      <id>T1505.003</id>
+    </mitre>
+    <nist_800_53>SI.7,SA.11</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_applications,zta_APP-003,cisa_secure_app_dev,ztmm_advanced,</group>
+    <info type="text">playbook=zta; severidad_thehive=3; origen=0930-zta_apps_data_rules.xml</info>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-APP-004 | Contenedor privilegiado o socket de Docker montado
+       CISA: Applications > Secure Application Development and Deployment | Advanced
+       Requiere el modulo docker-listener activo en ossec.conf.
+       ================================================================ -->
+  <rule id="100404" level="12">
+    <if_group>docker</if_group>
+    <field name="data.Actor.Attributes.privileged">^true$</field>
+    <description>ZTA-APP-004: Contenedor lanzado en modo privilegiado. Rompe el aislamiento de la carga de trabajo.</description>
+    <mitre>
+      <id>T1610</id>
+    </mitre>
+    <nist_800_53>CM.7,AC.6</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_applications,zta_APP-004,cisa_secure_app_dev,ztmm_advanced,</group>
+    <info type="text">playbook=zta; severidad_thehive=3; origen=0930-zta_apps_data_rules.xml</info>
+  </rule>
+
+  <rule id="100405" level="13">
+    <if_group>syscheck|syslog|audit</if_group>
+    <match>/var/run/docker.sock</match>
+    <description>ZTA-APP-004: Acceso o montaje del socket de Docker detectado en $(hostname). Equivale a acceso root al nodo.</description>
+    <mitre>
+      <id>T1610</id>
+    </mitre>
+    <nist_800_53>CM.7,AC.6</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_applications,zta_APP-004,cisa_secure_app_dev,ztmm_advanced,</group>
+    <info type="text">playbook=zta; severidad_thehive=3; origen=0930-zta_apps_data_rules.xml</info>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-DAT-001 | Acceso masivo a datos clasificados
+       CISA: Data > Data Access | Advanced
+       Requiere auditd con reglas de watch sobre las rutas clasificadas.
+       ================================================================ -->
+  <rule id="100450" level="0">
+    <if_group>audit</if_group>
+    <list field="audit.file.name" lookup="match_key">etc/lists/zta_data_classification</list>
+    <description>ZTA base: acceso a un fichero clasificado.</description>
+    <group>detectionlab,auto_cierre,zta_base,</group>
+    <info type="text">playbook=zta; severidad_thehive=1; origen=0930-zta_apps_data_rules.xml</info>
+  </rule>
+
+  <rule id="100451" level="12" frequency="50" timeframe="300">
+    <if_matched_sid>100450</if_matched_sid>
+    <same_user />
+    <description>ZTA-DAT-001: El usuario $(audit.uid) ha accedido a un volumen anomalo de ficheros clasificados en 5 minutos. Posible staging previo a exfiltracion.</description>
+    <mitre>
+      <id>T1530</id>
+    </mitre>
+    <nist_800_53>AC.3,AU.6</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_data,zta_DAT-001,cisa_data_access,ztmm_advanced,</group>
+    <info type="text">playbook=zta; severidad_thehive=3; origen=0930-zta_apps_data_rules.xml</info>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-DAT-002 | Volumen de subida anomalo hacia destino externo
+       CISA: Data > Data Access | Advanced
+       El calculo por percentiles se hace en Splunk; aqui se usa umbral fijo.
+       ================================================================ -->
+  <rule id="100452" level="12">
+    <if_group>suricata</if_group>
+    <field name="data.event_type">^flow$</field>
+    <field name="data.flow.bytes_toserver" type="pcre2">^[0-9]{9,}$</field>
+    <field name="data.dest_ip" negate="yes">^10\.|^172\.(1[6-9]|2[0-9]|3[01])\.|^192\.168\.</field>
+    <description>ZTA-DAT-002: Transferencia saliente superior a 100 MB desde $(data.src_ip) hacia $(data.dest_ip). Posible exfiltracion.</description>
+    <mitre>
+      <id>T1567</id>
+    </mitre>
+    <nist_800_53>SC.7,AU.6</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_data,zta_DAT-002,cisa_data_access,ztmm_advanced,</group>
+    <info type="text">playbook=zta; severidad_thehive=3; origen=0930-zta_apps_data_rules.xml</info>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-DAT-003 | Acceso a datos clasificados desde equipo no conforme
+       CISA: Data > Data Categorization | Optimal
+       Correlaciona ZTA-DEV-003 (100203) con el acceso al dato.
+       Es el control mas puramente Zero Trust del paquete: la decision de
+       acceso depende de la postura del equipo en ese momento.
+       ================================================================ -->
+  <rule id="100453" level="13" frequency="2" timeframe="3600">
+    <if_matched_sid>100203</if_matched_sid>
+    <if_sid>100450</if_sid>
+    <same_location />
+    <description>ZTA-DAT-003: Acceso a datos clasificados desde un equipo que ha fallado el baseline Zero Trust. La politica de acceso dinamica no se esta aplicando.</description>
+    <mitre>
+      <id>T1530</id>
+    </mitre>
+    <nist_800_53>AC.3,CM.6</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_data,zta_DAT-003,cisa_data_categorization,ztmm_optimal,</group>
+    <info type="text">playbook=zta; severidad_thehive=3; origen=0930-zta_apps_data_rules.xml</info>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-DAT-004 | Copia de datos a un medio no aprobado
+       CISA: Data > Data Access | Advanced
+       Correlaciona con ZTA-DEV-006 (almacenamiento extraible).
+       ================================================================ -->
+  <rule id="100454" level="12" frequency="2" timeframe="900">
+    <if_matched_sid>100207</if_matched_sid>
+    <if_sid>100450</if_sid>
+    <same_location />
+    <description>ZTA-DAT-004: Acceso a datos clasificados poco despues de conectarse un dispositivo extraible en $(hostname). Posible copia a medio no aprobado.</description>
+    <mitre>
+      <id>T1052.001</id>
+    </mitre>
+    <nist_800_53>MP.7,AC.3</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_data,zta_DAT-004,cisa_data_access,ztmm_advanced,</group>
+    <info type="text">playbook=zta; severidad_thehive=3; origen=0930-zta_apps_data_rules.xml</info>
+  </rule>
+
+</group>

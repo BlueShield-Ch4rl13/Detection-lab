@@ -1,0 +1,58 @@
+// Generado por tools/build.py — no editar a mano
+// Dominio: zta  ·  pipeline: tools/pipelines/sentinel.yml + sentinel_asim
+
+// ─────────────────────────────────────────────────────────
+// Montaje de almacenamiento extraible
+// Severidad: medium  ·  ATT&CK: T1052.001, T1091
+// Origen: rules/zta/zta_dev_001_almacenamiento_extraible.yml
+SecurityEvent
+| where EventID == 6416 and (ClassName contains "DiskDrive" or ClassName contains "USB" or ClassName contains "WPD")
+
+// ─────────────────────────────────────────────────────────
+// Uso de protocolo de autenticacion heredado
+// Severidad: high  ·  ATT&CK: T1078.004, T1556.006
+// Origen: rules/zta/zta_id_001_autenticacion_heredada.yml
+SigninLogs
+| where ResultType =~ "0" and (ClientAppUsed in~ ("IMAP4", "POP3", "SMTP", "MAPI Over HTTP", "Exchange ActiveSync", "Other clients", "Authenticated SMTP", "Exchange Web Services"))
+
+// ─────────────────────────────────────────────────────────
+// Cuenta de servicio con inicio de sesion interactivo
+// Severidad: high  ·  ATT&CK: T1078.002
+// Origen: rules/zta/zta_id_002_cuenta_servicio_interactiva.yml
+SecurityEvent
+| where (EventID == 4624 and (LogonType in~ ("2", "7", "10", "11"))) and (TargetUserName startswith "svc_" or TargetUserName startswith "srv_" or TargetUserName startswith "sa_" or TargetUserName startswith "app_") and (not(TargetUserName endswith "$"))
+
+// ─────────────────────────────────────────────────────────
+// Protocolo en claro hacia un recurso que exige cifrado
+// Severidad: medium  ·  ATT&CK: T1040
+// Origen: rules/zta/zta_net_001_protocolo_en_claro.yml
+imNetworkSession
+| where (DstPortNumber in~ ("21", "23", "69", "110", "143", "389", "512", "513", "514")) and NetworkDirection =~ "true"
+
+// ─────────────────────────────────────────────────────────
+// Carga de libreria desde una ruta no estandar
+// Severidad: high  ·  ATT&CK: T1574.001, T1574.002
+// Origen: rules/zta/zta_sup_001_libreria_ruta_no_estandar.yml
+DeviceImageLoadEvents
+| where (FolderPath contains "\\AppData\\Local\\Temp\\" or FolderPath contains "\\AppData\\Roaming\\" or FolderPath contains "\\Users\\Public\\" or FolderPath contains "\\ProgramData\\" or FolderPath contains "\\Windows\\Temp\\" or FolderPath contains "\\$Recycle.Bin\\") and FolderPath endswith ".dll" and (not(((IsSigned =~ "true" and SignatureStatus =~ "Valid") or (InitiatingProcessFolderPath endswith "\\msiexec.exe" or InitiatingProcessFolderPath endswith "\\TrustedInstaller.exe" or InitiatingProcessFolderPath endswith "\\setup.exe"))))
+
+// ─────────────────────────────────────────────────────────
+// Instalacion de paquete desde un repositorio no aprobado
+// Severidad: medium  ·  ATT&CK: T1195.001, T1195.002
+// Origen: rules/zta/zta_sup_002_paquete_repositorio_no_aprobado.yml
+imProcessCreate
+| where (TargetProcessName endswith "/pip" or TargetProcessName endswith "/pip3" or TargetProcessName endswith "/npm" or TargetProcessName endswith "/yarn" or TargetProcessName endswith "/gem" or TargetProcessName endswith "/go" or TargetProcessName endswith "/cargo" or TargetProcessName endswith "/composer") and ((TargetProcessCommandLine contains "install git+" or TargetProcessCommandLine contains "install http://" or TargetProcessCommandLine contains "install https://" or TargetProcessCommandLine contains "--index-url" or TargetProcessCommandLine contains "--extra-index-url" or TargetProcessCommandLine contains "--registry" or TargetProcessCommandLine contains "install github.com/") or (TargetProcessCommandLine contains "curl" and TargetProcessCommandLine contains "install")) and (not((TargetProcessCommandLine contains "repo.midominio.local" or TargetProcessCommandLine contains "nexus.midominio.local" or TargetProcessCommandLine contains "artifactory.midominio.local")))
+
+// ─────────────────────────────────────────────────────────
+// Modificacion de un fichero de dependencias o lockfile
+// Severidad: medium  ·  ATT&CK: T1195.001
+// Origen: rules/zta/zta_sup_003_fichero_dependencias_modificado.yml
+imFileEvent
+| where (TargetFileName endswith "/package-lock.json" or TargetFileName endswith "/yarn.lock" or TargetFileName endswith "/pnpm-lock.yaml" or TargetFileName endswith "/poetry.lock" or TargetFileName endswith "/Pipfile.lock" or TargetFileName endswith "/requirements.txt" or TargetFileName endswith "/go.sum" or TargetFileName endswith "/Cargo.lock" or TargetFileName endswith "/composer.lock" or TargetFileName endswith "/Gemfile.lock") and (not((TargetFilePath endswith "/git" or TargetFilePath endswith "/npm" or TargetFilePath endswith "/yarn" or TargetFilePath endswith "/pnpm" or TargetFilePath endswith "/poetry" or TargetFilePath endswith "/pip" or TargetFilePath endswith "/pip3" or TargetFilePath endswith "/go" or TargetFilePath endswith "/cargo" or TargetFilePath endswith "/composer" or TargetFilePath endswith "/bundle")))
+
+// ─────────────────────────────────────────────────────────
+// Borrado o reduccion del registro de auditoria
+// Severidad: critical  ·  ATT&CK: T1070.001, T1562.002
+// Origen: rules/zta/zta_vis_001_borrado_registro_auditoria.yml
+SecurityEvent
+| where (EventID in~ ("1102", "1100")) or EventID == 4719

@@ -5,10 +5,15 @@ SIEM: Splunk, Microsoft Sentinel, Wazuh y Elastic.
 
     rules/*.yml
         |
-        +-- deploy/splunk/savedsearches.conf   busquedas programadas con cadencia
-        +-- deploy/sentinel/*.kql              consultas KQL por dominio
-        +-- deploy/wazuh/*.xml                 reglas nativas (via sigma_to_wazuh)
-        +-- deploy/elastic/*.txt               Lucene y ES|QL
+        +-- deploy/splunk/reglas/savedsearches.conf   busquedas con cadencia
+        +-- deploy/sentinel/reglas/*.kql              consultas KQL por dominio
+        +-- deploy/wazuh/reglas/*.xml                 reglas nativas
+        +-- deploy/elastic/reglas/*.txt               Lucene y ES|QL
+
+Cada carpeta de SIEM lleva ademas, escritas a mano y no regeneradas:
+    consultas/    caza sobre lo ya indexado, con su ventana y su umbral
+    listas/       indicadores de News CTI (los genera tools/sync_cti.py)
+    INSTALAR.md   como se carga todo eso en ese SIEM concreto
 
 La regla se escribe una vez. Si hay que cambiar un indice, un sourcetype o una
 tabla, se cambia en tools/pipelines/ y todo el contenido se regenera. Ninguna
@@ -19,7 +24,7 @@ Que NO hace este script, y por que
 No inventa lo que un backend no soporta. Tres reglas son correlaciones Sigma
 (cuentan cardinalidad de un campo en una ventana) y el backend de Kusto no las
 convierte; sus consultas KQL estan escritas a mano en deploy/sentinel/
-correlaciones.kql y este script las respeta. Wazuh tampoco puede expresarlas, y
+consultas/correlaciones.kql y este script las respeta. Wazuh tampoco puede expresarlas, y
 sigma_to_wazuh.py lo declara en sus avisos en vez de generar una regla que
 parezca equivalente sin serlo.
 
@@ -192,7 +197,7 @@ action.notable.param.security_domain = threat
 action.notable.param.severity = {nivel}
 action.notable.param.drilldown_name = Ver eventos de la deteccion
 # MITRE ATT&CK: {tec}
-# Regla Sigma: {f.relative_to(RAIZ).as_posix()}
+# Regla Sigma: {f.relative_to(RAIZ)}
 # UUID: {doc.get('id', '-')}
 """)
     return "\n".join(partes)
@@ -247,7 +252,7 @@ def generar_kql(reglas, resultados, fallos) -> dict[str, str]:
                 f"// ─────────────────────────────────────────────────────────\n"
                 f"// {doc.get('title', f.stem)}\n"
                 f"// Severidad: {doc.get('level', 'medium')}  ·  ATT&CK: {tec}\n"
-                f"// Origen: {f.relative_to(RAIZ).as_posix()}\n"
+                f"// Origen: {f.relative_to(RAIZ)}\n"
                 f"{consulta}\n"
             )
         # los fallos de este dominio se declaran en el propio fichero
@@ -256,7 +261,7 @@ def generar_kql(reglas, resultados, fallos) -> dict[str, str]:
             bloques.append("// ── Sin conversion automatica a KQL ──")
             for f, m in propios:
                 bloques.append(f"//   {f.name}: {m}")
-            bloques.append("// Ver deploy/sentinel/correlaciones.kql\n")
+            bloques.append("// Ver deploy/sentinel/consultas/correlaciones.kql\n")
         salidas[dom] = "\n".join(bloques)
     return salidas
 
@@ -440,24 +445,24 @@ def main() -> int:
 
         if destino == "splunk":
             escrituras = {"savedsearches.conf": generar_splunk(ficheros, resultados)}
-            carpeta = DEPLOY / "splunk"
+            carpeta = DEPLOY / "splunk" / "reglas"
         elif destino == "sentinel":
             escrituras = {f"{k}.kql": v for k, v in
                           generar_kql(ficheros, resultados, fallos).items()}
-            carpeta = DEPLOY / "sentinel"
+            carpeta = DEPLOY / "sentinel" / "reglas"
         elif destino == "elastic":
             escrituras = {f"{k}-lucene.txt": v for k, v in
                           generar_texto(resultados, "Lucene (indexador Wazuh / OpenSearch)").items()}
-            carpeta = DEPLOY / "elastic"
+            carpeta = DEPLOY / "elastic" / "reglas"
         else:  # elastic-esql
             escrituras = {f"{k}-esql.txt": v for k, v in
                           generar_texto(resultados, "ES|QL (Elastic)").items()}
-            carpeta = DEPLOY / "elastic"
+            carpeta = DEPLOY / "elastic" / "reglas"
 
         if not args.check:
             carpeta.mkdir(parents=True, exist_ok=True)
             for nombre, contenido in escrituras.items():
-                (carpeta / nombre).write_text(contenido, encoding="utf-8", newline="\n")
+                (carpeta / nombre).write_text(contenido, encoding="utf-8")
 
         resumen[destino] = (len(resultados), fallos)
         estado = "" if args.check else f" -> {carpeta.relative_to(RAIZ)}/"
@@ -466,12 +471,28 @@ def main() -> int:
         for f, m in fallos:
             print(f"                 · {f.name}: {m[:100]}")
 
+    # El catalogo de reglas se genera de las reglas: un catalogo escrito a mano
+    # se desincroniza a la tercera regla nueva y entonces describe detecciones
+    # que ya no existen.
+    if not args.check and (RAIZ / "docs" / "fusion-de-bibliotecas.md").exists():
+        r = subprocess.run([sys.executable, str(RAIZ / "tools" / "generar_catalogo.py")],
+                           capture_output=True, text=True)
+        print("\n" + (r.stdout.strip() or r.stderr.strip()))
+
+    # La capa de respuesta se compila de los playbooks: el nodo de Shuffle no
+    # puede leer ficheros, asi que la tabla va embebida y hay que regenerarla
+    # cada vez que cambia un playbook.
+    if not args.check and (RAIZ / "respuesta" / "playbooks").is_dir():
+        r = subprocess.run([sys.executable, str(RAIZ / "tools" / "generar_enrutador.py")],
+                           capture_output=True, text=True)
+        print("\n" + (r.stdout.strip() or r.stderr.strip()))
+
     # El mapa purple team se genera de las reglas, no se mantiene a mano.
     if not args.check:
         mapa = RAIZ / "purple" / "atomic-map.md"
         mapa.parent.mkdir(parents=True, exist_ok=True)
         mapa.write_text(generar_atomic_map([(f, leer(f)) for f in ficheros]),
-                        encoding="utf-8", newline="\n")
+                        encoding="utf-8")
         print(f"\n{'purple/atomic-map.md':14} regenerado desde rules/")
 
     # Wazuh se delega al backend propio: pySigma no tiene uno oficial.

@@ -1,0 +1,18 @@
+#!/bin/sh
+# Lanzador que Wazuh invoca. El manager ejecuta el fichero sin extension.
+WPYTHON_BIN="framework/python/bin/python3"
+SCRIPT_PATH_NAME="$0"
+DIR_NAME="$(cd "$(dirname "${SCRIPT_PATH_NAME}")" && pwd -P)"
+SCRIPT_NAME="$(basename "${SCRIPT_PATH_NAME}")"
+
+case "${DIR_NAME}" in
+  */active-response/bin | */wodles*) WAZUH_PATH="$(cd "${DIR_NAME}/../.." && pwd)" ;;
+  */bin)                             WAZUH_PATH="$(cd "${DIR_NAME}/.." && pwd)" ;;
+  */integrations)                    WAZUH_PATH="$(cd "${DIR_NAME}/.." && pwd)" ;;
+esac
+
+if [ -x "${WAZUH_PATH}/${WPYTHON_BIN}" ]; then
+  "${WAZUH_PATH}/${WPYTHON_BIN}" "${DIR_NAME}/${SCRIPT_NAME}.py" "$@"
+else
+  python3 "${DIR_NAME}/${SCRIPT_NAME}.py" "$@"
+fi

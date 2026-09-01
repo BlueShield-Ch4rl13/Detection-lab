@@ -1,0 +1,115 @@
+<!--
+  Reglas que consumen las listas de inteligencia de News CTI.
+
+  Escritas a mano, NO las genera tools/build.py: Sigma no expresa "este campo
+  esta en una lista externa", asi que no hay una regla Sigma de la que salgan.
+
+  Requisitos previos:
+    1. python3 tools/sync_cti.py
+    2. sudo cp intel/listas/wazuh/*.cdb /var/ossec/etc/lists/
+    3. Declarar cada lista en ossec.conf, dentro de <ruleset>:
+         <list>etc/lists/cti_hash</list>
+         <list>etc/lists/cti_ip</list>
+         <list>etc/lists/cti_dominio</list>
+         <list>etc/lists/cti_url</list>
+    4. sudo /var/ossec/bin/ossec-makelists
+    5. sudo systemctl restart wazuh-manager
+
+  Serie 101300-101399, que no choca con las 100xxx de marco ni con las 101000+
+  generadas desde Sigma.
+
+  Sobre los niveles: solo el hash alerta de verdad (level 12). IP, dominio y URL
+  se quedan en level 4, por debajo del umbral habitual de notificacion, para que
+  queden registrados y correlacionables sin llenar la cola. Un indicador de
+  reputacion coincide muchas veces por sinkholes, CDN compartidas y dominios
+  reciclados; tratarlo como alerta entrena al turno a cerrar sin mirar.
+-->
+<group name="cti,newscti,threat_intel,">
+
+  <!-- ── Hash de fichero: coincide o no coincide ─────────────────────── -->
+  <rule id="101300" level="12">
+    <if_group>sysmon_event1</if_group>
+    <list field="win.eventdata.hashes" lookup="match_key">etc/lists/cti_hash</list>
+    <description>CTI: proceso ejecutado con un hash presente en la inteligencia de News CTI</description>
+    <mitre>
+      <id>T1204.002</id>
+    </mitre>
+    <group>detectionlab,auto_analisis,cti_hash,pci_dss_10.6.1,gdpr_IV_35.7.d,</group>
+    <info type="text">playbook=inteligencia; severidad_thehive=3; origen=0980-cti_indicadores.xml</info>
+  </rule>
+
+  <rule id="101301" level="12">
+    <if_group>syscheck</if_group>
+    <list field="syscheck.sha256_after" lookup="match_key">etc/lists/cti_hash</list>
+    <description>CTI: fichero escrito en disco con un hash presente en la inteligencia</description>
+    <mitre>
+      <id>T1105</id>
+    </mitre>
+    <group>detectionlab,auto_analisis,cti_hash,</group>
+    <info type="text">playbook=inteligencia; severidad_thehive=3; origen=0980-cti_indicadores.xml</info>
+  </rule>
+
+  <!-- ── IP, dominio y URL: se registran, no despiertan a nadie ──────── -->
+  <rule id="101310" level="4">
+    <if_group>sysmon_event3</if_group>
+    <list field="win.eventdata.destinationIp" lookup="address_match_key">etc/lists/cti_ip</list>
+    <description>CTI: conexion saliente hacia una IP de la inteligencia de News CTI</description>
+    <mitre>
+      <id>T1071</id>
+    </mitre>
+    <group>detectionlab,auto_enriq,cti_ip,</group>
+    <info type="text">playbook=inteligencia; severidad_thehive=1; origen=0980-cti_indicadores.xml</info>
+  </rule>
+
+  <rule id="101311" level="4">
+    <if_group>sysmon_event22</if_group>
+    <list field="win.eventdata.queryName" lookup="match_key">etc/lists/cti_dominio</list>
+    <description>CTI: resolucion DNS de un dominio presente en la inteligencia</description>
+    <mitre>
+      <id>T1071.004</id>
+    </mitre>
+    <group>detectionlab,auto_enriq,cti_dominio,</group>
+    <info type="text">playbook=inteligencia; severidad_thehive=1; origen=0980-cti_indicadores.xml</info>
+  </rule>
+
+  <rule id="101312" level="4">
+    <decoded_as>json</decoded_as>
+    <field name="url">\.+</field>
+    <list field="url" lookup="match_key">etc/lists/cti_url</list>
+    <description>CTI: peticion hacia una URL presente en la inteligencia</description>
+    <mitre>
+      <id>T1071.001</id>
+    </mitre>
+    <group>detectionlab,auto_enriq,cti_url,</group>
+    <info type="text">playbook=inteligencia; severidad_thehive=1; origen=0980-cti_indicadores.xml</info>
+  </rule>
+
+  <!-- ── Lo que si merece alertar: repeticion ────────────────────────────
+       Una coincidencia de reputacion suelta es ruido. Cinco del mismo equipo
+       en diez minutos ya no lo es: eso es un patron, no una casualidad de CDN.
+       Aqui es donde <frequency> hace lo que sabe hacer, que es contar disparos
+       de una regla, no cardinalidad de un campo.
+  -->
+  <rule id="101320" level="10" frequency="5" timeframe="600">
+    <if_matched_sid>101310</if_matched_sid>
+    <same_srcip />
+    <description>CTI: contacto repetido con infraestructura de la inteligencia desde el mismo origen</description>
+    <mitre>
+      <id>T1071</id>
+    </mitre>
+    <group>detectionlab,auto_analisis,cti_ip,cti_correlacion,</group>
+    <info type="text">playbook=inteligencia; severidad_thehive=2; origen=0980-cti_indicadores.xml</info>
+  </rule>
+
+  <rule id="101321" level="10" frequency="5" timeframe="600">
+    <if_matched_sid>101311</if_matched_sid>
+    <same_srcip />
+    <description>CTI: resoluciones repetidas de dominios de la inteligencia desde el mismo equipo</description>
+    <mitre>
+      <id>T1071.004</id>
+    </mitre>
+    <group>detectionlab,auto_analisis,cti_dominio,cti_correlacion,</group>
+    <info type="text">playbook=inteligencia; severidad_thehive=2; origen=0980-cti_indicadores.xml</info>
+  </rule>
+
+</group>

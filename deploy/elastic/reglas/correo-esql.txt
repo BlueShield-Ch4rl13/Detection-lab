@@ -1,0 +1,28 @@
+# Generado por tools/build.py — no editar a mano
+# Dominio: correo  ·  ES|QL (Elastic)
+
+# Correo desde un dominio recien registrado  [medium]
+from * metadata _id, _index, _version | where eventType=="message_delivered" and senderDomainAge<30
+
+# Suplantacion de directivo en el nombre para mostrar  [high]
+from * metadata _id, _index, _version | where (headerFrom like "*Director General*" or headerFrom like "*Direccion Financiera*" or headerFrom like "*CEO*" or headerFrom like "*CFO*") and senderIsInternal==false and not ends_with(sender, "@midominio.local")
+
+# Fallo de autenticacion de correo en el dominio propio  [high]
+from * metadata _id, _index, _version | where ends_with(senderDomain, "midominio.local") and dmarcResult=="fail" and (spfResult=="fail" or dkimResult=="fail")
+
+# Adjunto con formato usado para entrega de malware  [high]
+from * metadata _id, _index, _version | where ends_with(attachmentName, ".iso") or ends_with(attachmentName, ".img") or ends_with(attachmentName, ".vhd") or ends_with(attachmentName, ".vhdx") or ends_with(attachmentName, ".one") or ends_with(attachmentName, ".lnk") or ends_with(attachmentName, ".chm") or ends_with(attachmentName, ".hta") or attachmentName rlike ".*\\.(pdf|doc|docx|xls|xlsx|jpg|png)\\s*\\.(exe|scr|js|vbs|bat|cmd|ps1)$" or ends_with(attachmentName, ".docm") or ends_with(attachmentName, ".xlsm") or ends_with(attachmentName, ".pptm") or ends_with(attachmentName, ".xlam")
+
+# Usuario pulsa una URL de phishing bloqueada o permitida  [high]
+from * metadata _id, _index, _version | where (eventType in ("click_permitted", "click_blocked")) and (threatStatus in ("active", "falsePositive"))
+
+# Regla de buzon con reenvio externo creada  [high]
+from * metadata _id, _index, _version | where (Operation in ("New-InboxRule", "Set-InboxRule", "Set-Mailbox", "UpdateInboxRules")) and (Parameters like "*ForwardTo*" or Parameters like "*ForwardAsAttachmentTo*" or Parameters like "*RedirectTo*" or Parameters like "*ForwardingSmtpAddress*" or Parameters like "*DeleteMessage*" or Parameters like "*MoveToFolder*")
+
+# Correo entregado desde una cuenta interna  [informational]
+from * metadata _id, _index, _version | where senderIsInternal==true and eventType=="message_delivered"
+| eval timebucket=date_trunc(1hours, @timestamp) | stats value_count=count_distinct(recipient) by timebucket, sender
+| where value_count >= 200
+
+# HTML smuggling en adjunto  [high]
+from * metadata _id, _index, _version | where (ends_with(attachmentName, ".html") or ends_with(attachmentName, ".htm") or ends_with(attachmentName, ".svg")) and (attachmentContent like "*msSaveOrOpenBlob*" or attachmentContent like "*new Blob(*" or attachmentContent like "*application/octet-stream*" or attachmentContent like "*download=*" or attachmentContent like "*atob(*" or attachmentContent like "*base64,*")

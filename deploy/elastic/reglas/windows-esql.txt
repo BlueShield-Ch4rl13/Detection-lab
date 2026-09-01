@@ -1,0 +1,131 @@
+# Generado por tools/build.py — no editar a mano
+# Dominio: windows  ·  ES|QL (Elastic)
+
+# DCShadow - registro de un controlador de dominio falso  [critical]
+from * metadata _id, _index, _version | where (EventID==4742 and ServicePrincipalNames like "*GC/*" and ServicePrincipalNames like "*E3514235-4B06-11D1-AB04-00C04FC2DCD2*" or EventID in (4928, 4929)) and not (ends_with(SubjectUserName, "$") or SubjectUserName in ("ANONYMOUS LOGON", "SYSTEM"))
+
+# Inyeccion de SID history en una cuenta del dominio  [critical]
+from * metadata _id, _index, _version | where EventID in (4765, 4766) or (EventID in (4738, 4742)) and SidHistory like "*S-1-5-21*"
+
+# Abuso de delegacion Kerberos - constrained, unconstrained y RBCD  [critical]
+from * metadata _id, _index, _version | where (EventID==5136 and AttributeLDAPDisplayName=="msDS-AllowedToActOnBehalfOfOtherIdentity" or (EventID in (4738, 4742)) and AllowedToDelegateTo like "*/*" or (EventID in (4738, 4742)) and (UserAccountControl like "*%%2075*" or UserAccountControl like "*%%2084*")) and not (SubjectUserName in ("ANONYMOUS LOGON", "SYSTEM"))
+
+# Modificacion de AdminSDHolder o del descriptor de seguridad de un objeto de directorio  [critical]
+from * metadata _id, _index, _version | where (EventID==5136 and ObjectDN like "*CN=AdminSDHolder*" or EventID==5136 and AttributeLDAPDisplayName=="nTSecurityDescriptor") and not (ends_with(SubjectUserName, "$") or SubjectUserName in ("ANONYMOUS LOGON", "SYSTEM"))
+
+# Lectura de contrasenas de administrador local gestionadas por LAPS  [high]
+from * metadata _id, _index, _version | where EventID==1 and (CommandLine like "*ms-Mcs-AdmPwd*" or CommandLine like "*msLAPS-Password*" or CommandLine like "*msLAPS-EncryptedPassword*" or CommandLine like "*Get-AdmPwdPassword*" or CommandLine like "*Get-LapsADPassword*" or CommandLine like "*Get-LapsAADPassword*" or ends_with(Image, "\\SharpLAPS.exe") or ends_with(Image, "\\LAPSDumper.exe") or CommandLine like "*SharpLAPS*" or CommandLine like "*lapsdumper*" or CommandLine like "*pyLAPS*" or CommandLine like "*-M laps*" or CommandLine like "*--laps*")
+
+# Extraccion de la base de datos ntds.dit del controlador de dominio  [critical]
+from * metadata _id, _index, _version | where EventID==1 and (ends_with(Image, "\\ntdsutil.exe") and (CommandLine like "*ifm*" or CommandLine like "*create full*" or CommandLine like "*snapshot*" or CommandLine like "*ac i ntds*") or ends_with(Image, "\\vssadmin.exe") and CommandLine like "*create*" and CommandLine like "*shadow*" or CommandLine like "*shadowcopy*" and CommandLine like "*create*" or ends_with(Image, "\\diskshadow.exe") or CommandLine like "*diskshadow /s*" or CommandLine like "*ntds.dit*" or ends_with(Image, "\\NTDSDumpEx.exe") or CommandLine like "*NTDSDumpEx*" or CommandLine like "*Invoke-NinjaCopy*")
+
+# Coercion de autenticacion y relay NTLM contra el controlador de dominio  [high]
+from * metadata _id, _index, _version | where (EventID==5145 and ends_with(ShareName, "IPC$") and (RelativeTargetName like "*efsrpc*" or RelativeTargetName like "*netdfs*" or RelativeTargetName like "*spoolss*" or RelativeTargetName like "*fssagentrpc*") or EventID==5145 and ends_with(ShareName, "IPC$") and (RelativeTargetName like "*lsarpc*" or RelativeTargetName like "*samr*" or RelativeTargetName like "*netlogon*" or RelativeTargetName like "*lsass*") and SubjectUserName=="ANONYMOUS LOGON" or EventID==4624 and LogonType==3 and AuthenticationPackageName=="NTLM" and ends_with(TargetUserName, "$")) and not TargetUserName=="ANONYMOUS LOGON"
+
+# Volcado de las colmenas SAM, SYSTEM y SECURITY  [critical]
+from * metadata _id, _index, _version | where EventID==1 and ((ends_with(Image, "\\reg.exe") or OriginalFileName=="reg.exe") and (CommandLine like "* save *" or CommandLine like "* export *") and (CommandLine like "*hklm\\sam*" or CommandLine like "*hklm\\security*" or CommandLine like "*hklm\\system*" or CommandLine like "*\\config\\SAM*" or CommandLine like "*\\config\\SECURITY*" or CommandLine like "*\\config\\SYSTEM*" or CommandLine like "*\\config\\RegBack\\*") or ends_with(Image, "\\esentutl.exe") and (CommandLine like "*/y*" or CommandLine like "*/vss*") and (CommandLine like "*hklm\\sam*" or CommandLine like "*hklm\\security*" or CommandLine like "*hklm\\system*" or CommandLine like "*\\config\\SAM*" or CommandLine like "*\\config\\SECURITY*" or CommandLine like "*\\config\\SYSTEM*" or CommandLine like "*\\config\\RegBack\\*") or CommandLine like "*HarddiskVolumeShadowCopy*" and CommandLine like "*\\config\\*" or ends_with(Image, "\\pwdump.exe") or ends_with(Image, "\\pwdump7.exe") or ends_with(Image, "\\gsecdump.exe") or ends_with(Image, "\\samdump2.exe") or CommandLine like "*lsadump::sam*" or CommandLine like "*lsadump::secrets*" or CommandLine like "*Invoke-PowerDump*")
+
+# Acceso a los almacenes de credenciales del navegador  [high]
+from * metadata _id, _index, _version | where EventID==1 and ((CommandLine like "*\\Login Data*" or CommandLine like "*\\User Data\\Local State*" or CommandLine like "*key4.db*" or CommandLine like "*key3.db*" or CommandLine like "*logins.json*" or CommandLine like "*cert9.db*" or CommandLine like "*cookies.sqlite*" or CommandLine like "*signons.sqlite*") and (CommandLine like "*copy *" or CommandLine like "*Copy-Item*" or CommandLine like "*xcopy*" or CommandLine like "*robocopy*" or CommandLine like "*Get-Content*" or CommandLine like "*Compress-Archive*" or CommandLine like "*esentutl*" or CommandLine like "*type *") or ends_with(Image, "\\SharpChrome.exe") or ends_with(Image, "\\SharpWeb.exe") or ends_with(Image, "\\HackBrowserData.exe") or ends_with(Image, "\\WebBrowserPassView.exe") or CommandLine like "*SharpChrome*" or CommandLine like "*HackBrowserData*" or CommandLine like "*Invoke-SharpChrome*" or CommandLine like "*firepwd*")
+
+# Abuso de DPAPI - masterkeys y clave de respaldo del dominio  [critical]
+from * metadata _id, _index, _version | where EventID==1 and (CommandLine like "*dpapi::masterkey*" or CommandLine like "*dpapi::cred*" or CommandLine like "*dpapi::blob*" or CommandLine like "*dpapi::chrome*" or CommandLine like "*dpapi::wifi*" or CommandLine like "*lsadump::backupkeys*" or CommandLine like "*sekurlsa::dpapi*" or ends_with(Image, "\\SharpDPAPI.exe") or ends_with(Image, "\\DonPAPI.exe") or CommandLine like "*SharpDPAPI*" or CommandLine like "*DonPAPI*" or CommandLine like "*dpapi.py*" or CommandLine like "*Get-LsaBackupKey*" or CommandLine like "*backupkeys /export*" or CommandLine like "*\\AppData\\Roaming\\Microsoft\\Protect\\*" or CommandLine like "*\\AppData\\Local\\Microsoft\\Credentials\\*" or CommandLine like "*\\AppData\\Roaming\\Microsoft\\Credentials\\*" or CommandLine like "*\\Microsoft\\Protect\\S-1-5-18*")
+
+# Descenso de version a WDigest para cachear credenciales en claro  [high]
+from * metadata _id, _index, _version | where (EventID in (12, 13, 14)) and (ends_with(TargetObject, "\\SecurityProviders\\WDigest\\UseLogonCredential") and Details like "*0x00000001*" or (ends_with(TargetObject, "\\Control\\Lsa\\RunAsPPL") or ends_with(TargetObject, "\\Control\\Lsa\\LsaCfgFlags") or ends_with(TargetObject, "\\Control\\Lsa\\DisableRestrictedAdmin")) and Details like "*0x00000000*" or ends_with(TargetObject, "\\Control\\Lsa\\TokenLeakDetectDelaySecs"))
+
+# Robo de ficheros de credenciales de nube y de SSH  [high]
+from * metadata _id, _index, _version | where EventID==1 and ((CommandLine like "*\\.aws\\credentials*" or CommandLine like "*\\.aws\\config*" or CommandLine like "*\\.azure\\accessTokens.json*" or CommandLine like "*\\.azure\\azureProfile.json*" or CommandLine like "*\\.kube\\config*" or CommandLine like "*\\.docker\\config.json*" or CommandLine like "*\\.ssh\\config*" or CommandLine like "*id_rsa*" or CommandLine like "*id_ed25519*" or CommandLine like "*credentials.db*") and (CommandLine like "*type *" or CommandLine like "*more *" or CommandLine like "*copy *" or CommandLine like "*xcopy*" or CommandLine like "*robocopy*" or CommandLine like "*Get-Content*" or CommandLine like "*Copy-Item*" or CommandLine like "*Compress-Archive*" or CommandLine like "*findstr*" or CommandLine like "*tar *") or CommandLine like "*dir *" and CommandLine like "*/s*" and (CommandLine like "*id_rsa*" or CommandLine like "*.pem*" or CommandLine like "*credentials*"))
+
+# Acceso a bases de datos de gestores de contrasenas  [high]
+from * metadata _id, _index, _version | where EventID==1 and ((CommandLine like "*.kdbx*" or CommandLine like "*.kdb*" or CommandLine like "*.psafe3*" or CommandLine like "*.opvault*" or CommandLine like "*KeePass.config.xml*" or CommandLine like "*\\Bitwarden\\data.json*" or CommandLine like "*\\1Password\\*" or CommandLine like "*\\KeePassXC\\*") and (CommandLine like "*copy *" or CommandLine like "*Copy-Item*" or CommandLine like "*xcopy*" or CommandLine like "*robocopy*" or CommandLine like "*Compress-Archive*" or CommandLine like "*Get-Content*" or CommandLine like "*Get-ChildItem*" or CommandLine like "*dir *" or CommandLine like "*-Recurse*") or ends_with(Image, "\\KeeThief.exe") or ends_with(Image, "\\KeeFarce.exe") or ends_with(Image, "\\LaZagne.exe") or CommandLine like "*KeeThief*" or CommandLine like "*KeeFarce*" or CommandLine like "*Get-KeePassDatabaseKey*" or CommandLine like "*lazagne*")
+
+# Volcado de credenciales cacheadas y del Administrador de credenciales de Windows  [high]
+from * metadata _id, _index, _version | where EventID==1 and (ends_with(Image, "\\cmdkey.exe") and (CommandLine like "*/list*" or CommandLine like "*/l *") or ends_with(Image, "\\vaultcmd.exe") and (CommandLine like "*/list*" or CommandLine like "*/listcreds*" or CommandLine like "*/listschema*") or CommandLine like "*lsadump::cache*" or CommandLine like "*vault::cred*" or CommandLine like "*vault::list*" or CommandLine like "*sekurlsa::credman*" or CommandLine like "*SECURITY\\Cache*" or CommandLine like "*SECURITY\\Policy\\Secrets*" or ends_with(Image, "\\CredentialsFileView.exe") or ends_with(Image, "\\VaultPasswordView.exe") or ends_with(Image, "\\netpass.exe") or CommandLine like "*Invoke-WCMDump*" or CommandLine like "*Get-VaultCredential*" or CommandLine like "*CredentialsFileView*" or CommandLine like "*VaultPasswordView*")
+
+# Proceso del sistema con conexion saliente inusual  [medium]
+from * metadata _id, _index, _version | where EventID==3 and (ends_with(Image, "\\rundll32.exe") or ends_with(Image, "\\regsvr32.exe") or ends_with(Image, "\\mshta.exe")) and Initiated==true
+
+# Creacion de cuenta local  [medium]
+from * metadata _id, _index, _version | where EventID==1 and CommandLine like "*net*" and CommandLine like "*user*" and CommandLine like "*/add*"
+
+# Documento de Office lanzando shell  [high]
+from * metadata _id, _index, _version | where EventID==1 and (ends_with(ParentImage, "\\winword.exe") or ends_with(ParentImage, "\\excel.exe") or ends_with(ParentImage, "\\powerpnt.exe") or ends_with(ParentImage, "\\outlook.exe")) and (ends_with(Image, "\\cmd.exe") or ends_with(Image, "\\powershell.exe") or ends_with(Image, "\\wscript.exe") or ends_with(Image, "\\cscript.exe") or ends_with(Image, "\\mshta.exe"))
+
+# Creacion de servicio via sc.exe  [medium]
+from * metadata _id, _index, _version | where EventID==1 and ends_with(Image, "\\sc.exe") and CommandLine like "*create*" and (CommandLine like "*binPath*" or CommandLine like "*binpath=*")
+
+# Ejecucion via WMIC process call create  [medium]
+from * metadata _id, _index, _version | where EventID==1 and ends_with(Image, "\\wmic.exe") and CommandLine like "*process*" and CommandLine like "*call*" and CommandLine like "*create*"
+
+# Kerberoasting - solicitud masiva de tickets de servicio con RC4  [high]
+from * metadata _id, _index, _version | where EventID==4769 and TicketOptions=="0x40810000" and TicketEncryptionType=="0x17" and not (ends_with(ServiceName, "$") or ServiceName=="krbtgt")
+
+# AS-REP Roasting - peticion sin preautenticacion Kerberos  [high]
+from * metadata _id, _index, _version | where EventID==4768 and PreAuthType==0 and TicketEncryptionType=="0x17" and not ends_with(TargetUserName, "$")
+
+# DCSync - replicacion de directorio desde un equipo que no es DC  [critical]
+from * metadata _id, _index, _version | where EventID==4662 and (Properties like "*1131f6aa-9c07-11d1-f79f-00c04fc2dcd2*" or Properties like "*1131f6ad-9c07-11d1-f79f-00c04fc2dcd2*" or Properties like "*89e95b76-444d-4c62-991a-0facbeda640c*") and not (ends_with(SubjectUserName, "$") or SubjectUserName in ("ANONYMOUS LOGON", "SYSTEM"))
+
+# Indicio de Golden Ticket - TGS de krbtgt con cifrado degradado  [critical]
+from * metadata _id, _index, _version | where EventID==4769 and starts_with(ServiceName, "krbtgt") and TicketEncryptionType=="0x17"
+
+# Herramienta de abuso de Kerberos ejecutada  [critical]
+from * metadata _id, _index, _version | where EventID==1 and (ends_with(Image, "\\Rubeus.exe") or ends_with(Image, "\\mimikatz.exe") or ends_with(Image, "\\kekeo.exe") or ends_with(Image, "\\GetUserSPNs.exe") or OriginalFileName in ("Rubeus.exe", "mimikatz.exe") or CommandLine like "*kerberoast*" or CommandLine like "*asreproast*" or CommandLine like "*lsadump::dcsync*" or CommandLine like "*sekurlsa::logonpasswords*" or CommandLine like "*sekurlsa::tickets*" or CommandLine like "*kerberos::golden*" or CommandLine like "*kerberos::ptt*" or CommandLine like "*GetUserSPNs.py*" or CommandLine like "*GetNPUsers.py*" or CommandLine like "*secretsdump.py*")
+
+# Pass-the-Hash y Overpass-the-Hash  [high]
+from * metadata _id, _index, _version | where EventID==4624 and LogonType==9 and LogonProcessName=="seclogo" and AuthenticationPackageName=="Negotiate" and not ends_with(TargetUserName, "$")
+
+# Enumeracion de Active Directory - BloodHound y comandos de reconocimiento  [medium]
+from * metadata _id, _index, _version | where EventID==1 and (ends_with(Image, "\\SharpHound.exe") or ends_with(Image, "\\AzureHound.exe") or CommandLine like "*Invoke-BloodHound*" or CommandLine like "*SharpHound.ps1*" or CommandLine like "*-CollectionMethod All*" or (ends_with(Image, "\\net.exe") or ends_with(Image, "\\net1.exe")) and (CommandLine like "*group \"domain admins\"*" or CommandLine like "*group \"enterprise admins\"*" or CommandLine like "*group /domain*" or CommandLine like "*user /domain*" or CommandLine like "*localgroup administrators*") or ends_with(Image, "\\dsquery.exe") and (CommandLine like "*group*" or CommandLine like "*user*"))
+
+# Ejecucion remota tipo PsExec  [high]
+from * metadata _id, _index, _version | where Provider_Name=="Service Control Manager" and EventID==7045 and (ServiceName like "*PSEXESVC*" or ServiceName like "*PAExec*" or ServiceName like "*csexec*" or ServiceName like "*RemCom*" or ImagePath like "*\\PSEXESVC*" or ImagePath like "*%SystemRoot%\\{*" or ImagePath like "*cmd.exe /c echo*" or ImagePath like "*\\ADMIN$\\*")
+
+# Ejecucion remota por WMI o WinRM  [high]
+from * metadata _id, _index, _version | where EventID==1 and (ends_with(ParentImage, "\\WmiPrvSE.exe") or ends_with(ParentImage, "\\wsmprovhost.exe") or ends_with(ParentImage, "\\winrshost.exe")) and (ends_with(Image, "\\cmd.exe") or ends_with(Image, "\\powershell.exe") or ends_with(Image, "\\pwsh.exe") or ends_with(Image, "\\wscript.exe") or ends_with(Image, "\\cscript.exe") or ends_with(Image, "\\rundll32.exe") or ends_with(Image, "\\mshta.exe"))
+
+# Modificacion sospechosa de directiva de grupo  [high]
+from * metadata _id, _index, _version | where EventID==1 and (ends_with(Image, "\\SharpGPOAbuse.exe") or ends_with(Image, "\\pyGPOAbuse.py") or CommandLine like "*SharpGPOAbuse*" or CommandLine like "*New-GPOImmediateTask*" or CommandLine like "*--AddComputerTask*" or CommandLine like "*--AddUserTask*" or CommandLine like "*\\SYSVOL\\*" and CommandLine like "*\\Policies\\*" and (CommandLine like "*ScheduledTasks.xml*" or CommandLine like "*\\Scripts\\Startup*" or CommandLine like "*GptTmpl.inf*"))
+
+# Cuenta de equipo creada por un usuario no administrador  [medium]
+from * metadata _id, _index, _version | where EventID==4741 and not ends_with(SubjectUserName, "$")
+
+# Abuso de servicios de certificados de Active Directory  [critical]
+from * metadata _id, _index, _version | where EventID==1 and (ends_with(Image, "\\Certify.exe") or ends_with(Image, "\\Certipy.exe") or CommandLine like "*Certify.exe request*" or CommandLine like "*certipy req*" or CommandLine like "*certipy auth*" or CommandLine like "*Rubeus.exe asktgt*" or CommandLine like "*certreq*" and CommandLine like "*san:*")
+
+# Volcado de memoria de LSASS  [critical]
+from * metadata _id, _index, _version | where EventID==1 and (CommandLine like "*comsvcs.dll*" and CommandLine like "*MiniDump*" or (ends_with(Image, "\\procdump.exe") or ends_with(Image, "\\procdump64.exe") or ends_with(Image, "\\dumpert.exe") or ends_with(Image, "\\nanodump.exe") or OriginalFileName in ("procdump", "procdump64.exe")) and CommandLine like "*lsass*" or CommandLine like "*rundll32*" and CommandLine like "*dbghelp*" and CommandLine like "*MiniDumpWriteDump*")
+
+# Acceso a memoria de LSASS con permisos de lectura  [high]
+from * metadata _id, _index, _version | where EventID==10 and ends_with(TargetImage, "\\lsass.exe") and (GrantedAccess in ("0x1010", "0x1410", "0x1438", "0x143a", "0x1fffff")) and not (starts_with(SourceImage, "C:\\Windows\\System32\\") or starts_with(SourceImage, "C:\\Windows\\SysWOW64\\") or starts_with(SourceImage, "C:\\Program Files\\Windows Defender\\"))
+
+# Destruccion de copias de seguridad y puntos de restauracion  [critical]
+from * metadata _id, _index, _version | where EventID==1 and (ends_with(Image, "\\vssadmin.exe") and CommandLine like "*delete*" and CommandLine like "*shadows*" or ends_with(Image, "\\wmic.exe") and CommandLine like "*shadowcopy*" and CommandLine like "*delete*" or ends_with(Image, "\\wbadmin.exe") and CommandLine like "*delete*" and CommandLine like "*catalog*" or ends_with(Image, "\\bcdedit.exe") and (CommandLine like "*recoveryenabled no*" or CommandLine like "*bootstatuspolicy ignoreallfailures*") or CommandLine like "*Get-WmiObject Win32_Shadowcopy*" or CommandLine like "*Remove-Item -Path C:\\Windows\\System32\\Recovery*")
+
+# Defensas de seguridad deshabilitadas  [high]
+from * metadata _id, _index, _version | where EventID==1 and (CommandLine like "*Set-MpPreference -DisableRealtimeMonitoring $true*" or CommandLine like "*Set-MpPreference -DisableBehaviorMonitoring $true*" or CommandLine like "*Set-MpPreference -DisableIOAVProtection $true*" or CommandLine like "*Add-MpPreference -ExclusionPath*" or CommandLine like "*DisableAntiSpyware*" or CommandLine like "*DisableAntiVirus*" or CommandLine like "*netsh advfirewall set allprofiles state off*" or CommandLine like "*netsh firewall set opmode disable*" or CommandLine like "*sc stop WinDefend*" or CommandLine like "*sc config WinDefend start= disabled*" or CommandLine like "*sc stop Sense*" or CommandLine like "*sc stop wazuh*" or CommandLine like "*Stop-Service -Name Sense*" or CommandLine like "*net stop \"Windows Defender*" or CommandLine like "*auditpol /clear*" or CommandLine like "*auditpol /set /category:* /success:disable*" or CommandLine like "*wevtutil cl *" or CommandLine like "*wevtutil sl *")
+
+# LOLBin usado para descargar y ejecutar  [high]
+from * metadata _id, _index, _version | where EventID==1 and (ends_with(Image, "\\certutil.exe") and (CommandLine like "*-urlcache*" or CommandLine like "*-verifyctl*" or CommandLine like "*decode*") or ends_with(Image, "\\bitsadmin.exe") and (CommandLine like "*/transfer*" or CommandLine like "*/create*" or CommandLine like "*/addfile*") or ends_with(Image, "\\mshta.exe") and (CommandLine like "*http*" or CommandLine like "*javascript:*" or CommandLine like "*vbscript:*") or ends_with(Image, "\\regsvr32.exe") and (CommandLine like "*scrobj.dll*" or CommandLine like "*/i:http*") or (CommandLine like "*DownloadString(*" or CommandLine like "*DownloadFile(*" or CommandLine like "*Invoke-WebRequest*" or CommandLine like "*Net.WebClient*" or CommandLine like "*Start-BitsTransfer*") and (CommandLine like "*http://*" or CommandLine like "*https://*"))
+
+# PowerShell codificado u ofuscado  [high]
+from * metadata _id, _index, _version | where EventID==1 and (ends_with(Image, "\\powershell.exe") or ends_with(Image, "\\pwsh.exe")) and (CommandLine like "* -enc *" or CommandLine like "* -EncodedCommand*" or CommandLine like "* -e JAB*" or CommandLine like "*FromBase64String*" or CommandLine like "*[Convert]::FromBase64*" or CommandLine like "*-nop -w hidden*" or CommandLine like "*-NoProfile -WindowStyle Hidden*" or CommandLine like "*IEX(New-Object*" or CommandLine like "*iex (New-Object*" or CommandLine like "*[Reflection.Assembly]::Load*" or CommandLine like "*-ExecutionPolicy Bypass*")
+
+# Cifrado masivo de ficheros por ransomware  [critical]
+from * metadata _id, _index, _version | where EventID==11 and (ends_with(TargetFilename, ".locked") or ends_with(TargetFilename, ".encrypted") or ends_with(TargetFilename, ".crypt") or ends_with(TargetFilename, ".lockbit") or ends_with(TargetFilename, ".blackcat") or ends_with(TargetFilename, ".royal") or ends_with(TargetFilename, ".akira") or ends_with(TargetFilename, ".basta") or ends_with(TargetFilename, ".cactus") or ends_with(TargetFilename, ".play") or TargetFilename like "*readme_for_decrypt*" or TargetFilename like "*how_to_decrypt*" or TargetFilename like "*recover_your_files*" or TargetFilename like "*restore-my-files*" or TargetFilename like "*_readme.txt*" or TargetFilename like "*HOW TO BACK FILES*" or TargetFilename like "*RESTORE_FILES_INFO*")
+
+# Tarea programada sospechosa  [high]
+from * metadata _id, _index, _version | where EventID==1 and ends_with(Image, "\\schtasks.exe") and CommandLine like "*/create*" and (CommandLine like "*powershell*" or CommandLine like "*cmd.exe /c*" or CommandLine like "*mshta*" or CommandLine like "*rundll32*" or CommandLine like "*wscript*" or CommandLine like "*cscript*" or CommandLine like "*regsvr32*" or CommandLine like "*\\AppData\\*" or CommandLine like "*\\Users\\Public\\*" or CommandLine like "*\\Temp\\*" or CommandLine like "*http://*" or CommandLine like "*https://*" or CommandLine like "*/ru system*" or CommandLine like "*/ru \"NT AUTHORITY\\SYSTEM\"*")
+
+# Persistencia por claves de arranque del registro  [high]
+from * metadata _id, _index, _version | where (EventID in (12, 13, 14)) and (TargetObject like "*\\CurrentVersion\\Run*" or TargetObject like "*\\CurrentVersion\\RunOnce*" or TargetObject like "*\\Winlogon\\Shell*" or TargetObject like "*\\Winlogon\\Userinit*" or TargetObject like "*\\CurrentVersion\\Explorer\\User Shell Folders*") and (Details like "*powershell*" or Details like "*cmd.exe*" or Details like "*mshta*" or Details like "*rundll32*" or Details like "*wscript*" or Details like "*regsvr32*" or Details like "*\\AppData\\*" or Details like "*\\Users\\Public\\*" or Details like "*\\Temp\\*" or Details like "*\\ProgramData\\*")
+
+# Inyeccion de codigo en proceso remoto  [high]
+from * metadata _id, _index, _version | where EventID==8 and (ends_with(TargetImage, "\\explorer.exe") or ends_with(TargetImage, "\\svchost.exe") or ends_with(TargetImage, "\\winlogon.exe") or ends_with(TargetImage, "\\lsass.exe") or ends_with(TargetImage, "\\rundll32.exe") or ends_with(TargetImage, "\\dllhost.exe") or ends_with(TargetImage, "\\notepad.exe") or ends_with(TargetImage, "\\werfault.exe")) and not (starts_with(SourceImage, "C:\\Windows\\System32\\") and (ends_with(SourceImage, "\\csrss.exe") or ends_with(SourceImage, "\\services.exe") or ends_with(SourceImage, "\\wininit.exe")))
+
+# Named pipe caracteristico de framework de C2  [critical]
+from * metadata _id, _index, _version | where (EventID in (17, 18)) and (starts_with(PipeName, "\\msagent_") or starts_with(PipeName, "\\postex_") or starts_with(PipeName, "\\postex_ssh_") or starts_with(PipeName, "\\status_") or starts_with(PipeName, "\\mojo_") or starts_with(PipeName, "\\wkssvc_") or starts_with(PipeName, "\\ntsvcs_") or starts_with(PipeName, "\\sliver-") or starts_with(PipeName, "\\MSSE-"))
+
+# Ejecucion de binario desde una ruta de escritura de usuario  [medium]
+from * metadata _id, _index, _version | where EventID==1 and (Image like "*\\AppData\\Local\\Temp\\*" or Image like "*\\Windows\\Temp\\*" or Image like "*\\Users\\Public\\*" or Image like "*\\$Recycle.Bin\\*" or Image like "*\\AppData\\Roaming\\*") and (ends_with(Image, ".exe") or ends_with(Image, ".scr") or ends_with(Image, ".com") or ends_with(Image, ".pif")) and not (ends_with(ParentImage, "\\msiexec.exe") or ends_with(ParentImage, "\\setup.exe") or ends_with(ParentImage, "\\TrustedInstaller.exe"))

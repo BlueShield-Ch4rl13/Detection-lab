@@ -18,9 +18,37 @@
     },
     {
       "techniqueID": "T1003.001",
-      "score": 4,
+      "score": 3,
       "color": "",
-      "comment": "4 regla(s): Volcado de LSASS via comsvcs MiniDump; Indicadores de Mimikatz en linea de comandos; Volcado de memoria de LSASS; Acceso a memoria de LSASS con permisos de lectura",
+      "comment": "3 regla(s): Descenso de version a WDigest para cachear credenciales en claro; Volcado de memoria de LSASS; Acceso a memoria de LSASS con permisos de lectura",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1003.002",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Volcado de las colmenas SAM, SYSTEM y SECURITY",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1003.003",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Extraccion de la base de datos ntds.dit del controlador de dominio",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1003.004",
+      "score": 2,
+      "color": "",
+      "comment": "2 regla(s): Volcado de las colmenas SAM, SYSTEM y SECURITY; Abuso de DPAPI - masterkeys y clave de respaldo del dominio",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1003.005",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Volcado de credenciales cacheadas y del Administrador de credenciales de Windows",
       "enabled": true
     },
     {
@@ -35,6 +63,20 @@
       "score": 1,
       "color": "",
       "comment": "1 regla(s): Lectura de /etc/shadow",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1005",
+      "score": 2,
+      "color": "",
+      "comment": "2 regla(s): Copia masiva de documentos a unidad extraible; Volcado de base de datos a ruta de usuario",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1020",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Reenvio automatico de correo a dominio personal",
       "enabled": true
     },
     {
@@ -74,16 +116,30 @@
     },
     {
       "techniqueID": "T1048",
+      "score": 2,
+      "color": "",
+      "comment": "2 regla(s): Exfiltracion por protocolo alternativo; Volumen de subida anomalo hacia el exterior",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1048.003",
       "score": 1,
       "color": "",
-      "comment": "1 regla(s): Volumen de subida anomalo hacia el exterior",
+      "comment": "1 regla(s): Exfiltracion por protocolo alternativo",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1052",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Impresion o captura masiva de documentos",
       "enabled": true
     },
     {
       "techniqueID": "T1052.001",
-      "score": 1,
+      "score": 2,
       "color": "",
-      "comment": "1 regla(s): Montaje de almacenamiento extraible",
+      "comment": "2 regla(s): Copia masiva de documentos a unidad extraible; Montaje de almacenamiento extraible",
       "enabled": true
     },
     {
@@ -95,9 +151,9 @@
     },
     {
       "techniqueID": "T1053.005",
-      "score": 2,
+      "score": 1,
       "color": "",
-      "comment": "2 regla(s): Creacion de tarea programada via schtasks; Tarea programada sospechosa",
+      "comment": "1 regla(s): Tarea programada sospechosa",
       "enabled": true
     },
     {
@@ -108,10 +164,17 @@
       "enabled": true
     },
     {
-      "techniqueID": "T1059.001",
-      "score": 3,
+      "techniqueID": "T1059",
+      "score": 1,
       "color": "",
-      "comment": "3 regla(s): Cradle de descarga en PowerShell; PowerShell con comando codificado; PowerShell codificado u ofuscado",
+      "comment": "1 regla(s): Inyeccion JNDI en peticion HTTP tipo Log4Shell",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1059.001",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): PowerShell codificado u ofuscado",
       "enabled": true
     },
     {
@@ -123,9 +186,23 @@
     },
     {
       "techniqueID": "T1059.004",
-      "score": 4,
+      "score": 6,
       "color": "",
-      "comment": "4 regla(s): Ejecucion de payload codificado en base64; Descarga tuberia a shell (curl|bash); Shell inversa (bash /dev/tcp); Descarga y ejecucion directa en macOS",
+      "comment": "6 regla(s): Ejecucion de payload codificado en base64; Descarga tuberia a shell (curl|bash); Shell inversa (bash /dev/tcp); Descarga y ejecucion directa en macOS; y 2 mas",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1059.007",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Cross-site scripting reflejado en la peticion",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1068",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Carga de driver vulnerable conocido",
       "enabled": true
     },
     {
@@ -137,9 +214,9 @@
     },
     {
       "techniqueID": "T1070.001",
-      "score": 3,
+      "score": 2,
       "color": "",
-      "comment": "3 regla(s): Borrado de registros de eventos; Defensas de seguridad deshabilitadas; Borrado o reduccion del registro de auditoria",
+      "comment": "2 regla(s): Defensas de seguridad deshabilitadas; Borrado o reduccion del registro de auditoria",
       "enabled": true
     },
     {
@@ -178,6 +255,13 @@
       "enabled": true
     },
     {
+      "techniqueID": "T1074.001",
+      "score": 2,
+      "color": "",
+      "comment": "2 regla(s): Archivado masivo previo a la exfiltracion; Volcado de base de datos a ruta de usuario",
+      "enabled": true
+    },
+    {
       "techniqueID": "T1078.002",
       "score": 1,
       "color": "",
@@ -199,10 +283,17 @@
       "enabled": true
     },
     {
-      "techniqueID": "T1087.002",
+      "techniqueID": "T1083",
       "score": 1,
       "color": "",
-      "comment": "1 regla(s): Enumeracion de Active Directory - BloodHound y comandos de reconocimiento",
+      "comment": "1 regla(s): Salto de directorio hacia ficheros fuera de la raiz web",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1087.002",
+      "score": 2,
+      "color": "",
+      "comment": "2 regla(s): Lectura de contrasenas de administrador local gestionadas por LAPS; Enumeracion de Active Directory - BloodHound y comandos de reconocimiento",
       "enabled": true
     },
     {
@@ -217,6 +308,13 @@
       "score": 1,
       "color": "",
       "comment": "1 regla(s): Montaje de almacenamiento extraible",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1098",
+      "score": 2,
+      "color": "",
+      "comment": "2 regla(s): Abuso de delegacion Kerberos - constrained, unconstrained y RBCD; Modificacion de AdminSDHolder o del descriptor de seguridad de un objeto de directorio",
       "enabled": true
     },
     {
@@ -256,9 +354,9 @@
     },
     {
       "techniqueID": "T1105",
-      "score": 5,
+      "score": 3,
       "color": "",
-      "comment": "5 regla(s): Descarga tuberia a shell (curl|bash); Descarga y ejecucion directa en macOS; Certutil usado para descargar o decodificar; Cradle de descarga en PowerShell; y 1 mas",
+      "comment": "3 regla(s): Descarga tuberia a shell (curl|bash); Descarga y ejecucion directa en macOS; LOLBin usado para descargar y ejecutar",
       "enabled": true
     },
     {
@@ -269,10 +367,31 @@
       "enabled": true
     },
     {
-      "techniqueID": "T1114.003",
+      "techniqueID": "T1112",
+      "score": 4,
+      "color": "",
+      "comment": "4 regla(s): Descenso de version a WDigest para cachear credenciales en claro; Exclusion anadida al antivirus; Reglas ASR desactivadas o puestas en auditoria; Arranque en modo seguro forzado por bcdedit",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1113",
       "score": 1,
       "color": "",
-      "comment": "1 regla(s): Regla de buzon con reenvio externo creada",
+      "comment": "1 regla(s): Impresion o captura masiva de documentos",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1114.003",
+      "score": 2,
+      "color": "",
+      "comment": "2 regla(s): Regla de buzon con reenvio externo creada; Reenvio automatico de correo a dominio personal",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1134.005",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Inyeccion de SID history en una cuenta del dominio",
       "enabled": true
     },
     {
@@ -291,16 +410,30 @@
     },
     {
       "techniqueID": "T1140",
-      "score": 3,
+      "score": 2,
       "color": "",
-      "comment": "3 regla(s): Ejecucion de payload codificado en base64; Certutil usado para descargar o decodificar; LOLBin usado para descargar y ejecutar",
+      "comment": "2 regla(s): Ejecucion de payload codificado en base64; LOLBin usado para descargar y ejecutar",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1187",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Coercion de autenticacion y relay NTLM contra el controlador de dominio",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1189",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Cross-site scripting reflejado en la peticion",
       "enabled": true
     },
     {
       "techniqueID": "T1190",
-      "score": 1,
+      "score": 10,
       "color": "",
-      "comment": "1 regla(s): Explotacion de vulnerabilidad web contra un servicio publicado",
+      "comment": "10 regla(s): Inyeccion SQL en parametros de la peticion HTTP; Salto de directorio hacia ficheros fuera de la raiz web; Peticion falsificada desde el servidor hacia metadatos de nube; Deserializacion insegura de datos controlados por el cliente; y 6 mas",
       "enabled": true
     },
     {
@@ -319,9 +452,9 @@
     },
     {
       "techniqueID": "T1197",
-      "score": 2,
+      "score": 1,
       "color": "",
-      "comment": "2 regla(s): Descarga con BITSAdmin; LOLBin usado para descargar y ejecutar",
+      "comment": "1 regla(s): LOLBin usado para descargar y ejecutar",
       "enabled": true
     },
     {
@@ -329,6 +462,13 @@
       "score": 2,
       "color": "",
       "comment": "2 regla(s): Documento de Office lanzando shell; Ejecucion de binario desde una ruta de escritura de usuario",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1207",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): DCShadow - registro de un controlador de dominio falso",
       "enabled": true
     },
     {
@@ -340,16 +480,23 @@
     },
     {
       "techniqueID": "T1218.005",
-      "score": 2,
+      "score": 1,
       "color": "",
-      "comment": "2 regla(s): Ejecucion sospechosa de mshta; LOLBin usado para descargar y ejecutar",
+      "comment": "1 regla(s): LOLBin usado para descargar y ejecutar",
       "enabled": true
     },
     {
       "techniqueID": "T1218.010",
-      "score": 2,
+      "score": 1,
       "color": "",
-      "comment": "2 regla(s): Regsvr32 ejecutando scriptlet remoto (Squiblydoo); LOLBin usado para descargar y ejecutar",
+      "comment": "1 regla(s): LOLBin usado para descargar y ejecutar",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1222",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Modificacion de AdminSDHolder o del descriptor de seguridad de un objeto de directorio",
       "enabled": true
     },
     {
@@ -374,17 +521,24 @@
       "enabled": true
     },
     {
-      "techniqueID": "T1490",
-      "score": 2,
+      "techniqueID": "T1489",
+      "score": 1,
       "color": "",
-      "comment": "2 regla(s): Borrado de instantaneas (anti-recuperacion); Destruccion de copias de seguridad y puntos de restauracion",
+      "comment": "1 regla(s): Desinstalacion o parada del sensor EDR",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1490",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Destruccion de copias de seguridad y puntos de restauracion",
       "enabled": true
     },
     {
       "techniqueID": "T1505.003",
-      "score": 1,
+      "score": 3,
       "color": "",
-      "comment": "1 regla(s): Interaccion con webshell",
+      "comment": "3 regla(s): Interaccion con webshell; Subida de fichero con extension ejecutable al directorio publicado; Shell lanzada por el proceso del servidor web tras explotacion",
       "enabled": true
     },
     {
@@ -396,9 +550,9 @@
     },
     {
       "techniqueID": "T1539",
-      "score": 1,
+      "score": 2,
       "color": "",
-      "comment": "1 regla(s): Inicio de sesion correcto en Entra ID",
+      "comment": "2 regla(s): Inicio de sesion correcto en Entra ID; Acceso a los almacenes de credenciales del navegador",
       "enabled": true
     },
     {
@@ -424,9 +578,9 @@
     },
     {
       "techniqueID": "T1547.001",
-      "score": 2,
+      "score": 1,
       "color": "",
-      "comment": "2 regla(s): Persistencia por clave Run (registro); Persistencia por claves de arranque del registro",
+      "comment": "1 regla(s): Persistencia por claves de arranque del registro",
       "enabled": true
     },
     {
@@ -438,9 +592,9 @@
     },
     {
       "techniqueID": "T1550.001",
-      "score": 1,
+      "score": 2,
       "color": "",
-      "comment": "1 regla(s): Consentimiento concedido a una aplicacion no verificada",
+      "comment": "2 regla(s): Consentimiento concedido a una aplicacion no verificada; Abuso de token JWT con algoritmo nulo o cabecera manipulada",
       "enabled": true
     },
     {
@@ -448,6 +602,34 @@
       "score": 1,
       "color": "",
       "comment": "1 regla(s): Pass-the-Hash y Overpass-the-Hash",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1550.003",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Abuso de delegacion Kerberos - constrained, unconstrained y RBCD",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1552.001",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Robo de ficheros de credenciales de nube y de SSH",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1552.004",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Robo de ficheros de credenciales de nube y de SSH",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1552.005",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Peticion falsificada desde el servidor hacia metadatos de nube",
       "enabled": true
     },
     {
@@ -465,10 +647,38 @@
       "enabled": true
     },
     {
+      "techniqueID": "T1555",
+      "score": 2,
+      "color": "",
+      "comment": "2 regla(s): Lectura de contrasenas de administrador local gestionadas por LAPS; Abuso de DPAPI - masterkeys y clave de respaldo del dominio",
+      "enabled": true
+    },
+    {
       "techniqueID": "T1555.001",
       "score": 1,
       "color": "",
       "comment": "1 regla(s): Acceso o volcado del llavero de macOS",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1555.003",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Acceso a los almacenes de credenciales del navegador",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1555.004",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Volcado de credenciales cacheadas y del Administrador de credenciales de Windows",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1555.005",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Acceso a bases de datos de gestores de contrasenas",
       "enabled": true
     },
     {
@@ -483,6 +693,13 @@
       "score": 1,
       "color": "",
       "comment": "1 regla(s): Politica de acceso condicional modificada o deshabilitada",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1557.001",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Coercion de autenticacion y relay NTLM contra el controlador de dominio",
       "enabled": true
     },
     {
@@ -514,17 +731,38 @@
       "enabled": true
     },
     {
-      "techniqueID": "T1562.001",
-      "score": 3,
+      "techniqueID": "T1560.001",
+      "score": 1,
       "color": "",
-      "comment": "3 regla(s): Gatekeeper deshabilitado o cuarentena eliminada; Manipulacion de Windows Defender; Defensas de seguridad deshabilitadas",
+      "comment": "1 regla(s): Archivado masivo previo a la exfiltracion",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1562.001",
+      "score": 6,
+      "color": "",
+      "comment": "6 regla(s): Gatekeeper deshabilitado o cuarentena eliminada; Defensas de seguridad deshabilitadas; Desinstalacion o parada del sensor EDR; Exclusion anadida al antivirus; y 2 mas",
       "enabled": true
     },
     {
       "techniqueID": "T1562.002",
+      "score": 2,
+      "color": "",
+      "comment": "2 regla(s): Manipulacion del canal de telemetria ETW; Borrado o reduccion del registro de auditoria",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1562.006",
       "score": 1,
       "color": "",
-      "comment": "1 regla(s): Borrado o reduccion del registro de auditoria",
+      "comment": "1 regla(s): Manipulacion del canal de telemetria ETW",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1562.009",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Arranque en modo seguro forzado por bcdedit",
       "enabled": true
     },
     {
@@ -549,10 +787,17 @@
       "enabled": true
     },
     {
-      "techniqueID": "T1567.002",
+      "techniqueID": "T1567.001",
       "score": 1,
       "color": "",
-      "comment": "1 regla(s): Subida de datos a un servicio SaaS no aprobado",
+      "comment": "1 regla(s): Subida de codigo o secretos a repositorio publico",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1567.002",
+      "score": 2,
+      "color": "",
+      "comment": "2 regla(s): Subida de datos a un servicio SaaS no aprobado; Subida a almacenamiento personal en la nube",
       "enabled": true
     },
     {
@@ -581,6 +826,27 @@
       "score": 1,
       "color": "",
       "comment": "1 regla(s): Modificacion de ld.so.preload (rootkit)",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1595.002",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Escaneo automatizado del servidor web por herramienta conocida",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1595.003",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Escaneo automatizado del servidor web por herramienta conocida",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1606",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Abuso de token JWT con algoritmo nulo o cabecera manipulada",
       "enabled": true
     },
     {
@@ -618,7 +884,7 @@
       "#4FD6C4"
     ],
     "minValue": 0,
-    "maxValue": 5
+    "maxValue": 10
   },
   "legendItems": [
     {

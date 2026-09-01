@@ -93,7 +93,7 @@ que se ejecuta en lugar de generar algo que parezca equivalente:
 | Correo desde un dominio recien registrado | Usa el modificador `|lt` (comparacion numerica), que Wazuh no expresa |
 
 Las tres correlaciones si estan disponibles en Splunk, y en Sentinel como KQL
-escrito a mano en `deploy/sentinel/correlaciones.kql`.
+escrito a mano en `deploy/sentinel/consultas/correlaciones.kql`.
 
 ## Paso 3 — Emular con Atomic Red Team
 

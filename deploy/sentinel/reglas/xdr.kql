@@ -1,0 +1,44 @@
+// Generado por tools/build.py — no editar a mano
+// Dominio: xdr  ·  pipeline: tools/pipelines/sentinel.yml + sentinel_asim
+
+// ─────────────────────────────────────────────────────────
+// Desinstalacion o parada del sensor EDR
+// Severidad: critical  ·  ATT&CK: T1489, T1562.001
+// Origen: rules/xdr/xdr_001_desinstalacion_sensor_edr.yml
+imProcessCreate
+| where (TargetProcessCommandLine contains "WinDefend" or TargetProcessCommandLine contains "WdNisSvc" or TargetProcessCommandLine contains "MsSense" or TargetProcessCommandLine contains "SenseIR" or TargetProcessCommandLine contains "CSFalconService" or TargetProcessCommandLine contains "CSFalconContainer" or TargetProcessCommandLine contains "CsUninstallTool" or TargetProcessCommandLine contains "CrowdStrike" or TargetProcessCommandLine contains "WindowsSensor" or TargetProcessCommandLine contains "SentinelAgent" or TargetProcessCommandLine contains "SentinelOne" or TargetProcessCommandLine contains "sentinelctl" or TargetProcessCommandLine contains "CyveraService" or TargetProcessCommandLine contains "cyserver" or TargetProcessCommandLine contains "cytool" or TargetProcessCommandLine contains "Cortex XDR" or TargetProcessCommandLine contains "WazuhSvc" or TargetProcessCommandLine contains "wazuh-agent" or TargetProcessCommandLine contains "OssecSvc" or TargetProcessCommandLine contains "CarbonBlack" or TargetProcessCommandLine contains "CbDefense" or TargetProcessCommandLine contains "SAVService" or TargetProcessCommandLine contains "Sysmon64") and (TargetProcessCommandLine contains "sc delete" or TargetProcessCommandLine contains "sc.exe delete" or TargetProcessCommandLine contains "sc stop" or TargetProcessCommandLine contains "sc.exe stop" or TargetProcessCommandLine contains "sc config" or TargetProcessCommandLine contains "net stop" or TargetProcessCommandLine contains "Stop-Service" or TargetProcessCommandLine contains "Remove-Service" or TargetProcessCommandLine contains "msiexec /x" or TargetProcessCommandLine contains "msiexec.exe /x" or TargetProcessCommandLine contains "call uninstall" or TargetProcessCommandLine contains "Uninstall-Package" or TargetProcessCommandLine contains "/uninstall" or TargetProcessCommandLine contains " -u " or TargetProcessCommandLine contains "start= disabled")
+
+// ─────────────────────────────────────────────────────────
+// Exclusion anadida al antivirus
+// Severidad: high  ·  ATT&CK: T1112, T1562.001
+// Origen: rules/xdr/xdr_002_exclusiones_antivirus.yml
+imRegistry
+| where (RegistryKey endswith "\\Windows Defender\\Exclusions\\Paths*" or RegistryKey endswith "\\Windows Defender\\Exclusions\\Processes*" or RegistryKey endswith "\\Windows Defender\\Exclusions\\Extensions*" or RegistryKey endswith "\\Windows Defender\\Exclusions\\IpAddresses*" or RegistryKey endswith "\\Windows Defender\\Exclusions\\TemporaryPaths*" or RegistryKey endswith "\\Windows Defender Exploit Guard\\ASR\\ASROnlyExclusions*") and (RegistryKey endswith "\\AppData*" or RegistryKey endswith "\\Users\\Public*" or RegistryKey endswith "\\Temp*" or RegistryKey endswith "\\ProgramData*" or RegistryKey endswith "\\PerfLogs*" or RegistryKey endswith "\\$Recycle.Bin*" or RegistryKey endswith "\\Downloads*" or RegistryKey contains ".exe" or RegistryKey contains ".dll" or RegistryKey contains ".ps1" or RegistryKey contains ".bat" or RegistryKey contains ".vbs" or RegistryKey contains ".scr")
+
+// ─────────────────────────────────────────────────────────
+// Reglas ASR desactivadas o puestas en auditoria
+// Severidad: high  ·  ATT&CK: T1112, T1562.001
+// Origen: rules/xdr/xdr_003_reglas_asr_desactivadas.yml
+imProcessCreate
+| where (TargetProcessCommandLine contains "AttackSurfaceReductionRules_Actions" and (TargetProcessCommandLine contains "Disabled" or TargetProcessCommandLine contains "AuditMode" or TargetProcessCommandLine contains "Warn" or TargetProcessCommandLine contains "Actions 0" or TargetProcessCommandLine contains "Actions 2")) or (TargetProcessCommandLine contains "Remove-MpPreference -AttackSurfaceReductionRules_Ids" or TargetProcessCommandLine contains "AttackSurfaceReductionOnlyExclusions") or (TargetProcessCommandLine contains "Windows Defender Exploit Guard\\ASR\\Rules" or TargetProcessCommandLine contains "Windows Defender Exploit Guard\\Controlled Folder Access" or TargetProcessCommandLine contains "Windows Defender Exploit Guard\\Network Protection" or TargetProcessCommandLine contains "EnableControlledFolderAccess" or TargetProcessCommandLine contains "EnableNetworkProtection")
+
+// ─────────────────────────────────────────────────────────
+// Carga de driver vulnerable conocido
+// Severidad: critical  ·  ATT&CK: T1068, T1562.001
+// Origen: rules/xdr/xdr_004_driver_vulnerable_byovd.yml
+DeviceEvents
+| where ActionType =~ "DriverLoad" and ((FolderPath endswith "\\RTCore64.sys" or FolderPath endswith "\\DBUtil_2_3.sys" or FolderPath endswith "\\gdrv.sys" or FolderPath endswith "\\iqvw64e.sys" or FolderPath endswith "\\procexp152.sys" or FolderPath endswith "\\aswArPot.sys" or FolderPath endswith "\\kprocesshacker.sys" or FolderPath endswith "\\viragt64.sys" or FolderPath endswith "\\truesight.sys" or FolderPath endswith "\\mhyprot2.sys" or FolderPath endswith "\\dbk64.sys" or FolderPath endswith "\\WinRing0x64.sys" or FolderPath endswith "\\speedfan.sys" or FolderPath endswith "\\ucorew64.sys") or ((FolderPath contains "\\Users\\" or FolderPath contains "\\AppData\\" or FolderPath contains "\\Temp\\" or FolderPath contains "\\ProgramData\\" or FolderPath contains "\\PerfLogs\\" or FolderPath contains "\\$Recycle.Bin\\") and (SignatureStatus in~ ("Unavailable", "Expired", "Revoked", "Untrusted", "Invalid"))))
+
+// ─────────────────────────────────────────────────────────
+// Manipulacion del canal de telemetria ETW
+// Severidad: high  ·  ATT&CK: T1562.002, T1562.006
+// Origen: rules/xdr/xdr_005_telemetria_etw_manipulada.yml
+imProcessCreate
+| where (TargetProcessCommandLine contains "stop DiagTrack" or TargetProcessCommandLine contains "delete DiagTrack" or TargetProcessCommandLine contains "config DiagTrack" or TargetProcessCommandLine contains "Stop-Service DiagTrack" or TargetProcessCommandLine contains "Set-Service DiagTrack" or TargetProcessCommandLine contains "stop diagnosticshub.standardcollector.service") or (TargetProcessCommandLine contains "\\WMI\\Autologger\\" or TargetProcessCommandLine contains "Autologger\\EventLog-" or TargetProcessCommandLine contains "Autologger\\DefenderApiLogger" or TargetProcessCommandLine contains "Autologger\\DefenderAuditLogger" or TargetProcessCommandLine contains "Autologger\\SenseEventLog" or TargetProcessCommandLine contains "Autologger\\Diagtrack-Listener") or (TargetProcessCommandLine contains "Set-EtwTraceProvider" or TargetProcessCommandLine contains "Remove-EtwTraceProvider" or TargetProcessCommandLine contains "Remove-EtwTraceSession") or ((TargetProcessCommandLine contains "wevtutil sl" or TargetProcessCommandLine contains "wevtutil.exe sl" or TargetProcessCommandLine contains "Set-LogProperties") and (TargetProcessCommandLine contains "/e:false" or TargetProcessCommandLine contains "/enabled:false" or TargetProcessCommandLine contains "-Enabled $false")) or ((TargetProcessCommandLine contains "logman stop" or TargetProcessCommandLine contains "logman.exe stop" or TargetProcessCommandLine contains "logman update trace" or TargetProcessCommandLine contains "logman.exe update trace") and (TargetProcessCommandLine contains "-ets" or TargetProcessCommandLine contains "EventLog-" or TargetProcessCommandLine contains "Autologger" or TargetProcessCommandLine contains "DefenderApiLogger" or TargetProcessCommandLine contains "SenseEvent"))
+
+// ─────────────────────────────────────────────────────────
+// Arranque en modo seguro forzado por bcdedit
+// Severidad: critical  ·  ATT&CK: T1112, T1562.009
+// Origen: rules/xdr/xdr_006_arranque_modo_seguro.yml
+imProcessCreate
+| where (TargetProcessCommandLine contains "/set safeboot" or TargetProcessCommandLine contains "/set {default} safeboot" or TargetProcessCommandLine contains "/set {current} safeboot" or TargetProcessCommandLine contains "safeboot minimal" or TargetProcessCommandLine contains "safeboot network" or TargetProcessCommandLine contains "Set-BcdElement -Element safeboot" or TargetProcessCommandLine contains "safebootalternateshell") or ((TargetProcessCommandLine contains "Control\\SafeBoot\\Minimal" or TargetProcessCommandLine contains "Control\\SafeBoot\\Network") and (TargetProcessCommandLine contains "reg add" or TargetProcessCommandLine contains "reg delete" or TargetProcessCommandLine contains "reg.exe add" or TargetProcessCommandLine contains "reg.exe delete" or TargetProcessCommandLine contains "New-ItemProperty" or TargetProcessCommandLine contains "Set-ItemProperty" or TargetProcessCommandLine contains "Remove-Item"))

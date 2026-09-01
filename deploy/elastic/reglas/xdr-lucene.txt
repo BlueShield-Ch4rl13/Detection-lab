@@ -1,0 +1,20 @@
+# Generado por tools/build.py — no editar a mano
+# Dominio: xdr  ·  Lucene (indexador Wazuh / OpenSearch)
+
+# Desinstalacion o parada del sensor EDR  [critical]
+(process.command_line:(*WinDefend* OR *WdNisSvc* OR *MsSense* OR *SenseIR* OR *CSFalconService* OR *CSFalconContainer* OR *CsUninstallTool* OR *CrowdStrike* OR *WindowsSensor* OR *SentinelAgent* OR *SentinelOne* OR *sentinelctl* OR *CyveraService* OR *cyserver* OR *cytool* OR *Cortex\ XDR* OR *WazuhSvc* OR *wazuh\-agent* OR *OssecSvc* OR *CarbonBlack* OR *CbDefense* OR *SAVService* OR *Sysmon64*)) AND (process.command_line:(*sc\ delete* OR *sc.exe\ delete* OR *sc\ stop* OR *sc.exe\ stop* OR *sc\ config* OR *net\ stop* OR *Stop\-Service* OR *Remove\-Service* OR *msiexec\ \/x* OR *msiexec.exe\ \/x* OR *call\ uninstall* OR *Uninstall\-Package* OR *\/uninstall* OR *\ \-u\ * OR *start\=\ disabled*))
+
+# Exclusion anadida al antivirus  [high]
+(registry.path:(*\\Windows\ Defender\\Exclusions\\Paths\\* OR *\\Windows\ Defender\\Exclusions\\Processes\\* OR *\\Windows\ Defender\\Exclusions\\Extensions\\* OR *\\Windows\ Defender\\Exclusions\\IpAddresses\\* OR *\\Windows\ Defender\\Exclusions\\TemporaryPaths\\* OR *\\Windows\ Defender\ Exploit\ Guard\\ASR\\ASROnlyExclusions\\*)) AND (registry.path:(*\\AppData\\* OR *\\Users\\Public\\* OR *\\Temp\\* OR *\\ProgramData\\* OR *\\PerfLogs\\* OR *\\$Recycle.Bin\\* OR *\\Downloads\\* OR *.exe* OR *.dll* OR *.ps1* OR *.bat* OR *.vbs* OR *.scr*))
+
+# Reglas ASR desactivadas o puestas en auditoria  [high]
+(process.command_line:*AttackSurfaceReductionRules_Actions* AND (process.command_line:(*Disabled* OR *AuditMode* OR *Warn* OR *Actions\ 0* OR *Actions\ 2*))) OR (process.command_line:(*Remove\-MpPreference\ \-AttackSurfaceReductionRules_Ids* OR *AttackSurfaceReductionOnlyExclusions*)) OR (process.command_line:(*Windows\ Defender\ Exploit\ Guard\\ASR\\Rules* OR *Windows\ Defender\ Exploit\ Guard\\Controlled\ Folder\ Access* OR *Windows\ Defender\ Exploit\ Guard\\Network\ Protection* OR *EnableControlledFolderAccess* OR *EnableNetworkProtection*))
+
+# Carga de driver vulnerable conocido  [critical]
+(file.path:(*\\RTCore64.sys OR *\\DBUtil_2_3.sys OR *\\gdrv.sys OR *\\iqvw64e.sys OR *\\procexp152.sys OR *\\aswArPot.sys OR *\\kprocesshacker.sys OR *\\viragt64.sys OR *\\truesight.sys OR *\\mhyprot2.sys OR *\\dbk64.sys OR *\\WinRing0x64.sys OR *\\speedfan.sys OR *\\ucorew64.sys)) OR ((file.path:(*\\Users\\* OR *\\AppData\\* OR *\\Temp\\* OR *\\ProgramData\\* OR *\\PerfLogs\\* OR *\\$Recycle.Bin\\*)) AND (file.code_signature.status:(Unavailable OR Expired OR Revoked OR Untrusted OR Invalid)))
+
+# Manipulacion del canal de telemetria ETW  [high]
+(process.command_line:(*stop\ DiagTrack* OR *delete\ DiagTrack* OR *config\ DiagTrack* OR *Stop\-Service\ DiagTrack* OR *Set\-Service\ DiagTrack* OR *stop\ diagnosticshub.standardcollector.service*)) OR (process.command_line:(*\\WMI\\Autologger\\* OR *Autologger\\EventLog\-* OR *Autologger\\DefenderApiLogger* OR *Autologger\\DefenderAuditLogger* OR *Autologger\\SenseEventLog* OR *Autologger\\Diagtrack\-Listener*)) OR (process.command_line:(*Set\-EtwTraceProvider* OR *Remove\-EtwTraceProvider* OR *Remove\-EtwTraceSession*)) OR ((process.command_line:(*wevtutil\ sl* OR *wevtutil.exe\ sl* OR *Set\-LogProperties*)) AND (process.command_line:(*\/e\:false* OR *\/enabled\:false* OR *\-Enabled\ $false*))) OR ((process.command_line:(*logman\ stop* OR *logman.exe\ stop* OR *logman\ update\ trace* OR *logman.exe\ update\ trace*)) AND (process.command_line:(*\-ets* OR *EventLog\-* OR *Autologger* OR *DefenderApiLogger* OR *SenseEvent*)))
+
+# Arranque en modo seguro forzado por bcdedit  [critical]
+(process.command_line:(*\/set\ safeboot* OR *\/set\ \{default\}\ safeboot* OR *\/set\ \{current\}\ safeboot* OR *safeboot\ minimal* OR *safeboot\ network* OR *Set\-BcdElement\ \-Element\ safeboot* OR *safebootalternateshell*)) OR ((process.command_line:(*Control\\SafeBoot\\Minimal* OR *Control\\SafeBoot\\Network*)) AND (process.command_line:(*reg\ add* OR *reg\ delete* OR *reg.exe\ add* OR *reg.exe\ delete* OR *New\-ItemProperty* OR *Set\-ItemProperty* OR *Remove\-Item*)))

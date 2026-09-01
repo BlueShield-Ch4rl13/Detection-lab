@@ -23,6 +23,7 @@ SALIDA = RAIZ / "docs" / "img" / "cobertura-attack.svg"
 
 RE_TEC = re.compile(r"^attack\.(t\d{4})(?:\.(\d{3}))?$", re.I)
 TACTICAS = {
+    "reconnaissance": "Reconocimiento", "resource-development": "Preparacion",
     "initial-access": "Acceso inicial", "execution": "Ejecucion",
     "persistence": "Persistencia", "privilege-escalation": "Escalada priv.",
     "defense-evasion": "Evasion", "credential-access": "Credenciales",
@@ -33,7 +34,8 @@ TACTICAS = {
 COLOR_DOM = {
     "windows": "#2ee6f0", "cloud": "#f0a72e", "linux": "#4fd6c4",
     "macos": "#a78bfa", "contenedores": "#f472b6", "correo": "#60a5fa",
-    "red": "#34d399", "zta": "#fbbf24",
+    "red": "#34d399", "zta": "#fbbf24", "web": "#fb7185", "exfiltracion": "#38bdf8",
+    "xdr": "#c084fc",
 }
 MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
 

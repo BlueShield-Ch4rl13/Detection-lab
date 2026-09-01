@@ -1,0 +1,99 @@
+valor,tipo,amenaza,nivel,score,confianza,pais,fuente,visto,edad_dias
+176.65.139.206,ip:port,Mirai,alta,72,80,NL,ThreatFox,2026-08-31 09:15:21 UTC,0
+45.225.135.156,ip:port,PureRAT,alta,71,75,NL,ThreatFox,2026-08-30 19:45:59 UTC,0
+154.91.180.246,ip:port,VShell,media,67,100,HK,ThreatFox,2026-08-31 09:05:09 UTC,0
+160.250.128.197,ip:port,Unknown malware,media,63,100,VN,ThreatFox,2026-08-30 14:05:08 UTC,1
+167.99.194.254,ip:port,Aisuru,media,61,100,GB,ThreatFox,2026-08-31 07:46:58 UTC,0
+106.15.10.2,ip:port,Cobalt Strike,media,59,100,CN,ThreatFox,2026-08-31 04:05:05 UTC,0
+1.117.77.166,ip:port,Unknown malware,media,58,100,CN,ThreatFox,2026-08-31 13:05:08 UTC,0
+129.204.11.247,ip:port,Cobalt Strike,media,57,100,CN,ThreatFox,2026-08-31 13:05:05 UTC,0
+43.129.180.120,ip:port,Aisuru,media,57,100,HK,ThreatFox,2026-08-31 12:58:32 UTC,0
+131.226.2.95,ip:port,Remcos,media,57,100,US,ThreatFox,2026-08-31 10:49:45 UTC,0
+213.152.162.29,ip:port,Remcos,media,57,100,NL,ThreatFox,2026-08-31 09:15:22 UTC,0
+117.72.202.93,ip:port,Unknown malware,media,57,100,CN,ThreatFox,2026-08-31 03:05:07 UTC,0
+106.54.41.209,ip:port,Unknown malware,media,57,100,CN,ThreatFox,2026-08-31 03:05:07 UTC,0
+106.53.172.234,ip:port,VShell,media,57,100,CN,ThreatFox,2026-08-30 14:05:07 UTC,1
+101.42.136.73,ip:port,Cobalt Strike,media,56,100,CN,ThreatFox,2026-08-31 13:05:07 UTC,0
+142.11.244.124,ip:port,DanaBot,media,56,100,US,ThreatFox,2026-08-31 12:58:40 UTC,0
+106.55.25.253,ip:port,Cobalt Strike,media,56,100,CN,ThreatFox,2026-08-31 11:05:06 UTC,0
+167.99.128.245,ip:port,Aisuru,media,56,100,DE,ThreatFox,2026-08-31 07:47:09 UTC,0
+123.56.83.34,ip:port,VShell,media,56,100,CN,ThreatFox,2026-08-31 04:05:05 UTC,0
+156.251.11.58,ip:port,ValleyRAT,media,56,100,HK,ThreatFox,2026-08-31 00:55:09 UTC,0
+159.89.24.55,ip:port,Aisuru,media,56,100,DE,ThreatFox,2026-08-30 17:39:55 UTC,0
+121.127.253.146,ip:port,AdaptixC2,media,56,100,HK,ThreatFox,2026-08-30 14:05:05 UTC,1
+175.43.223.199,ip:port,Unknown malware,media,55,100,CN,ThreatFox,2026-08-31 13:05:08 UTC,0
+207.148.64.94,ip:port,VShell,media,55,100,SG,ThreatFox,2026-08-31 12:05:05 UTC,0
+64.224.17.88,ip:port,Remcos,media,55,100,US,ThreatFox,2026-08-31 11:45:04 UTC,0
+147.124.223.53,ip:port,Remcos,media,55,100,US,ThreatFox,2026-08-31 10:10:02 UTC,0
+144.172.84.7,ip:port,ValleyRAT,media,55,100,US,ThreatFox,2026-08-31 09:45:03 UTC,0
+31.76.102.46,ip:port,Havoc,media,55,100,FI,ThreatFox,2026-08-31 09:05:06 UTC,0
+8.148.26.139,ip:port,Cobalt Strike,media,55,100,CN,ThreatFox,2026-08-31 09:05:05 UTC,0
+185.181.8.182,ip:port,Vidar,media,55,100,NL,ThreatFox,2026-08-31 08:35:39 UTC,0
+46.224.87.76,ip:port,Vidar,media,55,100,DE,ThreatFox,2026-08-31 08:35:39 UTC,0
+62.238.126.31,ip:port,Vidar,media,55,100,DE,ThreatFox,2026-08-31 08:35:39 UTC,0
+185.229.225.31,ip:port,Vidar,media,55,100,NL,ThreatFox,2026-08-31 08:35:39 UTC,0
+2.29.15.172,ip:port,Vidar,media,55,100,FI,ThreatFox,2026-08-31 08:35:39 UTC,0
+2.28.53.167,ip:port,Vidar,media,55,100,DE,ThreatFox,2026-08-31 08:35:39 UTC,0
+168.119.61.136,ip:port,Vidar,media,55,100,DE,ThreatFox,2026-08-31 08:35:39 UTC,0
+91.98.236.89,ip:port,Vidar,media,55,100,DE,ThreatFox,2026-08-31 08:35:39 UTC,0
+77.42.69.149,ip:port,Vidar,media,55,100,FI,ThreatFox,2026-08-31 08:35:39 UTC,0
+2.28.55.31,ip:port,Vidar,media,55,100,DE,ThreatFox,2026-08-31 08:35:39 UTC,0
+62.238.117.133,ip:port,Vidar,media,55,100,DE,ThreatFox,2026-08-31 08:35:38 UTC,0
+2.28.51.112,ip:port,Vidar,media,55,100,DE,ThreatFox,2026-08-31 08:35:38 UTC,0
+46.29.26.43,ip:port,Vidar,media,55,100,TR,ThreatFox,2026-08-31 08:35:38 UTC,0
+46.29.26.42,ip:port,Vidar,media,55,100,TR,ThreatFox,2026-08-31 08:35:38 UTC,0
+103.13.210.168,ip:port,Vidar,media,55,100,NL,ThreatFox,2026-08-31 08:35:38 UTC,0
+5.223.57.239,ip:port,Vidar,media,55,100,SG,ThreatFox,2026-08-31 08:35:38 UTC,0
+95.217.223.130,ip:port,Vidar,media,55,100,FI,ThreatFox,2026-08-31 08:35:38 UTC,0
+194.146.39.66,ip:port,Vidar,media,55,100,NL,ThreatFox,2026-08-31 08:35:38 UTC,0
+178.104.215.65,ip:port,Vidar,media,55,100,DE,ThreatFox,2026-08-31 08:35:38 UTC,0
+46.29.26.32,ip:port,Vidar,media,55,100,TR,ThreatFox,2026-08-31 08:35:38 UTC,0
+46.29.26.41,ip:port,Vidar,media,55,100,TR,ThreatFox,2026-08-31 08:35:38 UTC,0
+168.119.60.33,ip:port,Vidar,media,55,100,DE,ThreatFox,2026-08-31 08:35:37 UTC,0
+5.78.91.236,ip:port,Vidar,media,55,100,US,ThreatFox,2026-08-31 08:35:37 UTC,0
+168.119.56.135,ip:port,Vidar,media,55,100,DE,ThreatFox,2026-08-31 08:35:37 UTC,0
+2.28.48.67,ip:port,Vidar,media,55,100,DE,ThreatFox,2026-08-31 08:35:37 UTC,0
+46.29.26.35,ip:port,Vidar,media,55,100,TR,ThreatFox,2026-08-31 08:35:37 UTC,0
+104.248.41.207,ip:port,Aisuru,media,55,100,DE,ThreatFox,2026-08-31 07:47:10 UTC,0
+192.159.99.121,ip:port,Remcos,media,55,100,US,ThreatFox,2026-08-31 07:47:07 UTC,0
+174.138.30.59,ip:port,Aisuru,media,55,100,SG,ThreatFox,2026-08-31 07:47:02 UTC,0
+163.245.199.241,ip:port,Remcos,media,55,100,US,ThreatFox,2026-08-31 07:46:57 UTC,0
+31.97.133.166,ip:port,Remus,media,55,100,US,ThreatFox,2026-08-31 07:46:57 UTC,0
+172.111.163.174,ip:port,Remcos,media,55,100,GB,ThreatFox,2026-08-31 07:46:52 UTC,0
+172.111.163.162,ip:port,Remcos,media,55,100,GB,ThreatFox,2026-08-31 07:46:52 UTC,0
+47.105.114.163,ip:port,VShell,media,55,100,CN,ThreatFox,2026-08-31 01:05:06 UTC,0
+150.158.102.111,ip:port,Cobalt Strike,media,55,100,CN,ThreatFox,2026-08-31 00:05:05 UTC,0
+109.236.50.145,ip:port,Cobalt Strike,media,55,100,NL,ThreatFox,2026-08-30 23:05:05 UTC,0
+104.168.102.116,ip:port,Cobalt Strike,media,55,100,US,ThreatFox,2026-08-30 21:05:07 UTC,0
+102.117.167.19,ip:port,Unknown malware,media,55,100,MU,ThreatFox,2026-08-30 19:05:04 UTC,0
+45.142.30.152,ip:port,Unknown malware,media,55,100,DE,ThreatFox,2026-08-30 17:39:56 UTC,0
+145.79.143.166,ip:port,VShell,media,55,100,HK,ThreatFox,2026-08-30 14:05:08 UTC,1
+162.243.160.70,ip:port,Havoc,media,54,75,US,ThreatFox,2026-08-30 19:43:52 UTC,0
+192.99.70.186,ip:port,Evilginx,media,51,75,CA,ThreatFox,2026-08-31 09:45:32 UTC,0
+157.254.194.45,ip:port,AdaptixC2,media,51,75,US,ThreatFox,2026-08-31 09:44:14 UTC,0
+129.80.106.68,ip:port,Unknown malware,media,51,75,US,ThreatFox,2026-08-31 09:43:42 UTC,0
+64.89.160.45,ip:port,PureLogs Stealer,media,51,75,LU,ThreatFox,2026-08-31 08:56:53 UTC,0
+123.253.32.82,ip:port,Remcos,media,51,75,MY,ThreatFox,2026-08-31 08:44:25 UTC,0
+31.177.110.9,ip:port,AsyncRAT,media,51,75,RU,ThreatFox,2026-08-31 08:40:31 UTC,0
+92.118.206.129,ip:port,XWorm,media,51,75,DE,ThreatFox,2026-08-31 08:40:31 UTC,0
+217.60.103.4,ip:port,Remcos,media,51,75,US,ThreatFox,2026-08-31 08:40:30 UTC,0
+172.245.92.217,ip:port,XWorm,media,51,75,US,ThreatFox,2026-08-31 08:35:22 UTC,0
+209.54.103.151,ip:port,XWorm,media,51,75,US,ThreatFox,2026-08-31 08:35:22 UTC,0
+172.94.111.195,ip:port,Remcos,media,51,75,DE,ThreatFox,2026-08-31 08:15:10 UTC,0
+91.92.43.15,ip:port,Unknown malware,media,51,75,DE,ThreatFox,2026-08-31 07:55:06 UTC,0
+112.213.103.17,ip:port,AsyncRAT,media,51,75,HK,ThreatFox,2026-08-30 23:50:19 UTC,0
+112.213.103.58,ip:port,AsyncRAT,media,51,75,HK,ThreatFox,2026-08-30 23:50:19 UTC,0
+94.228.166.168,ip:port,PureRAT,media,51,75,RU,ThreatFox,2026-08-30 19:46:39 UTC,0
+91.219.239.81,ip:port,AsyncRAT,media,51,75,HU,ThreatFox,2026-08-30 19:46:33 UTC,0
+217.60.195.109,ip:port,PureRAT,media,51,75,NL,ThreatFox,2026-08-30 19:45:29 UTC,0
+195.177.94.188,ip:port,PureRAT,media,51,75,FR,ThreatFox,2026-08-30 19:44:37 UTC,0
+194.59.30.96,ip:port,HypeAgent,media,51,75,FR,ThreatFox,2026-08-30 19:44:35 UTC,0
+185.112.59.115,ip:port,PureRAT,media,51,75,NL,ThreatFox,2026-08-30 19:44:14 UTC,0
+172.86.122.177,ip:port,PureRAT,media,51,75,US,ThreatFox,2026-08-30 19:44:04 UTC,0
+160.119.69.30,ip:port,AsyncRAT,media,51,75,NL,ThreatFox,2026-08-30 19:43:51 UTC,0
+144.31.6.6,ip:port,PureRAT,media,51,75,FI,ThreatFox,2026-08-30 19:43:37 UTC,0
+144.31.106.168,ip:port,Chaos,media,51,75,DE,ThreatFox,2026-08-30 19:43:36 UTC,0
+160.250.181.124,ip:port,Mirai,media,51,75,VN,ThreatFox,2026-08-30 18:09:20 UTC,0
+87.120.104.147,ip:port,Unknown malware,media,51,75,NO,ThreatFox,2026-08-30 18:00:42 UTC,0
+196.251.121.183,ip:port,Cobalt Strike,media,49,50,DE,ThreatFox,2026-08-31 07:46:59 UTC,0
+216.203.20.232,ip:port,Cobalt Strike,media,48,50,NL,ThreatFox,2026-08-31 07:46:59 UTC,0

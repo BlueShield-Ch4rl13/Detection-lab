@@ -1,0 +1,179 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// Consultas de caza e inteligencia — Microsoft Sentinel
+//
+// Escritas a mano. tools/build.py NO las regenera: cruzan contra watchlists y
+// agregan en ventana, y Sigma no expresa ninguna de las dos cosas.
+//
+// Watchlists necesarias, importadas desde deploy/sentinel/watchlists/:
+//   CTI_Ip · CTI_Dominio · CTI_Url · CTI_Hash
+// Al crearlas, el alias debe ser el nombre SIN el prefijo: Ip, Dominio, Url,
+// Hash. La columna de busqueda es `valor` en las cuatro.
+// Ver deploy/sentinel/INSTALAR.md.
+//
+// Por que casi todo es caza y no regla de analitica: un indicador de
+// reputacion coincide muchas veces por sinkholes, CDN compartidas y dominios
+// reciclados. Solo la del hash esta pensada para desplegarse como alerta.
+// ═══════════════════════════════════════════════════════════════════════════
+
+
+// ───────────────────────────────────────────────────────────────────────────
+// ALERTA · Hash de la inteligencia ejecutado en un endpoint
+// Frecuencia sugerida: cada 10 min sobre ventana de 15 min
+// Severidad: High     ATT&CK: T1204.002
+//
+// Un hash no comparte infraestructura con nada legitimo. Si coincide, coincide.
+// ───────────────────────────────────────────────────────────────────────────
+let hashes = _GetWatchlist('Hash') | project valor = tolower(tostring(valor)),
+                                             amenaza, nivel, score, fuente, visto;
+DeviceProcessEvents
+| where TimeGenerated > ago(15m)
+| extend h_sha256 = tolower(SHA256), h_md5 = tolower(MD5), h_sha1 = tolower(SHA1)
+| mv-expand valor = pack_array(h_sha256, h_sha1, h_md5) to typeof(string)
+| where isnotempty(valor)
+| join kind=inner hashes on valor
+| project TimeGenerated, DeviceName, AccountName, FileName, FolderPath,
+          ProcessCommandLine, InitiatingProcessFileName,
+          valor, amenaza, nivel, score, fuente, visto
+| order by TimeGenerated desc
+
+
+// ───────────────────────────────────────────────────────────────────────────
+// CAZA · Contacto con infraestructura de la inteligencia, con umbral
+// Frecuencia sugerida: cada hora sobre ventana de 1 h
+//
+// No dispara con una coincidencia. Exige que el equipo acumule varias, que
+// toque indicadores distintos, o que el indicador sea de nivel alto. Ese es el
+// filtro que separa una CDN compartida de una infeccion.
+// ───────────────────────────────────────────────────────────────────────────
+let ips = _GetWatchlist('Ip') | project valor = tostring(valor), amenaza, nivel;
+let dominios = _GetWatchlist('Dominio') | project valor = tostring(valor), amenaza, nivel;
+let ventana = 1h;
+union isfuzzy=true
+    (DeviceNetworkEvents
+     | where TimeGenerated > ago(ventana)
+     | project TimeGenerated, Equipo = DeviceName,
+               indicador = tostring(RemoteIP), tipo = "ip",
+               contexto = strcat(InitiatingProcessFileName, " ", RemoteUrl)),
+    (DnsEvents
+     | where TimeGenerated > ago(ventana)
+     | project TimeGenerated, Equipo = Computer,
+               indicador = tolower(tostring(Name)), tipo = "dominio",
+               contexto = tostring(ClientIP))
+| join kind=inner (
+      union (ips | extend tipo = "ip"), (dominios | extend tipo = "dominio")
+  ) on indicador == $right.valor
+| summarize Coincidencias = count(),
+            IndicadoresDistintos = dcount(indicador),
+            Indicadores = make_set(indicador, 12),
+            Amenazas = make_set(amenaza, 12),
+            NivelMax = max(nivel),
+            Contextos = make_set(contexto, 8),
+            Primera = min(TimeGenerated),
+            Ultima = max(TimeGenerated)
+        by Equipo
+| where Coincidencias >= 3 or IndicadoresDistintos >= 2 or NivelMax == "alta"
+| extend DuracionMin = round(datetime_diff('second', Ultima, Primera) / 60.0, 1)
+| order by Coincidencias desc
+
+
+// ───────────────────────────────────────────────────────────────────────────
+// CAZA · Intentos contra CVE del catalogo KEV de CISA
+// Frecuencia sugerida: cada 4 h sobre ventana de 24 h
+//
+// No detecta la vulnerabilidad: detecta el intento. Los CVE vienen del bloque
+// cisa_kev_recent del feed, que son los explotados activamente.
+// ───────────────────────────────────────────────────────────────────────────
+// Sustituye por la watchlist CTI_Cve si la importas; si no, pega aqui la lista
+// de intel/listas/splunk/cti_cve_kev.csv.
+let kev = datatable(cve: string, producto: string) [
+    "CVE-2023-49105", "ownCloud"
+];
+union isfuzzy=true W3CIISLog, AZFWApplicationRule, CommonSecurityLog
+| where TimeGenerated > ago(24h)
+| extend linea = strcat(tostring(csUriQuery), " ", tostring(RequestURL),
+                        " ", tostring(AdditionalExtensions))
+| extend cve_visto = extract(@"(CVE-\d{4}-\d{4,7})", 1, linea)
+| where isnotempty(cve_visto)
+| join kind=inner kev on $left.cve_visto == $right.cve
+| summarize Intentos = count(), Origenes = dcount(tostring(cIP)),
+            IPs = make_set(tostring(cIP), 15)
+        by cve_visto, producto
+| order by Intentos desc
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Caza sin inteligencia externa
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ───────────────────────────────────────────────────────────────────────────
+// CAZA · Binarios poco frecuentes en el parque
+// Ventana: 30 dias. Ejecutar bajo demanda, no programada.
+//
+// En un parque homogeneo, un ejecutable que solo ha visto un equipo en treinta
+// dias merece una mirada. No es una alerta: es una lista de trabajo.
+// ───────────────────────────────────────────────────────────────────────────
+DeviceProcessEvents
+| where TimeGenerated > ago(30d)
+| where FolderPath !startswith "C:\\Windows\\System32\\"
+      and FolderPath !startswith "C:\\Windows\\SysWOW64\\"
+      and FolderPath !startswith "C:\\Program Files\\"
+      and FolderPath !startswith "C:\\Program Files (x86)\\"
+| summarize Equipos = dcount(DeviceName), Ejecuciones = count(),
+            Hosts = make_set(DeviceName, 5),
+            Padres = make_set(InitiatingProcessFileName, 5),
+            PrimeraVez = min(TimeGenerated)
+        by FileName, FolderPath
+| where Equipos <= 2
+| extend DiasDesdePrimera = round(datetime_diff('hour', now(), PrimeraVez) / 24.0, 1)
+| order by Equipos asc, Ejecuciones desc
+
+
+// ───────────────────────────────────────────────────────────────────────────
+// CAZA · Patron de baliza por regularidad del intervalo
+// Ventana: 24 h
+//
+// El C2 balizado se delata por la desviacion tipica del intervalo, no por el
+// destino. Un humano navegando produce intervalos irregulares; un implante que
+// pregunta cada N segundos, no. Por eso el filtro es el jitter, no la IP.
+// ───────────────────────────────────────────────────────────────────────────
+DeviceNetworkEvents
+| where TimeGenerated > ago(24h)
+| where isnotempty(RemoteIP) and ActionType == "ConnectionSuccess"
+| where not(ipv4_is_private(RemoteIP))
+| sort by DeviceName asc, RemoteIP asc, TimeGenerated asc
+| extend Anterior = prev(TimeGenerated), MismoPar = (prev(DeviceName) == DeviceName
+                                                     and prev(RemoteIP) == RemoteIP)
+| where MismoPar
+| extend Intervalo = datetime_diff('second', TimeGenerated, Anterior)
+| where Intervalo > 0
+| summarize Conexiones = count(), IntervaloMedio = avg(Intervalo),
+            Desviacion = stdev(Intervalo),
+            Procesos = make_set(InitiatingProcessFileName, 5)
+        by DeviceName, RemoteIP
+| where Conexiones >= 12 and IntervaloMedio > 30
+| extend JitterPct = round((Desviacion / IntervaloMedio) * 100, 1)
+| where JitterPct < 20
+| extend IntervaloMedio = round(IntervaloMedio, 1)
+| order by JitterPct asc, Conexiones desc
+
+
+// ───────────────────────────────────────────────────────────────────────────
+// CAZA · Primer inicio de sesion de un usuario en un equipo
+// Ventana: 24 h contra linea base de 30 dias
+//
+// Convierte un acceso legitimo en una pregunta. En movimiento lateral, la
+// primera sesion en un equipo nuevo es justo la senal, y no la ve ninguna
+// regla de firma.
+// ───────────────────────────────────────────────────────────────────────────
+let base = DeviceLogonEvents
+    | where TimeGenerated between (ago(30d) .. ago(24h))
+    | where ActionType == "LogonSuccess"
+    | distinct AccountName, DeviceName;
+DeviceLogonEvents
+| where TimeGenerated > ago(24h)
+| where ActionType == "LogonSuccess"
+| summarize Sesiones = count(), Primera = min(TimeGenerated),
+            Tipos = make_set(LogonType, 5), Origenes = make_set(RemoteIP, 5)
+        by AccountName, DeviceName
+| join kind=leftanti base on AccountName, DeviceName
+| order by Primera desc

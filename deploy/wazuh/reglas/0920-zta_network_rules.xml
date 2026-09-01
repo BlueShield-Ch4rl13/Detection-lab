@@ -1,0 +1,153 @@
+<!--
+  ZTA Detection Pack - Pilar 3: Redes
+  Marco: NIST SP 800-207 + CISA ZTMM 2.0
+  Rango de IDs: 100300-100399
+
+  Fuente principal: Suricata (eve.json) leido por el modulo logcollector
+  con formato json. Los campos siguen el esquema data.<campo> del decoder
+  de Wazuh. Ajusta <if_group>suricata</if_group> si usas otro sensor.
+
+  Listas CDB necesarias:
+      etc/lists/zta_crown_jewels     (IPs de segmentos protegidos)
+      etc/lists/zta_approved_proxies (IPs de los proxies de salida)
+      etc/lists/zta_threat_intel     (IPs de C2, exportadas desde MISP)
+-->
+<group name="zta,zta_networks,">
+
+  <!-- ================================================================
+       ZTA-NET-001 | Trafico este-oeste hacia un segmento protegido
+       CISA: Networks > Network Segmentation | Advanced
+       Tenet 2: toda comunicacion se asegura con independencia de la red.
+       ================================================================ -->
+  <rule id="100300" level="10">
+    <if_group>suricata</if_group>
+    <list field="data.dest_ip" lookup="address_match_key">etc/lists/zta_crown_jewels</list>
+    <field name="data.src_ip">^10\.|^172\.(1[6-9]|2[0-9]|3[01])\.|^192\.168\.</field>
+    <description>ZTA-NET-001: Trafico este-oeste desde $(data.src_ip) hacia el segmento protegido $(data.dest_ip). Verificar la politica de microsegmentacion.</description>
+    <mitre>
+      <id>T1021</id>
+    </mitre>
+    <nist_800_53>SC.7,AC.4</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_networks,zta_NET-001,cisa_network_segmentation,ztmm_advanced,</group>
+    <info type="text">playbook=zta; severidad_thehive=2; origen=0920-zta_network_rules.xml</info>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-NET-002 | Salida a Internet evitando el proxy corporativo
+       CISA: Networks > Network Traffic Management | Advanced
+       ================================================================ -->
+  <rule id="100301" level="10">
+    <if_group>suricata</if_group>
+    <field name="data.dest_port">^80$|^443$|^8080$</field>
+    <field name="data.src_ip">^10\.|^172\.(1[6-9]|2[0-9]|3[01])\.|^192\.168\.</field>
+    <list field="data.src_ip" lookup="not_address_match_key">etc/lists/zta_approved_proxies</list>
+    <field name="data.dest_ip" negate="yes">^10\.|^172\.(1[6-9]|2[0-9]|3[01])\.|^192\.168\.</field>
+    <description>ZTA-NET-002: Salida directa a Internet desde $(data.src_ip) sin pasar por un proxy aprobado.</description>
+    <mitre>
+      <id>T1090</id>
+    </mitre>
+    <nist_800_53>SC.7,AC.4</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_networks,zta_NET-002,cisa_network_traffic_mgmt,ztmm_advanced,</group>
+    <info type="text">playbook=zta; severidad_thehive=2; origen=0920-zta_network_rules.xml</info>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-NET-003 | Posible tunel DNS
+       CISA: Networks > Network Traffic Management | Advanced
+       Wazuh marca el patron; el analisis por volumen y entropia se hace
+       en Splunk (ZTA-NET-003 en savedsearches.conf).
+       ================================================================ -->
+  <rule id="100302" level="0">
+    <if_group>suricata</if_group>
+    <field name="data.dns.rrtype">^TXT$|^NULL$|^CNAME$</field>
+    <description>ZTA base: consulta DNS de tipo susceptible de tunelizacion.</description>
+    <group>detectionlab,auto_cierre,zta_base,</group>
+    <info type="text">playbook=zta; severidad_thehive=1; origen=0920-zta_network_rules.xml</info>
+  </rule>
+
+  <rule id="100303" level="10" frequency="30" timeframe="60">
+    <if_matched_sid>100302</if_matched_sid>
+    <same_srcip />
+    <description>ZTA-NET-003: Volumen anomalo de consultas DNS TXT/NULL desde $(data.src_ip). Posible tunel DNS o canal C2.</description>
+    <mitre>
+      <id>T1071.004</id>
+    </mitre>
+    <nist_800_53>SC.7,SI.4</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_networks,zta_NET-003,cisa_network_traffic_mgmt,ztmm_advanced,</group>
+    <info type="text">playbook=zta; severidad_thehive=2; origen=0920-zta_network_rules.xml</info>
+  </rule>
+
+  <rule id="100304" level="10">
+    <if_group>suricata</if_group>
+    <field name="data.dns.rrname" type="pcre2">[a-z0-9]{40,}\.</field>
+    <description>ZTA-NET-003: Consulta DNS con etiqueta anormalmente larga desde $(data.src_ip). Posible exfiltracion por DNS.</description>
+    <mitre>
+      <id>T1071.004</id>
+    </mitre>
+    <nist_800_53>SC.7,SI.4</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_networks,zta_NET-003,cisa_network_traffic_mgmt,ztmm_advanced,</group>
+    <info type="text">playbook=zta; severidad_thehive=2; origen=0920-zta_network_rules.xml</info>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-NET-004 | Protocolo en claro hacia un recurso protegido
+       CISA: Networks > Traffic Encryption | Advanced
+       Tenet 2 de NIST 800-207.
+       ================================================================ -->
+  <rule id="100305" level="10">
+    <if_group>suricata</if_group>
+    <field name="data.dest_port">^21$|^23$|^80$|^110$|^143$|^389$|^1433$|^3306$</field>
+    <list field="data.dest_ip" lookup="address_match_key">etc/lists/zta_crown_jewels</list>
+    <description>ZTA-NET-004: Conexion sin cifrar hacia el recurso protegido $(data.dest_ip):$(data.dest_port). Incumple el cifrado obligatorio en transito.</description>
+    <mitre>
+      <id>T1040</id>
+    </mitre>
+    <nist_800_53>SC.8,SC.13</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_networks,zta_NET-004,cisa_traffic_encryption,ztmm_advanced,</group>
+    <info type="text">playbook=zta; severidad_thehive=2; origen=0920-zta_network_rules.xml</info>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-NET-005 | Barrido de puertos desde un host interno
+       CISA: Networks > Network Segmentation | Initial
+       ================================================================ -->
+  <rule id="100306" level="0">
+    <if_group>suricata</if_group>
+    <field name="data.event_type">^flow$|^alert$</field>
+    <field name="data.src_ip">^10\.|^172\.(1[6-9]|2[0-9]|3[01])\.|^192\.168\.</field>
+    <description>ZTA base: flujo interno observado por Suricata.</description>
+    <group>detectionlab,auto_cierre,zta_base,</group>
+    <info type="text">playbook=zta; severidad_thehive=1; origen=0920-zta_network_rules.xml</info>
+  </rule>
+
+  <rule id="100307" level="10" frequency="25" timeframe="120">
+    <if_matched_sid>100306</if_matched_sid>
+    <same_srcip />
+    <different_dstip />
+    <description>ZTA-NET-005: $(data.src_ip) ha contactado con un numero anomalo de destinos internos en 2 minutos. Posible reconocimiento lateral.</description>
+    <mitre>
+      <id>T1046</id>
+    </mitre>
+    <nist_800_53>SC.7,SI.4</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_networks,zta_NET-005,cisa_network_segmentation,ztmm_initial,</group>
+    <info type="text">playbook=zta; severidad_thehive=2; origen=0920-zta_network_rules.xml</info>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-NET-006 | Conexion hacia un indicador de C2 conocido
+       CISA: Networks > Network Resilience | Advanced
+       La lista se genera desde MISP (ver scripts/misp_to_cdb.py)
+       ================================================================ -->
+  <rule id="100308" level="13">
+    <if_group>suricata</if_group>
+    <list field="data.dest_ip" lookup="address_match_key">etc/lists/zta_threat_intel</list>
+    <description>ZTA-NET-006: $(data.src_ip) ha contactado con el indicador de amenaza conocido $(data.dest_ip).</description>
+    <mitre>
+      <id>T1071</id>
+    </mitre>
+    <nist_800_53>SI.4,SC.7</nist_800_53>
+    <group>detectionlab,auto_analisis,zta_networks,zta_NET-006,cisa_network_resilience,ztmm_advanced,</group>
+    <info type="text">playbook=zta; severidad_thehive=3; origen=0920-zta_network_rules.xml</info>
+  </rule>
+
+</group>

@@ -1,0 +1,55 @@
+// Generado por tools/build.py — no editar a mano
+// Dominio: correo  ·  pipeline: tools/pipelines/sentinel.yml + sentinel_asim
+
+// ─────────────────────────────────────────────────────────
+// Correo desde un dominio recien registrado
+// Severidad: medium  ·  ATT&CK: T1566.002
+// Origen: rules/correo/soc_mail_001_dominio_reciente.yml
+ProofpointTAPMessagesBlocked_CL
+| where eventType_s =~ "message_delivered" and senderDomainAge_d < 30
+
+// ─────────────────────────────────────────────────────────
+// Suplantacion de directivo en el nombre para mostrar
+// Severidad: high  ·  ATT&CK: T1534
+// Origen: rules/correo/soc_mail_002_suplantacion_directivo.yml
+ProofpointTAPMessagesBlocked_CL
+| where (headerFrom_s contains "Director General" or headerFrom_s contains "Direccion Financiera" or headerFrom_s contains "CEO" or headerFrom_s contains "CFO") and senderIsInternal_b =~ false and (not(sender_s endswith "@midominio.local"))
+
+// ─────────────────────────────────────────────────────────
+// Fallo de autenticacion de correo en el dominio propio
+// Severidad: high  ·  ATT&CK: T1566.002
+// Origen: rules/correo/soc_mail_003_fallo_dmarc.yml
+ProofpointTAPMessagesBlocked_CL
+| where (senderDomain_s endswith "midominio.local" and dmarcResult_s =~ "fail") and (spfResult_s =~ "fail" or dkimResult_s =~ "fail")
+
+// ─────────────────────────────────────────────────────────
+// Adjunto con formato usado para entrega de malware
+// Severidad: high  ·  ATT&CK: T1566.001
+// Origen: rules/correo/soc_mail_004_adjunto_sospechoso.yml
+ProofpointTAPMessagesBlocked_CL
+| where (attachmentName_s endswith ".iso" or attachmentName_s endswith ".img" or attachmentName_s endswith ".vhd" or attachmentName_s endswith ".vhdx" or attachmentName_s endswith ".one" or attachmentName_s endswith ".lnk" or attachmentName_s endswith ".chm" or attachmentName_s endswith ".hta") or attachmentName_s matches regex ".*\\.(pdf|doc|docx|xls|xlsx|jpg|png)\\s*\\.(exe|scr|js|vbs|bat|cmd|ps1)$" or (attachmentName_s endswith ".docm" or attachmentName_s endswith ".xlsm" or attachmentName_s endswith ".pptm" or attachmentName_s endswith ".xlam")
+
+// ─────────────────────────────────────────────────────────
+// Usuario pulsa una URL de phishing bloqueada o permitida
+// Severidad: high  ·  ATT&CK: T1566.002
+// Origen: rules/correo/soc_mail_005_url_pulsada.yml
+ProofpointTAPMessagesBlocked_CL
+| where (eventType_s in~ ("click_permitted", "click_blocked")) and (threatStatus_s in~ ("active", "falsePositive"))
+
+// ─────────────────────────────────────────────────────────
+// Regla de buzon con reenvio externo creada
+// Severidad: high  ·  ATT&CK: T1114.003, T1564.008
+// Origen: rules/correo/soc_mail_006_regla_buzon_externa.yml
+OfficeActivity
+| where (Operation in~ ("New-InboxRule", "Set-InboxRule", "Set-Mailbox", "UpdateInboxRules")) and (Parameters contains "ForwardTo" or Parameters contains "ForwardAsAttachmentTo" or Parameters contains "RedirectTo" or Parameters contains "ForwardingSmtpAddress" or Parameters contains "DeleteMessage" or Parameters contains "MoveToFolder")
+
+// ─────────────────────────────────────────────────────────
+// HTML smuggling en adjunto
+// Severidad: high  ·  ATT&CK: T1027.006
+// Origen: rules/correo/soc_mail_008_html_smuggling.yml
+ProofpointTAPMessagesBlocked_CL
+| where (attachmentName_s endswith ".html" or attachmentName_s endswith ".htm" or attachmentName_s endswith ".svg") and (attachmentContent_s contains "msSaveOrOpenBlob" or attachmentContent_s contains "new Blob(" or attachmentContent_s contains "application/octet-stream" or attachmentContent_s contains "download=" or attachmentContent_s contains "atob(" or attachmentContent_s contains "base64,")
+
+// ── Sin conversion automatica a KQL ──
+//   soc_mail_007_envio_masivo_interno.yml: Backend does not support correlation rules.
+// Ver deploy/sentinel/consultas/correlaciones.kql

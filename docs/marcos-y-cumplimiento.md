@@ -22,7 +22,7 @@ dividen en tres clases:
 | **Detectan una ausencia** | Copia de seguridad no ejecutada dentro del RPO, notificacion NIS2 de 72 h pendiente, retencion por debajo del minimo | Sigma detecta que algo **pasa**. Estas detectan que algo **no ha pasado** dentro de un plazo, que es una busqueda programada sobre un registro, no una coincidencia de evento. |
 
 Las detecciones de esta via viven como **reglas nativas de Wazuh** en
-`deploy/wazuh/09[0-6]*.xml` y como **busquedas programadas de Splunk**. El
+`deploy/wazuh/reglas/09[0-6]*.xml` y como **busquedas programadas de Splunk**. El
 catalogo declara para cada una si esta en los dos SIEM o solo en Splunk, y en
 qué estado está.
 
@@ -104,11 +104,11 @@ a mano y se despliegan tal cual.
 
 ```bash
 # Wazuh: reglas de marco (series 100100-100799)
-sudo cp deploy/wazuh/09[0-6]*.xml /var/ossec/etc/rules/
+sudo cp deploy/wazuh/reglas/09[0-6]*.xml /var/ossec/etc/rules/
 sudo systemctl restart wazuh-manager
 
 # Wazuh: reglas generadas desde Sigma (serie 101000+)
-sudo cp deploy/wazuh/0970-detection_lab_sigma.xml /var/ossec/etc/rules/
+sudo cp deploy/wazuh/reglas/0970-detection_lab_sigma.xml /var/ossec/etc/rules/
 ```
 
 Las series de identificadores no se solapan, asi que las dos vias pueden
@@ -118,4 +118,115 @@ convivir en el mismo manager:
 |---|---|
 | 100100 – 100699 | Detecciones Zero Trust escritas a mano |
 | 100700 – 100799 | Detecciones de cumplimiento escritas a mano |
-| 101000 – 101999 | Generadas desde `rules/` por `tools/sigma_to_wazuh.py` |
+| 101000 – 101299 | Generadas desde `rules/` por `tools/sigma_to_wazuh.py` |
+
+---
+
+# Mapeo a NIST SP 800-53 e ISO/IEC 27001:2022
+
+Añadido a las 127 reglas Sigma: cada una lleva, además de sus etiquetas ATT&CK,
+los controles que **evidencia**.
+
+```yaml
+tags:
+    - attack.credential-access
+    - attack.t1003.002
+    - attack.t1003.004
+    - iso27001-2022.a-5-17     # Authentication information
+    - iso27001-2022.a-8-5      # Secure authentication
+    - nist.ac-6                # Least Privilege
+    - nist.ia-5                # Authenticator Management
+```
+
+## Qué afirma el mapeo, y qué no
+
+**Lo que afirma:** esta regla aporta evidencia a la parte de detección de este
+control.
+
+**Lo que no afirma:** que el control esté cumplido. AC-2 (*Account Management*)
+exige además procedimientos de alta y baja, revisión periódica y titularidad de
+cada cuenta. Nada de eso lo demuestra una regla Sigma. Presentar «tengo 17
+reglas que tocan AC-2» como cumplimiento de AC-2 es exactamente el tipo de
+afirmación que un auditor tumba en la primera pregunta.
+
+La matriz dice «esta regla aporta evidencia a este control», que es una
+afirmación mucho más pequeña y la única que se sostiene.
+
+## Se genera, no se etiqueta a mano
+
+`tools/mapear_marcos.py` **deriva** el mapeo de la técnica ATT&CK de cada regla.
+Una regla nueva queda mapeada sola; una regla que cambia de técnica cambia de
+control.
+
+Un mapeo mantenido a mano se desincroniza a la tercera regla nueva, y un mapeo
+desincronizado es peor que ninguno: en una auditoría se presenta como evidencia
+de una cobertura que ya no existe. El CI comprueba en cada commit que el mapeo
+sigue cuadrando.
+
+```bash
+python3 tools/mapear_marcos.py            # etiqueta y genera la matriz
+python3 tools/mapear_marcos.py --check    # sólo informa
+```
+
+## Controles transversales
+
+Cinco aplican a **toda** la biblioteca por construcción. No se etiquetan en cada
+regla porque sería repetir cinco líneas 127 veces sin aportar nada:
+
+| Control | Título |
+|---|---|
+| `AU-6` | Audit Record Review, Analysis, and Reporting |
+| `AU-12` | Audit Record Generation |
+| `SI-4` | System Monitoring |
+| `A.8.15` | Logging |
+| `A.8.16` | Monitoring activities |
+
+## Cobertura
+
+**62 controles distintos**: 37 de NIST SP 800-53 Rev 5 y 25 del Anexo A de
+ISO/IEC 27001:2022. Ninguna de las 127 reglas se queda sin control asignado.
+
+Los diez con más reglas de respaldo:
+
+| Control | Reglas | Título |
+|---|---:|---|
+| `AC-6` | 30 | Least Privilege |
+| `CM-7` | 27 | Least Functionality |
+| `A.8.5` | 26 | Secure authentication |
+| `SC-7` | 26 | Boundary Protection |
+| `A.8.7` | 24 | Protection against malware |
+| `SI-3` | 24 | Malicious Code Protection |
+| `IA-5` | 22 | Authenticator Management |
+| `A.8.9` | 18 | Configuration management |
+| `AC-2` | 17 | Account Management |
+| `A.5.17` | 17 | Authentication information |
+
+## La matriz
+
+`marcos/matriz_controles.csv`, una fila por regla:
+
+| Columna | Contenido |
+|---|---|
+| `regla` | Nombre del fichero Sigma |
+| `dominio` | Carpeta de `rules/` |
+| `titulo` | Título de la regla |
+| `severidad` | Nivel Sigma |
+| `mitre` | Técnicas base ATT&CK |
+| `nist_800_53` | Controles NIST, separados por coma |
+| `iso_27001_2022` | Controles del Anexo A |
+| `justificacion` | **Por qué** ese mapeo, técnica a técnica |
+
+La columna `justificacion` es la que hace la matriz defendible: en una auditoría
+la pregunta siguiente a «¿esto cubre AU-9?» siempre es «¿por qué?», y ahí está
+escrita.
+
+## Fuentes verificadas
+
+Los identificadores y títulos se comprobaron contra la fuente, no contra
+memoria:
+
+- **NIST SP 800-53 Rev 5** — `AU-6` es *Audit Record Review, Analysis, and
+  Reporting*, y la familia AU va de AU-1 a AU-16 sin AU-15.
+- **ISO/IEC 27001:2022 Anexo A** — 93 controles en 4 temas. Los de detección son
+  `A.8.15` *Logging* y `A.8.16` *Monitoring activities*; inteligencia de
+  amenazas es `A.5.7`, no un control del tema 8.

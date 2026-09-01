@@ -1,0 +1,32 @@
+# Generado por tools/build.py — no editar a mano
+# Dominio: linux  ·  ES|QL (Elastic)
+
+# Ejecucion de payload codificado en base64  [high]
+from * metadata _id, _index, _version | where (CommandLine like "*base64 -d*" or CommandLine like "*base64 --decode*" or CommandLine like "*base64 -di*") and (CommandLine like "*|bash*" or CommandLine like "*| bash*" or CommandLine like "*|sh*" or CommandLine like "*| sh*" or CommandLine like "*eval*")
+
+# Permisos de ejecucion en /tmp o /dev/shm  [medium]
+from * metadata _id, _index, _version | where CommandLine like "*chmod*" and (CommandLine like "*/tmp/*" or CommandLine like "*/dev/shm/*" or CommandLine like "*/var/tmp/*") and (CommandLine like "*+x*" or CommandLine like "*0755*" or CommandLine like "*777*")
+
+# Persistencia por cron  [medium]
+from * metadata _id, _index, _version | where CommandLine like "*crontab -*" or CommandLine like "*/etc/cron.d/*" or CommandLine like "*/etc/crontab*" or CommandLine like "*/var/spool/cron*"
+
+# Deshabilitar historial de shell (anti-forense)  [medium]
+from * metadata _id, _index, _version | where CommandLine like "*unset HISTFILE*" or CommandLine like "*HISTFILE=/dev/null*" or CommandLine like "*HISTSIZE=0*" or CommandLine like "*export HISTSIZE=0*"
+
+# Descarga tuberia a shell (curl|bash)  [high]
+from * metadata _id, _index, _version | where (CommandLine like "*curl*" or CommandLine like "*wget*") and (CommandLine like "*|bash*" or CommandLine like "*| bash*" or CommandLine like "*|sh*" or CommandLine like "*| sh*")
+
+# Modificacion de ld.so.preload (rootkit)  [critical]
+from * metadata _id, _index, _version | where CommandLine like "*/etc/ld.so.preload*"
+
+# Lectura de /etc/shadow  [high]
+from * metadata _id, _index, _version | where CommandLine like "*/etc/shadow*"
+
+# Shell inversa (bash /dev/tcp)  [high]
+from * metadata _id, _index, _version | where CommandLine like "*/dev/tcp/*" or CommandLine like "*/dev/udp/*" or CommandLine like "*bash -i*" or CommandLine like "*sh -i*"
+
+# Adicion de clave SSH (authorized_keys)  [high]
+from * metadata _id, _index, _version | where CommandLine like "*authorized_keys*" and (CommandLine like "*echo*" or CommandLine like "*tee*" or CommandLine like "*>>*" or CommandLine like "*>*" or CommandLine like "*cat*")
+
+# Creacion o modificacion de cuenta  [medium]
+from * metadata _id, _index, _version | where ends_with(Image, "/useradd") or ends_with(Image, "/usermod") or ends_with(Image, "/adduser")

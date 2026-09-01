@@ -1,7 +1,17 @@
+# Cadena de conversion Sigma -> Splunk / Sentinel / Wazuh / Elastic
+#
+# Wazuh no aparece aqui porque no tiene backend oficial de pySigma: su
+# conversion la hace tools/sigma_to_wazuh.py, que no necesita dependencias
+# fuera de pyyaml.
+
 sigma-cli>=1.0                       # CLI de conversion Sigma
 pysigma>=0.11                        # motor de validacion Sigma
-pysigma-backend-splunk>=1.0          # backend Splunk
-pysigma-backend-elasticsearch>=1.0   # backend Elastic (Lucene / ES|QL) - tambien Wazuh/OpenSearch
+
+pysigma-backend-splunk>=1.0          # backend Splunk (SPL)
+pysigma-backend-kusto>=0.4           # backend Kusto: Microsoft Sentinel y Defender XDR
+pysigma-backend-elasticsearch>=1.0   # backend Elastic: Lucene y ES|QL
+
 pysigma-pipeline-sysmon>=1.0         # mapeo de campos a Sysmon
 pysigma-pipeline-windows>=1.0        # mapeo de logs de Windows
+
 pyyaml>=6.0

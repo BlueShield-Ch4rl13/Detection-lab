@@ -388,3 +388,44 @@ transformations:
       - type: logsource
         category: image_load
 
+
+  # ── Carga de drivers (driver_load) ──────────────────────────────────────
+  # ASIM tampoco esquematiza driver_load, y sin esta entrada el backend de
+  # Kusto no sabe contra que tabla escribir: la conversion falla con
+  # "Unable to determine table name from rule". En Defender XDR la carga de un
+  # driver llega a DeviceEvents, distinguida por ActionType.
+  #
+  # Signature y SignatureStatus NO son columnas: viajan dentro de la columna
+  # dynamic AdditionalFields, igual que PipeName o GrantedAccess mas arriba. La
+  # regla de analitica los crea antes del where:
+  #
+  #   DeviceEvents
+  #   | where ActionType == "DriverLoad"
+  #   | extend af = parse_json(AdditionalFields)
+  #   | extend Signature       = tostring(af.Signature),
+  #            SignatureStatus = tostring(af.SignatureStatus)
+  - id: tabla_driverload
+    type: set_state
+    key: query_table
+    val: DeviceEvents
+    rule_conditions:
+      - type: logsource
+        category: driver_load
+
+  - id: accion_driver_load
+    type: add_condition
+    conditions:
+      ActionType: DriverLoad
+    rule_conditions:
+      - type: logsource
+        category: driver_load
+
+  - id: campos_driverload
+    type: field_name_mapping
+    mapping:
+      ImageLoaded: FolderPath
+      Image: InitiatingProcessFolderPath
+      Hashes: SHA256
+    rule_conditions:
+      - type: logsource
+        category: driver_load
