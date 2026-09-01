@@ -1,0 +1,26 @@
+# Generado por tools/build.py — no editar a mano
+# Dominio: zta  ·  ES|QL (Elastic)
+
+# Montaje de almacenamiento extraible  [medium]
+from * metadata _id, _index, _version | where EventID==6416 and (ClassName like "*DiskDrive*" or ClassName like "*USB*" or ClassName like "*WPD*")
+
+# Uso de protocolo de autenticacion heredado  [high]
+from * metadata _id, _index, _version | where ResultType=="0" and (ClientAppUsed in ("IMAP4", "POP3", "SMTP", "MAPI Over HTTP", "Exchange ActiveSync", "Other clients", "Authenticated SMTP", "Exchange Web Services"))
+
+# Cuenta de servicio con inicio de sesion interactivo  [high]
+from * metadata _id, _index, _version | where EventID==4624 and (LogonType in (2, 7, 10, 11)) and (starts_with(TargetUserName, "svc_") or starts_with(TargetUserName, "srv_") or starts_with(TargetUserName, "sa_") or starts_with(TargetUserName, "app_")) and not ends_with(TargetUserName, "$")
+
+# Protocolo en claro hacia un recurso que exige cifrado  [medium]
+from * metadata _id, _index, _version | where (DestinationPort in (21, 23, 69, 110, 143, 389, 512, 513, 514)) and Initiated=="true"
+
+# Carga de libreria desde una ruta no estandar  [high]
+from * metadata _id, _index, _version | where EventID==7 and (ImageLoaded like "*\\AppData\\Local\\Temp\\*" or ImageLoaded like "*\\AppData\\Roaming\\*" or ImageLoaded like "*\\Users\\Public\\*" or ImageLoaded like "*\\ProgramData\\*" or ImageLoaded like "*\\Windows\\Temp\\*" or ImageLoaded like "*\\$Recycle.Bin\\*") and ends_with(ImageLoaded, ".dll") and not (Signed=="true" and SignatureStatus=="Valid" or ends_with(Image, "\\msiexec.exe") or ends_with(Image, "\\TrustedInstaller.exe") or ends_with(Image, "\\setup.exe"))
+
+# Instalacion de paquete desde un repositorio no aprobado  [medium]
+from * metadata _id, _index, _version | where (ends_with(Image, "/pip") or ends_with(Image, "/pip3") or ends_with(Image, "/npm") or ends_with(Image, "/yarn") or ends_with(Image, "/gem") or ends_with(Image, "/go") or ends_with(Image, "/cargo") or ends_with(Image, "/composer")) and (CommandLine like "*install git+*" or CommandLine like "*install http://*" or CommandLine like "*install https://*" or CommandLine like "*--index-url*" or CommandLine like "*--extra-index-url*" or CommandLine like "*--registry*" or CommandLine like "*install github.com/*" or CommandLine like "*curl*" and CommandLine like "*install*") and not (CommandLine like "*repo.midominio.local*" or CommandLine like "*nexus.midominio.local*" or CommandLine like "*artifactory.midominio.local*")
+
+# Modificacion de un fichero de dependencias o lockfile  [medium]
+from * metadata _id, _index, _version | where (ends_with(TargetFilename, "/package-lock.json") or ends_with(TargetFilename, "/yarn.lock") or ends_with(TargetFilename, "/pnpm-lock.yaml") or ends_with(TargetFilename, "/poetry.lock") or ends_with(TargetFilename, "/Pipfile.lock") or ends_with(TargetFilename, "/requirements.txt") or ends_with(TargetFilename, "/go.sum") or ends_with(TargetFilename, "/Cargo.lock") or ends_with(TargetFilename, "/composer.lock") or ends_with(TargetFilename, "/Gemfile.lock")) and not (ends_with(Image, "/git") or ends_with(Image, "/npm") or ends_with(Image, "/yarn") or ends_with(Image, "/pnpm") or ends_with(Image, "/poetry") or ends_with(Image, "/pip") or ends_with(Image, "/pip3") or ends_with(Image, "/go") or ends_with(Image, "/cargo") or ends_with(Image, "/composer") or ends_with(Image, "/bundle"))
+
+# Borrado o reduccion del registro de auditoria  [critical]
+from * metadata _id, _index, _version | where EventID in (1102, 1100) or EventID==4719

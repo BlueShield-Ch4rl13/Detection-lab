@@ -1,0 +1,39 @@
+title: Persistencia por LaunchAgent o LaunchDaemon
+id: 85b54d2d-a1e6-56d4-bc85-eb76d07aad0c
+status: experimental
+description: |
+    Detecta la escritura de un fichero .plist en las rutas que launchd carga
+    automaticamente al arrancar el sistema o al iniciar sesion el usuario. Es el
+    mecanismo de persistencia mas usado en macOS, tanto por adware como por
+    implantes de acceso remoto.
+references:
+    - https://attack.mitre.org/techniques/T1543/001/
+    - https://www.launchd.info/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1543.001
+    - attack.t1543.004
+logsource:
+    category: file_event
+    product: macos
+detection:
+    selection_rutas:
+        TargetFilename|contains:
+            - '/Library/LaunchAgents/'
+            - '/Library/LaunchDaemons/'
+            - '/Library/StartupItems/'
+    selection_plist:
+        TargetFilename|endswith: '.plist'
+    filtro_instaladores:
+        Image|startswith:
+            - '/usr/sbin/installer'
+            - '/System/Library/PrivateFrameworks/PackageKit.framework/'
+            - '/usr/libexec/xpcproxy'
+    condition: selection_rutas and selection_plist and not filtro_instaladores
+falsepositives:
+    - Instaladores .pkg legitimos, que normalmente van precedidos de un evento de installer
+    - Herramientas de gestion de flota (Jamf, Munki) desplegando agentes
+level: medium

@@ -1,0 +1,40 @@
+title: Escape de contenedor hacia los namespaces del host
+id: d4e7c487-eb0b-5457-99f7-c59ad3143ecd
+status: experimental
+description: |
+    nsenter contra el PID 1, chroot sobre un /host montado o la escritura de
+    release_agent en cgroups son las tres rutas clasicas para salir de un
+    contenedor privilegiado y ejecutar en el nodo.
+references:
+    - https://attack.mitre.org/techniques/T1611/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.privilege-escalation
+    - attack.t1611
+logsource:
+    category: process_creation
+    product: linux
+detection:
+    selection_nsenter:
+        Image|endswith: '/nsenter'
+        CommandLine|contains:
+            - '-t 1'
+            - '--target 1'
+            - '--mount=/proc/1/ns/mnt'
+    selection_chroot:
+        Image|endswith: '/chroot'
+        CommandLine|contains:
+            - '/host'
+            - '/mnt/host'
+            - '/proc/1/root'
+    selection_cgroup:
+        CommandLine|contains:
+            - 'release_agent'
+            - 'notify_on_release'
+    selection_procroot:
+        CommandLine|contains: '/proc/1/root'
+    condition: 1 of selection_*
+falsepositives:
+    - Herramientas de depuracion de nodos como kubectl debug, que deberian ser puntuales y trazables
+level: critical

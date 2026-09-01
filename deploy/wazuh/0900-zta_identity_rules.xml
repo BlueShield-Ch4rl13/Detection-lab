@@ -1,0 +1,211 @@
+<!--
+  ZTA Detection Pack - Pilar 1: Identidad
+  Marco: NIST SP 800-207 + CISA Zero Trust Maturity Model 2.0
+  Rango de IDs: 100100-100199 (rango de usuario: 100000-120000)
+
+  Nota de diseno: Wazuh solo admite las etiquetas de cumplimiento pci_dss, gdpr,
+  hipaa, nist_800_53, tsc y gpg13. No existe una etiqueta ZTA, asi que el mapeo
+  Zero Trust se hace con <group> (zta_, cisa_, ztmm_) y se consulta con:
+      /var/ossec/bin/wazuh-logtest
+      curl -k -u user:pass -X GET "https://<manager>:55000/rules?group=zta"
+
+  Listas CDB necesarias (ver docs/03-despliegue-wazuh.md):
+      etc/lists/zta_privileged_accounts
+      etc/lists/zta_service_accounts
+      etc/lists/zta_admin_jumphosts
+-->
+<group name="zta,zta_identity,">
+
+  <!-- ================================================================
+       ZTA-ID-001 | Fuerza bruta seguida de autenticacion exitosa
+       CISA: Identity > Authentication | NIST 800-207: Tenet 4 | Initial
+       ================================================================ -->
+  <rule id="100100" level="0">
+    <if_group>authentication_failed|invalid_login|authentication_failures</if_group>
+    <description>ZTA base: intento de autenticacion fallido (usado en correlacion).</description>
+    <group>zta_base,</group>
+  </rule>
+
+  <rule id="100101" level="10" frequency="6" timeframe="300">
+    <if_matched_sid>100100</if_matched_sid>
+    <same_srcip />
+    <if_group>authentication_success</if_group>
+    <description>ZTA-ID-001: Autenticacion exitosa desde $(srcip) tras multiples fallos. Posible fuerza bruta con exito.</description>
+    <mitre>
+      <id>T1110.001</id>
+    </mitre>
+    <nist_800_53>IA.2,AC.7</nist_800_53>
+    <group>zta_identity,zta_ID-001,cisa_authentication,ztmm_initial,authentication_success,</group>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-ID-002 | Cuenta privilegiada autenticada fuera del jump host
+       CISA: Identity > Authentication | Advanced
+       Los logs de Windows no llevan el resultado de MFA: la verificacion
+       real de "sin MFA" se hace en Splunk contra los sign-in del IdP
+       (ver savedsearches.conf). Aqui se cubre el control equivalente de
+       acceso privilegiado desde origen no aprobado.
+       ================================================================ -->
+  <rule id="100102" level="12">
+    <if_group>authentication_success</if_group>
+    <list field="user" lookup="match_key">etc/lists/zta_privileged_accounts</list>
+    <list field="srcip" lookup="not_address_match_key">etc/lists/zta_admin_jumphosts</list>
+    <description>ZTA-ID-002: Cuenta privilegiada $(user) autenticada desde $(srcip), fuera de los equipos de administracion aprobados.</description>
+    <mitre>
+      <id>T1078.002</id>
+    </mitre>
+    <nist_800_53>IA.2,AC.6</nist_800_53>
+    <group>zta_identity,zta_ID-002,cisa_authentication,ztmm_advanced,</group>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-ID-003 | Cambio de geografia entre autenticaciones
+       CISA: Identity > Risk Assessments | Advanced
+       Requiere GeoIP habilitado en el manager. El calculo de velocidad
+       (viaje imposible propiamente dicho) se hace en Splunk.
+       ================================================================ -->
+  <rule id="100103" level="10" frequency="2" timeframe="3600">
+    <if_matched_group>authentication_success</if_matched_group>
+    <same_user />
+    <different_srcgeoip />
+    <description>ZTA-ID-003: El usuario $(user) se ha autenticado desde dos paises distintos en menos de una hora.</description>
+    <mitre>
+      <id>T1078.004</id>
+    </mitre>
+    <nist_800_53>AC.2,SI.4</nist_800_53>
+    <group>zta_identity,zta_ID-003,cisa_risk_assessments,ztmm_advanced,</group>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-ID-004 | MFA fatigue: rechazos consecutivos
+       CISA: Identity > Authentication | Advanced
+       Requiere ingesta de logs del IdP en JSON con el campo mfa_result.
+       ================================================================ -->
+  <rule id="100104" level="0">
+    <decoded_as>json</decoded_as>
+    <field name="mfa_result">^denied$|^rejected$|^fraud$</field>
+    <description>ZTA base: notificacion MFA rechazada por el usuario.</description>
+    <group>zta_base,</group>
+  </rule>
+
+  <rule id="100105" level="12" frequency="4" timeframe="600">
+    <if_matched_sid>100104</if_matched_sid>
+    <same_field>user</same_field>
+    <description>ZTA-ID-004: Multiples notificaciones MFA rechazadas para $(user). Posible MFA fatigue o push bombing.</description>
+    <mitre>
+      <id>T1621</id>
+    </mitre>
+    <nist_800_53>IA.2,IA.5</nist_800_53>
+    <group>zta_identity,zta_ID-004,cisa_authentication,ztmm_advanced,</group>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-ID-005 | Alta de cuenta en grupo privilegiado
+       CISA: Identity > Access Management | Initial
+       ================================================================ -->
+  <rule id="100106" level="10">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID">^4728$|^4732$|^4756$</field>
+    <description>ZTA-ID-005: Miembro anadido a un grupo privilegiado de Windows por $(win.eventdata.subjectUserName).</description>
+    <mitre>
+      <id>T1098</id>
+    </mitre>
+    <nist_800_53>AC.2,AC.6</nist_800_53>
+    <group>zta_identity,zta_ID-005,cisa_access_management,ztmm_initial,</group>
+  </rule>
+
+  <rule id="100107" level="10">
+    <if_group>syslog</if_group>
+    <match>usermod -aG sudo|usermod -aG wheel|adduser sudo|gpasswd -a</match>
+    <description>ZTA-ID-005: Cuenta anadida a un grupo con privilegios de administracion en Linux.</description>
+    <mitre>
+      <id>T1098</id>
+    </mitre>
+    <nist_800_53>AC.2,AC.6</nist_800_53>
+    <group>zta_identity,zta_ID-005,cisa_access_management,ztmm_initial,</group>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-ID-006 | Cuenta de servicio con inicio de sesion interactivo
+       CISA: Identity > Identity Stores | Advanced
+       ================================================================ -->
+  <rule id="100108" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID">^4624$</field>
+    <field name="win.eventdata.logonType">^2$|^10$|^11$</field>
+    <list field="win.eventdata.targetUserName" lookup="match_key">etc/lists/zta_service_accounts</list>
+    <description>ZTA-ID-006: La cuenta de servicio $(win.eventdata.targetUserName) ha iniciado sesion de forma interactiva (tipo $(win.eventdata.logonType)).</description>
+    <mitre>
+      <id>T1078.003</id>
+    </mitre>
+    <nist_800_53>AC.6,IA.4</nist_800_53>
+    <group>zta_identity,zta_ID-006,cisa_identity_stores,ztmm_advanced,</group>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-ID-007 | Cuenta creada y utilizada de inmediato
+       CISA: Identity > Identity Stores | Initial
+       ================================================================ -->
+  <rule id="100109" level="5">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID">^4720$</field>
+    <description>ZTA base: cuenta de usuario creada en Windows.</description>
+    <group>zta_base,</group>
+  </rule>
+
+  <rule id="100110" level="12" frequency="2" timeframe="600">
+    <if_matched_sid>100109</if_matched_sid>
+    <if_group>authentication_success</if_group>
+    <description>ZTA-ID-007: Cuenta recien creada utilizada para autenticarse en menos de 10 minutos. Posible persistencia.</description>
+    <mitre>
+      <id>T1136.001</id>
+    </mitre>
+    <nist_800_53>AC.2,IA.4</nist_800_53>
+    <group>zta_identity,zta_ID-007,cisa_identity_stores,ztmm_initial,</group>
+  </rule>
+
+  <rule id="100111" level="10">
+    <if_group>syslog</if_group>
+    <match>useradd|new user:</match>
+    <description>ZTA-ID-007: Cuenta local creada en Linux. Verificar contra el proceso de alta aprobado.</description>
+    <mitre>
+      <id>T1136.001</id>
+    </mitre>
+    <nist_800_53>AC.2,IA.4</nist_800_53>
+    <group>zta_identity,zta_ID-007,cisa_identity_stores,ztmm_initial,</group>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-ID-008 | Uso de protocolo de autenticacion heredado
+       CISA: Identity > Authentication | Advanced
+       ================================================================ -->
+  <rule id="100112" level="8">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID">^4624$</field>
+    <field name="win.eventdata.lmPackageName">NTLM V1|^LM$</field>
+    <description>ZTA-ID-008: Autenticacion mediante NTLMv1/LM para $(win.eventdata.targetUserName). Protocolo heredado incompatible con Zero Trust.</description>
+    <mitre>
+      <id>T1078</id>
+    </mitre>
+    <nist_800_53>IA.2,SC.13</nist_800_53>
+    <group>zta_identity,zta_ID-008,cisa_authentication,ztmm_advanced,</group>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-ID-009 | Acceso concedido sin reevaluar la postura del equipo
+       CISA: Identity > Risk Assessments | Optimal
+       Correlaciona con ZTA-DEV-003 (fallo de baseline SCA, regla 100203)
+       ================================================================ -->
+  <rule id="100113" level="12" frequency="2" timeframe="1800">
+    <if_matched_sid>100203</if_matched_sid>
+    <if_group>authentication_success</if_group>
+    <same_srcip />
+    <description>ZTA-ID-009: Autenticacion exitosa desde un equipo que acaba de fallar el baseline Zero Trust. La politica de acceso no se ha reevaluado.</description>
+    <mitre>
+      <id>T1078</id>
+    </mitre>
+    <nist_800_53>AC.2,CM.6</nist_800_53>
+    <group>zta_identity,zta_ID-009,cisa_risk_assessments,ztmm_optimal,</group>
+  </rule>
+
+</group>

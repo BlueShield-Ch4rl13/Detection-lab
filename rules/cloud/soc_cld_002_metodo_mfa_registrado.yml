@@ -1,0 +1,29 @@
+title: Metodo MFA registrado tras un inicio de sesion de riesgo
+id: 6bd3a056-bb2a-5da6-9e88-2ed2cfbc375f
+status: stable
+description: |
+    Registrar un segundo factor propio es como el atacante convierte un acceso puntual
+    en persistencia. Detecta el alta de un metodo de autenticacion en la ventana
+    posterior a un inicio de sesion marcado como de riesgo. La correlacion temporal la
+    aporta el SIEM sobre esta regla base.
+references:
+    - https://attack.mitre.org/techniques/T1098/005/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.persistence
+    - attack.t1098.005
+logsource:
+    product: azure
+    service: auditlogs
+detection:
+    selection:
+        properties.message:
+            - 'User registered security info'
+            - 'Admin registered security info'
+            - 'User registered all required security info'
+            - 'User changed default security info'
+    condition: selection
+falsepositives:
+    - Altas de empleado y renovacion de dispositivo, que son frecuentes y obligan a correlar con la senal de riesgo
+level: medium

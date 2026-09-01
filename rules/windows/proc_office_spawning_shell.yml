@@ -4,13 +4,13 @@ status: experimental
 description: 'Word/Excel/Outlook creando cmd/powershell/wscript: tipico de phishing
   con macros.'
 references:
-- https://attack.mitre.org/techniques/001
+- https://attack.mitre.org/techniques/T1204/002/
 author: C. Villalba
 date: 2026/07/16
 tags:
 - attack.execution
 - attack.t1204.002
-- attack.initial_access
+- attack.initial-access
 - attack.t1566.001
 logsource:
   category: process_creation

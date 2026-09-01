@@ -1,0 +1,32 @@
+# Generado por tools/build.py — no editar a mano
+# Dominio: linux  ·  Lucene (indexador Wazuh / OpenSearch)
+
+# Ejecucion de payload codificado en base64  [high]
+(CommandLine:(*base64\ \-d* OR *base64\ \-\-decode* OR *base64\ \-di*)) AND (CommandLine:(*\|bash* OR *\|\ bash* OR *\|sh* OR *\|\ sh* OR *eval*))
+
+# Permisos de ejecucion en /tmp o /dev/shm  [medium]
+(CommandLine:*chmod* AND (CommandLine:(*\/tmp\/* OR *\/dev\/shm\/* OR *\/var\/tmp\/*))) AND (CommandLine:(*\+x* OR *0755* OR *777*))
+
+# Persistencia por cron  [medium]
+CommandLine:(*crontab\ \-* OR *\/etc\/cron.d\/* OR *\/etc\/crontab* OR *\/var\/spool\/cron*)
+
+# Deshabilitar historial de shell (anti-forense)  [medium]
+CommandLine:(*unset\ HISTFILE* OR *HISTFILE\=\/dev\/null* OR *HISTSIZE\=0* OR *export\ HISTSIZE\=0*)
+
+# Descarga tuberia a shell (curl|bash)  [high]
+(CommandLine:(*curl* OR *wget*)) AND (CommandLine:(*\|bash* OR *\|\ bash* OR *\|sh* OR *\|\ sh*))
+
+# Modificacion de ld.so.preload (rootkit)  [critical]
+CommandLine:*\/etc\/ld.so.preload*
+
+# Lectura de /etc/shadow  [high]
+CommandLine:*\/etc\/shadow*
+
+# Shell inversa (bash /dev/tcp)  [high]
+CommandLine:(*\/dev\/tcp\/* OR *\/dev\/udp\/* OR *bash\ \-i* OR *sh\ \-i*)
+
+# Adicion de clave SSH (authorized_keys)  [high]
+CommandLine:*authorized_keys* AND (CommandLine:(*echo* OR *tee* OR *\>\>* OR *\>* OR *cat*))
+
+# Creacion o modificacion de cuenta  [medium]
+Image:(*\/useradd OR *\/usermod OR *\/adduser)

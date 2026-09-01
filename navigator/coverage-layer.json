@@ -6,182 +6,609 @@
     "layer": "4.5"
   },
   "domain": "enterprise-attack",
-  "description": "Tecnicas cubiertas por el catalogo de reglas Sigma de detection-lab (complemento de Infra-SocAnalyst).",
+  "description": "Tecnicas cubiertas por la biblioteca Sigma de detection-lab. Cada regla se despliega en Splunk, Microsoft Sentinel, Wazuh y Elastic desde una unica definicion.",
   "sorting": 3,
   "techniques": [
+    {
+      "techniqueID": "T1003",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Herramienta de abuso de Kerberos ejecutada",
+      "enabled": true
+    },
     {
       "techniqueID": "T1003.001",
       "score": 2,
       "color": "",
-      "comment": "2 regla(s) Sigma",
+      "comment": "2 regla(s): Volcado de memoria de LSASS; Acceso a memoria de LSASS con permisos de lectura",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1003.006",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): DCSync - replicacion de directorio desde un equipo que no es DC",
       "enabled": true
     },
     {
       "techniqueID": "T1003.008",
       "score": 1,
       "color": "",
-      "comment": "1 regla(s) Sigma",
+      "comment": "1 regla(s): Lectura de /etc/shadow",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1021.006",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Ejecucion remota por WMI o WinRM",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1027",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): PowerShell codificado u ofuscado",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1027.006",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): HTML smuggling en adjunto",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1040",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Protocolo en claro hacia un recurso que exige cifrado",
       "enabled": true
     },
     {
       "techniqueID": "T1047",
+      "score": 2,
+      "color": "",
+      "comment": "2 regla(s): Ejecucion via WMIC process call create; Ejecucion remota por WMI o WinRM",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1048",
       "score": 1,
       "color": "",
-      "comment": "1 regla(s) Sigma",
+      "comment": "1 regla(s): Volumen de subida anomalo hacia el exterior",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1052.001",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Montaje de almacenamiento extraible",
       "enabled": true
     },
     {
       "techniqueID": "T1053.003",
       "score": 1,
       "color": "",
-      "comment": "1 regla(s) Sigma",
+      "comment": "1 regla(s): Persistencia por cron",
       "enabled": true
     },
     {
       "techniqueID": "T1053.005",
       "score": 1,
       "color": "",
-      "comment": "1 regla(s) Sigma",
+      "comment": "1 regla(s): Tarea programada sospechosa",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1055",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Inyeccion de codigo en proceso remoto",
       "enabled": true
     },
     {
       "techniqueID": "T1059.001",
-      "score": 2,
+      "score": 1,
       "color": "",
-      "comment": "2 regla(s) Sigma",
+      "comment": "1 regla(s): PowerShell codificado u ofuscado",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1059.002",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): AppleScript ejecutando shell o descargando codigo",
       "enabled": true
     },
     {
       "techniqueID": "T1059.004",
-      "score": 3,
+      "score": 4,
       "color": "",
-      "comment": "3 regla(s) Sigma",
+      "comment": "4 regla(s): Ejecucion de payload codificado en base64; Descarga tuberia a shell (curl|bash); Shell inversa (bash /dev/tcp); Descarga y ejecucion directa en macOS",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1069.002",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Enumeracion de Active Directory - BloodHound y comandos de reconocimiento",
       "enabled": true
     },
     {
       "techniqueID": "T1070.001",
+      "score": 2,
+      "color": "",
+      "comment": "2 regla(s): Defensas de seguridad deshabilitadas; Borrado o reduccion del registro de auditoria",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1070.002",
       "score": 1,
       "color": "",
-      "comment": "1 regla(s) Sigma",
+      "comment": "1 regla(s): Borrado de registros del sistema en macOS",
       "enabled": true
     },
     {
       "techniqueID": "T1070.003",
+      "score": 2,
+      "color": "",
+      "comment": "2 regla(s): Deshabilitar historial de shell (anti-forense); Borrado de registros del sistema en macOS",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1071",
       "score": 1,
       "color": "",
-      "comment": "1 regla(s) Sigma",
+      "comment": "1 regla(s): Named pipe caracteristico de framework de C2",
       "enabled": true
     },
     {
       "techniqueID": "T1071.001",
+      "score": 2,
+      "color": "",
+      "comment": "2 regla(s): Patron de beaconing hacia un destino externo; Proceso del sistema con conexion saliente inusual",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1071.004",
       "score": 1,
       "color": "",
-      "comment": "1 regla(s) Sigma",
+      "comment": "1 regla(s): Tunelizacion o exfiltracion por DNS",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1078.002",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Cuenta de servicio con inicio de sesion interactivo",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1078.003",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Enlace a un rol con privilegios de administrador del cluster",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1078.004",
+      "score": 2,
+      "color": "",
+      "comment": "2 regla(s): Dispositivo no conforme accediendo a un recurso corporativo; Uso de protocolo de autenticacion heredado",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1087.002",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Enumeracion de Active Directory - BloodHound y comandos de reconocimiento",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1090.003",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Inicio de sesion desde una red de anonimizacion",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1091",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Montaje de almacenamiento extraible",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1098.001",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Credencial anadida a una aplicacion o service principal",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1098.003",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Alta en un rol privilegiado de Entra ID",
       "enabled": true
     },
     {
       "techniqueID": "T1098.004",
       "score": 1,
       "color": "",
-      "comment": "1 regla(s) Sigma",
+      "comment": "1 regla(s): Adicion de clave SSH (authorized_keys)",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1098.005",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Metodo MFA registrado tras un inicio de sesion de riesgo",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1102",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Canal de mando sobre un servicio legitimo",
       "enabled": true
     },
     {
       "techniqueID": "T1105",
       "score": 3,
       "color": "",
-      "comment": "3 regla(s) Sigma",
+      "comment": "3 regla(s): Descarga tuberia a shell (curl|bash); Descarga y ejecucion directa en macOS; LOLBin usado para descargar y ejecutar",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1110.003",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Fallo de autenticacion en Entra ID por credencial invalida",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1114.003",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Regla de buzon con reenvio externo creada",
       "enabled": true
     },
     {
       "techniqueID": "T1136.001",
-      "score": 2,
+      "score": 3,
       "color": "",
-      "comment": "2 regla(s) Sigma",
+      "comment": "3 regla(s): Creacion o modificacion de cuenta; Creacion de usuario local u oculto en macOS; Creacion de cuenta local",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1136.002",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Cuenta de equipo creada por un usuario no administrador",
       "enabled": true
     },
     {
       "techniqueID": "T1140",
       "score": 2,
       "color": "",
-      "comment": "2 regla(s) Sigma",
+      "comment": "2 regla(s): Ejecucion de payload codificado en base64; LOLBin usado para descargar y ejecutar",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1190",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Explotacion de vulnerabilidad web contra un servicio publicado",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1195.001",
+      "score": 2,
+      "color": "",
+      "comment": "2 regla(s): Instalacion de paquete desde un repositorio no aprobado; Modificacion de un fichero de dependencias o lockfile",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1195.002",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Instalacion de paquete desde un repositorio no aprobado",
       "enabled": true
     },
     {
       "techniqueID": "T1197",
       "score": 1,
       "color": "",
-      "comment": "1 regla(s) Sigma",
+      "comment": "1 regla(s): LOLBin usado para descargar y ejecutar",
       "enabled": true
     },
     {
       "techniqueID": "T1204.002",
+      "score": 2,
+      "color": "",
+      "comment": "2 regla(s): Documento de Office lanzando shell; Ejecucion de binario desde una ruta de escritura de usuario",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1218",
       "score": 1,
       "color": "",
-      "comment": "1 regla(s) Sigma",
+      "comment": "1 regla(s): LOLBin usado para descargar y ejecutar",
       "enabled": true
     },
     {
       "techniqueID": "T1218.005",
       "score": 1,
       "color": "",
-      "comment": "1 regla(s) Sigma",
+      "comment": "1 regla(s): LOLBin usado para descargar y ejecutar",
       "enabled": true
     },
     {
       "techniqueID": "T1218.010",
       "score": 1,
       "color": "",
-      "comment": "1 regla(s) Sigma",
+      "comment": "1 regla(s): LOLBin usado para descargar y ejecutar",
       "enabled": true
     },
     {
       "techniqueID": "T1222.002",
       "score": 1,
       "color": "",
-      "comment": "1 regla(s) Sigma",
+      "comment": "1 regla(s): Permisos de ejecucion en /tmp o /dev/shm",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1484.001",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Modificacion sospechosa de directiva de grupo",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1486",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Cifrado masivo de ficheros por ransomware",
       "enabled": true
     },
     {
       "techniqueID": "T1490",
       "score": 1,
       "color": "",
-      "comment": "1 regla(s) Sigma",
+      "comment": "1 regla(s): Destruccion de copias de seguridad y puntos de restauracion",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1505.003",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Interaccion con webshell",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1534",
+      "score": 2,
+      "color": "",
+      "comment": "2 regla(s): Suplantacion de directivo en el nombre para mostrar; Correo entregado desde una cuenta interna",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1539",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Inicio de sesion correcto en Entra ID",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1543.001",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Persistencia por LaunchAgent o LaunchDaemon",
       "enabled": true
     },
     {
       "techniqueID": "T1543.003",
       "score": 1,
       "color": "",
-      "comment": "1 regla(s) Sigma",
+      "comment": "1 regla(s): Creacion de servicio via sc.exe",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1543.004",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Persistencia por LaunchAgent o LaunchDaemon",
       "enabled": true
     },
     {
       "techniqueID": "T1547.001",
       "score": 1,
       "color": "",
-      "comment": "1 regla(s) Sigma",
+      "comment": "1 regla(s): Persistencia por claves de arranque del registro",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1548.006",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Manipulacion de la base de datos TCC",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1550.001",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Consentimiento concedido a una aplicacion no verificada",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1550.002",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Pass-the-Hash y Overpass-the-Hash",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1552.007",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Lectura de secretos de Kubernetes",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1553.001",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Gatekeeper deshabilitado o cuarentena eliminada",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1555.001",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Acceso o volcado del llavero de macOS",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1556.006",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Uso de protocolo de autenticacion heredado",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1556.009",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Politica de acceso condicional modificada o deshabilitada",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1558",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Herramienta de abuso de Kerberos ejecutada",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1558.001",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Indicio de Golden Ticket - TGS de krbtgt con cifrado degradado",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1558.003",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Kerberoasting - solicitud masiva de tickets de servicio con RC4",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1558.004",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): AS-REP Roasting - peticion sin preautenticacion Kerberos",
       "enabled": true
     },
     {
       "techniqueID": "T1562.001",
+      "score": 2,
+      "color": "",
+      "comment": "2 regla(s): Gatekeeper deshabilitado o cuarentena eliminada; Defensas de seguridad deshabilitadas",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1562.002",
       "score": 1,
       "color": "",
-      "comment": "1 regla(s) Sigma",
+      "comment": "1 regla(s): Borrado o reduccion del registro de auditoria",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1564.008",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Regla de buzon con reenvio externo creada",
       "enabled": true
     },
     {
       "techniqueID": "T1566.001",
+      "score": 2,
+      "color": "",
+      "comment": "2 regla(s): Adjunto con formato usado para entrega de malware; Documento de Office lanzando shell",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1566.002",
+      "score": 3,
+      "color": "",
+      "comment": "3 regla(s): Correo desde un dominio recien registrado; Fallo de autenticacion de correo en el dominio propio; Usuario pulsa una URL de phishing bloqueada o permitida",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1567.002",
       "score": 1,
       "color": "",
-      "comment": "1 regla(s) Sigma",
+      "comment": "1 regla(s): Subida de datos a un servicio SaaS no aprobado",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1569.002",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Ejecucion remota tipo PsExec",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1574.001",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Carga de libreria desde una ruta no estandar",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1574.002",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Carga de libreria desde una ruta no estandar",
       "enabled": true
     },
     {
       "techniqueID": "T1574.006",
       "score": 1,
       "color": "",
-      "comment": "1 regla(s) Sigma",
+      "comment": "1 regla(s): Modificacion de ld.so.preload (rootkit)",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1609",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Ejecucion interactiva dentro de un pod",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1610",
+      "score": 2,
+      "color": "",
+      "comment": "2 regla(s): Acceso al socket del runtime de contenedores; Creacion de pod privilegiado",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1611",
+      "score": 5,
+      "color": "",
+      "comment": "5 regla(s): Escape de contenedor hacia los namespaces del host; Acceso al socket del runtime de contenedores; Contenedor con capacidades de kernel peligrosas; Pod que monta una ruta sensible del nodo; y 1 mas",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1649",
+      "score": 1,
+      "color": "",
+      "comment": "1 regla(s): Abuso de servicios de certificados de Active Directory",
       "enabled": true
     }
   ],
@@ -191,7 +618,7 @@
       "#4FD6C4"
     ],
     "minValue": 0,
-    "maxValue": 3
+    "maxValue": 5
   },
   "legendItems": [
     {

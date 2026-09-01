@@ -1,0 +1,30 @@
+title: Inicio de sesion desde una red de anonimizacion
+id: 91c66a9f-76c5-5135-80b8-0c98c3d7518c
+status: experimental
+description: |
+    Autenticacion correcta desde Tor, una VPN comercial o un proveedor de proxy
+    residencial. En un entorno corporativo con VPN propia no hay motivo para que un
+    usuario entre por esa via, y es el origen habitual del uso de credenciales robadas.
+references:
+    - https://attack.mitre.org/techniques/T1090/003/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.defense-evasion
+    - attack.command-and-control
+    - attack.t1090.003
+logsource:
+    product: azure
+    service: signinlogs
+detection:
+    selection:
+        ResultType: '0'
+        RiskEventTypes|contains:
+            - 'anonymizedIPAddress'
+            - 'maliciousIPAddress'
+            - 'unfamiliarFeatures'
+            - 'adminConfirmedUserCompromised'
+    condition: selection
+falsepositives:
+    - Usuarios en itinerancia con VPN personal, situacion que conviene regular por politica
+level: high

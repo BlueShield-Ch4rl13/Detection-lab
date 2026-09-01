@@ -1,0 +1,38 @@
+title: Descarga y ejecucion directa en macOS
+id: b37e6c5e-7e87-5523-a3d3-dcad9c9356ce
+status: experimental
+description: |
+    Patron curl o wget encadenado a un interprete sin escribir el codigo en disco.
+    Evita la deteccion basada en fichero y es la primera fase de casi todos los
+    instaladores maliciosos de macOS distribuidos por publicidad enganosa.
+references:
+    - https://attack.mitre.org/techniques/T1105/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.command-and-control
+    - attack.execution
+    - attack.t1105
+    - attack.t1059.004
+logsource:
+    category: process_creation
+    product: macos
+detection:
+    selection_descarga:
+        CommandLine|contains:
+            - 'curl '
+            - 'wget '
+            - 'nscurl '
+    selection_tuberia:
+        CommandLine|contains:
+            - '| bash'
+            - '| sh'
+            - '| zsh'
+            - '| python'
+            - '|bash'
+            - '|sh'
+            - '| osascript'
+    condition: selection_descarga and selection_tuberia
+falsepositives:
+    - Instaladores de herramientas de desarrollo como Homebrew o rustup
+level: high

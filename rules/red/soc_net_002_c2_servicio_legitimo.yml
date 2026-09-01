@@ -1,0 +1,43 @@
+title: Canal de mando sobre un servicio legitimo
+id: 30f00c05-fe4f-53a9-8499-9b822d50df2e
+status: experimental
+description: |
+    Uso de plataformas de confianza como canal de C2 o de exfiltracion: webhooks de
+    Discord y Slack, la API de Telegram, pastebin y servicios de tunel. Pasan el filtro
+    de reputacion porque el dominio es legitimo, asi que hay que mirar la ruta.
+references:
+    - https://attack.mitre.org/techniques/T1102/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.command-and-control
+    - attack.exfiltration
+    - attack.t1102
+logsource:
+    category: proxy
+detection:
+    selection_webhook:
+        c-uri|contains:
+            - 'discord.com/api/webhooks'
+            - 'discordapp.com/api/webhooks'
+            - 'hooks.slack.com/services'
+            - 'api.telegram.org/bot'
+    selection_paste:
+        c-uri|contains:
+            - 'pastebin.com/raw'
+            - 'hastebin.com/raw'
+            - 'ghostbin.co/paste'
+            - 'transfer.sh/'
+            - 'anonfiles.com/'
+            - 'gofile.io/uploadFile'
+    selection_tunel:
+        c-uri|contains:
+            - '.ngrok.io'
+            - '.ngrok-free.app'
+            - '.trycloudflare.com'
+            - '.loca.lt'
+            - '.serveo.net'
+    condition: 1 of selection_*
+falsepositives:
+    - Integraciones internas legitimas con Slack o Teams, que conviene registrar por origen
+level: high

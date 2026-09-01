@@ -1,0 +1,29 @@
+title: Fallo de autenticacion de correo en el dominio propio
+id: d34e302f-f3c2-58f3-9339-166a0ce20690
+status: experimental
+description: |
+    Correo que dice venir del dominio corporativo y falla SPF, DKIM o DMARC. Es
+    suplantacion directa del dominio, no de un parecido. Con DMARC en modo reject
+    deberia estar bloqueado; que llegue significa que la politica esta en none o que la
+    excepcion de un proveedor esta siendo abusada.
+references:
+    - https://attack.mitre.org/techniques/T1566/002/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.initial-access
+    - attack.t1566.002
+logsource:
+    product: proofpoint
+    service: tap
+detection:
+    selection:
+        senderDomain|endswith: 'midominio.local'
+        dmarcResult: 'fail'
+    selection_auth:
+        - spfResult: 'fail'
+        - dkimResult: 'fail'
+    condition: selection and selection_auth
+falsepositives:
+    - Proveedores que envian en nombre del dominio sin estar en el SPF, que hay que registrar
+level: high

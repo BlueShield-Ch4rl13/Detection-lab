@@ -1,0 +1,32 @@
+title: Ejecucion interactiva dentro de un pod
+id: 3f755e60-8d98-5bf4-8dea-10ad9f0effa5
+status: experimental
+description: |
+    kubectl exec abre una shell dentro de un contenedor en ejecucion. En un
+    cluster gestionado por GitOps no deberia hacer falta: cualquier exec sobre
+    produccion es, como minimo, una desviacion del procedimiento, y en un
+    compromiso es la via habitual de movimiento lateral.
+references:
+    - https://attack.mitre.org/techniques/T1609/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.execution
+    - attack.lateral-movement
+    - attack.t1609
+logsource:
+    product: kubernetes
+    service: audit
+detection:
+    selection:
+        verb: 'create'
+        resource: 'pods'
+        subresource:
+            - 'exec'
+            - 'attach'
+    filtro_servicio:
+        username|startswith: 'system:serviceaccount:kube-system:'
+    condition: selection and not filtro_servicio
+falsepositives:
+    - Depuracion autorizada en entornos de no produccion
+level: medium

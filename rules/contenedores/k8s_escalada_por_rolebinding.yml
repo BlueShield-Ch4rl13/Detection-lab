@@ -1,0 +1,34 @@
+title: Enlace a un rol con privilegios de administrador del cluster
+id: 34f6c415-b810-5fbb-ac9a-836216b887f6
+status: experimental
+description: |
+    Crear un ClusterRoleBinding hacia cluster-admin concede control total del
+    cluster al sujeto enlazado. Es la forma mas limpia de persistir en Kubernetes:
+    no toca ningun nodo y sobrevive al borrado de los pods del atacante.
+references:
+    - https://attack.mitre.org/techniques/T1078/003/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1078.003
+logsource:
+    product: kubernetes
+    service: audit
+detection:
+    selection:
+        verb:
+            - 'create'
+            - 'update'
+            - 'patch'
+        apiGroup: 'rbac.authorization.k8s.io'
+        resource:
+            - 'clusterrolebindings'
+            - 'rolebindings'
+    filtro_instalacion:
+        username|startswith: 'system:serviceaccount:kube-system:'
+    condition: selection and not filtro_instalacion
+falsepositives:
+    - Despliegue inicial del cluster o de un operador, acotado en el tiempo
+level: high

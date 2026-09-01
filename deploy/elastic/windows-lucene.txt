@@ -1,0 +1,89 @@
+# Generado por tools/build.py — no editar a mano
+# Dominio: windows  ·  Lucene (indexador Wazuh / OpenSearch)
+
+# Proceso del sistema con conexion saliente inusual  [medium]
+(process.executable.caseless:(*\\rundll32.exe OR *\\regsvr32.exe OR *\\mshta.exe)) AND network.direction:egress
+
+# Creacion de cuenta local  [medium]
+(process.command_line:*net* AND process.command_line:*user*) AND process.command_line:*\/add*
+
+# Documento de Office lanzando shell  [high]
+(process.parent.executable.caseless:(*\\winword.exe OR *\\excel.exe OR *\\powerpnt.exe OR *\\outlook.exe)) AND (process.executable.caseless:(*\\cmd.exe OR *\\powershell.exe OR *\\wscript.exe OR *\\cscript.exe OR *\\mshta.exe))
+
+# Creacion de servicio via sc.exe  [medium]
+process.executable.caseless:*\\sc.exe AND process.command_line:*create* AND (process.command_line:(*binPath* OR *binpath\=*))
+
+# Ejecucion via WMIC process call create  [medium]
+process.executable.caseless:*\\wmic.exe AND (process.command_line:*process* AND process.command_line:*call* AND process.command_line:*create*)
+
+# Kerberoasting - solicitud masiva de tickets de servicio con RC4  [high]
+winlog.channel:Security AND ((event.code:4769 AND winlog.event_data.TicketOptions:0x40810000 AND winlog.event_data.TicketEncryptionType:0x17) AND (NOT (service.name:(*$ OR krbtgt))))
+
+# AS-REP Roasting - peticion sin preautenticacion Kerberos  [high]
+winlog.channel:Security AND ((event.code:4768 AND winlog.event_data.PreAuthType:0 AND winlog.event_data.TicketEncryptionType:0x17) AND (NOT winlog.event_data.TargetUserName:*$))
+
+# DCSync - replicacion de directorio desde un equipo que no es DC  [critical]
+winlog.channel:Security AND ((event.code:4662 AND (winlog.event_data.Properties:(*1131f6aa\-9c07\-11d1\-f79f\-00c04fc2dcd2* OR *1131f6ad\-9c07\-11d1\-f79f\-00c04fc2dcd2* OR *89e95b76\-444d\-4c62\-991a\-0facbeda640c*))) AND (NOT (user.name:*$ OR (user.name:("ANONYMOUS LOGON" OR SYSTEM)))))
+
+# Indicio de Golden Ticket - TGS de krbtgt con cifrado degradado  [critical]
+winlog.channel:Security AND (event.code:4769 AND service.name:krbtgt* AND winlog.event_data.TicketEncryptionType:0x17)
+
+# Herramienta de abuso de Kerberos ejecutada  [critical]
+((process.executable.caseless:(*\\Rubeus.exe OR *\\mimikatz.exe OR *\\kekeo.exe OR *\\GetUserSPNs.exe)) OR (process.pe.original_file_name:(Rubeus.exe OR mimikatz.exe))) OR (process.command_line:(*kerberoast* OR *asreproast* OR *lsadump\:\:dcsync* OR *sekurlsa\:\:logonpasswords* OR *sekurlsa\:\:tickets* OR *kerberos\:\:golden* OR *kerberos\:\:ptt* OR *GetUserSPNs.py* OR *GetNPUsers.py* OR *secretsdump.py*))
+
+# Pass-the-Hash y Overpass-the-Hash  [high]
+winlog.channel:Security AND ((event.code:4624 AND winlog.event_data.LogonType:9 AND winlog.event_data.LogonProcessName:seclogo AND winlog.event_data.AuthenticationPackageName:Negotiate) AND (NOT winlog.event_data.TargetUserName:*$))
+
+# Enumeracion de Active Directory - BloodHound y comandos de reconocimiento  [medium]
+((process.executable.caseless:(*\\SharpHound.exe OR *\\AzureHound.exe)) OR (process.command_line:(*Invoke\-BloodHound* OR *SharpHound.ps1* OR *\-CollectionMethod\ All*))) OR ((process.executable.caseless:(*\\net.exe OR *\\net1.exe)) AND (process.command_line:(*group\ \"domain\ admins\"* OR *group\ \"enterprise\ admins\"* OR *group\ \/domain* OR *user\ \/domain* OR *localgroup\ administrators*))) OR (process.executable.caseless:*\\dsquery.exe AND (process.command_line:(*group* OR *user*)))
+
+# Ejecucion remota tipo PsExec  [high]
+winlog.channel:System AND ((winlog.provider_name:"Service Control Manager" AND event.code:7045) AND ((winlog.event_data.ServiceName:(*PSEXESVC* OR *PAExec* OR *csexec* OR *RemCom*)) OR (winlog.event_data.ImagePath:(*\\PSEXESVC* OR *%SystemRoot%\\\{* OR *cmd.exe\ \/c\ echo* OR *\\ADMIN$\\*))))
+
+# Ejecucion remota por WMI o WinRM  [high]
+(process.parent.executable.caseless:(*\\WmiPrvSE.exe OR *\\wsmprovhost.exe OR *\\winrshost.exe)) AND (process.executable.caseless:(*\\cmd.exe OR *\\powershell.exe OR *\\pwsh.exe OR *\\wscript.exe OR *\\cscript.exe OR *\\rundll32.exe OR *\\mshta.exe))
+
+# Modificacion sospechosa de directiva de grupo  [high]
+((process.executable.caseless:(*\\SharpGPOAbuse.exe OR *\\pyGPOAbuse.py)) OR (process.command_line:(*SharpGPOAbuse* OR *New\-GPOImmediateTask* OR *\-\-AddComputerTask* OR *\-\-AddUserTask*))) OR ((process.command_line:*\\SYSVOL\\* AND process.command_line:*\\Policies\\*) AND (process.command_line:(*ScheduledTasks.xml* OR *\\Scripts\\Startup* OR *GptTmpl.inf*)))
+
+# Cuenta de equipo creada por un usuario no administrador  [medium]
+winlog.channel:Security AND (event.code:4741 AND (NOT user.name:*$))
+
+# Abuso de servicios de certificados de Active Directory  [critical]
+((process.executable.caseless:(*\\Certify.exe OR *\\Certipy.exe)) OR (process.command_line:(*Certify.exe\ request* OR *certipy\ req* OR *certipy\ auth* OR *Rubeus.exe\ asktgt*))) OR (process.command_line:*certreq* AND process.command_line:*san\:*)
+
+# Volcado de memoria de LSASS  [critical]
+(process.command_line:*comsvcs.dll* AND process.command_line:*MiniDump*) OR (((process.executable.caseless:(*\\procdump.exe OR *\\procdump64.exe OR *\\dumpert.exe OR *\\nanodump.exe)) OR (process.pe.original_file_name:(procdump OR procdump64.exe))) AND process.command_line:*lsass*) OR (process.command_line:*rundll32* AND process.command_line:*dbghelp* AND process.command_line:*MiniDumpWriteDump*)
+
+# Acceso a memoria de LSASS con permisos de lectura  [high]
+(winlog.event_data.TargetImage:*\\lsass.exe AND (winlog.event_data.GrantedAccess:(0x1010 OR 0x1410 OR 0x1438 OR 0x143a OR 0x1fffff))) AND (NOT (process.executable.caseless:(C\:\\Windows\\System32\\* OR C\:\\Windows\\SysWOW64\\* OR C\:\\Program\ Files\\Windows\ Defender\\*)))
+
+# Destruccion de copias de seguridad y puntos de restauracion  [critical]
+(process.executable.caseless:*\\vssadmin.exe AND (process.command_line:*delete* AND process.command_line:*shadows*)) OR (process.executable.caseless:*\\wmic.exe AND (process.command_line:*shadowcopy* AND process.command_line:*delete*)) OR (process.executable.caseless:*\\wbadmin.exe AND (process.command_line:*delete* AND process.command_line:*catalog*)) OR (process.executable.caseless:*\\bcdedit.exe AND (process.command_line:(*recoveryenabled\ no* OR *bootstatuspolicy\ ignoreallfailures*))) OR (process.command_line:(*Get\-WmiObject\ Win32_Shadowcopy* OR *Remove\-Item\ \-Path\ C\:\\Windows\\System32\\Recovery*))
+
+# Defensas de seguridad deshabilitadas  [high]
+(process.command_line:(*Set\-MpPreference\ \-DisableRealtimeMonitoring\ $true* OR *Set\-MpPreference\ \-DisableBehaviorMonitoring\ $true* OR *Set\-MpPreference\ \-DisableIOAVProtection\ $true* OR *Add\-MpPreference\ \-ExclusionPath* OR *DisableAntiSpyware* OR *DisableAntiVirus*)) OR (process.command_line:(*netsh\ advfirewall\ set\ allprofiles\ state\ off* OR *netsh\ firewall\ set\ opmode\ disable*)) OR (process.command_line:(*sc\ stop\ WinDefend* OR *sc\ config\ WinDefend\ start\=\ disabled* OR *sc\ stop\ Sense* OR *sc\ stop\ wazuh* OR *Stop\-Service\ \-Name\ Sense* OR *net\ stop\ \"Windows\ Defender*)) OR (process.command_line:(*auditpol\ \/clear* OR *auditpol\ \/set\ \/category\:*\ \/success\:disable* OR *wevtutil\ cl\ * OR *wevtutil\ sl\ *))
+
+# LOLBin usado para descargar y ejecutar  [high]
+(process.executable.caseless:*\\certutil.exe AND (process.command_line:(*\-urlcache* OR *\-verifyctl* OR *decode*))) OR (process.executable.caseless:*\\bitsadmin.exe AND (process.command_line:(*\/transfer* OR *\/create* OR *\/addfile*))) OR (process.executable.caseless:*\\mshta.exe AND (process.command_line:(*http* OR *javascript\:* OR *vbscript\:*))) OR (process.executable.caseless:*\\regsvr32.exe AND (process.command_line:(*scrobj.dll* OR *\/i\:http*))) OR ((process.command_line:(*DownloadString\(* OR *DownloadFile\(* OR *Invoke\-WebRequest* OR *Net.WebClient* OR *Start\-BitsTransfer*)) AND (process.command_line:(*http\:\/\/* OR *https\:\/\/*)))
+
+# PowerShell codificado u ofuscado  [high]
+(process.executable.caseless:(*\\powershell.exe OR *\\pwsh.exe)) AND (process.command_line:(*\ \-enc\ * OR *\ \-EncodedCommand* OR *\ \-e\ JAB* OR *FromBase64String* OR *\[Convert\]\:\:FromBase64* OR *\-nop\ \-w\ hidden* OR *\-NoProfile\ \-WindowStyle\ Hidden* OR *IEX\(New\-Object* OR *iex\ \(New\-Object* OR *\[Reflection.Assembly\]\:\:Load* OR *\-ExecutionPolicy\ Bypass*))
+
+# Cifrado masivo de ficheros por ransomware  [critical]
+(file.path:(*.locked OR *.encrypted OR *.crypt OR *.lockbit OR *.blackcat OR *.royal OR *.akira OR *.basta OR *.cactus OR *.play)) OR (file.path:(*readme_for_decrypt* OR *how_to_decrypt* OR *recover_your_files* OR *restore\-my\-files* OR *_readme.txt* OR *HOW\ TO\ BACK\ FILES* OR *RESTORE_FILES_INFO*))
+
+# Tarea programada sospechosa  [high]
+(process.executable.caseless:*\\schtasks.exe AND process.command_line:*\/create*) AND ((process.command_line:(*powershell* OR *cmd.exe\ \/c* OR *mshta* OR *rundll32* OR *wscript* OR *cscript* OR *regsvr32* OR *\\AppData\\* OR *\\Users\\Public\\* OR *\\Temp\\* OR *http\:\/\/* OR *https\:\/\/*)) OR (process.command_line:(*\/ru\ system* OR *\/ru\ \"NT\ AUTHORITY\\SYSTEM\"*)))
+
+# Persistencia por claves de arranque del registro  [high]
+(registry.path:(*\\CurrentVersion\\Run* OR *\\CurrentVersion\\RunOnce* OR *\\Winlogon\\Shell* OR *\\Winlogon\\Userinit* OR *\\CurrentVersion\\Explorer\\User\ Shell\ Folders*)) AND (winlog.event_data.Details:(*powershell* OR *cmd.exe* OR *mshta* OR *rundll32* OR *wscript* OR *regsvr32* OR *\\AppData\\* OR *\\Users\\Public\\* OR *\\Temp\\* OR *\\ProgramData\\*))
+
+# Inyeccion de codigo en proceso remoto  [high]
+(winlog.event_data.TargetImage:(*\\explorer.exe OR *\\svchost.exe OR *\\winlogon.exe OR *\\lsass.exe OR *\\rundll32.exe OR *\\dllhost.exe OR *\\notepad.exe OR *\\werfault.exe)) AND (NOT (process.executable.caseless:C\:\\Windows\\System32\\* AND (process.executable.caseless:(*\\csrss.exe OR *\\services.exe OR *\\wininit.exe))))
+
+# Named pipe caracteristico de framework de C2  [critical]
+file.name:(\\msagent_* OR \\postex_* OR \\postex_ssh_* OR \\status_* OR \\mojo_* OR \\wkssvc_* OR \\ntsvcs_* OR \\sliver\-* OR \\MSSE\-*)
+
+# Ejecucion de binario desde una ruta de escritura de usuario  [medium]
+((process.executable.caseless:(*\\AppData\\Local\\Temp\\* OR *\\Windows\\Temp\\* OR *\\Users\\Public\\* OR *\\$Recycle.Bin\\* OR *\\AppData\\Roaming\\*)) AND (process.executable.caseless:(*.exe OR *.scr OR *.com OR *.pif))) AND (NOT (process.parent.executable.caseless:(*\\msiexec.exe OR *\\setup.exe OR *\\TrustedInstaller.exe)))

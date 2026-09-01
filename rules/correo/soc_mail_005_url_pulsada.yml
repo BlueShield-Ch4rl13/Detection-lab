@@ -1,0 +1,30 @@
+title: Usuario pulsa una URL de phishing bloqueada o permitida
+id: 25261569-4979-5ff2-aa56-17fedcd41634
+status: experimental
+description: |
+    El clic es el momento en que un correo deja de ser un riesgo y pasa a ser un
+    incidente. Detecta los eventos de clic sobre URL reescritas por el gateway, tanto
+    los bloqueados (que confirman el intento) como los permitidos (que exigen revisar
+    el puesto).
+references:
+    - https://attack.mitre.org/techniques/T1566/002/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.initial-access
+    - attack.t1566.002
+logsource:
+    product: proofpoint
+    service: tap
+detection:
+    selection:
+        eventType:
+            - 'click_permitted'
+            - 'click_blocked'
+        threatStatus:
+            - 'active'
+            - 'falsePositive'
+    condition: selection
+falsepositives:
+    - Reclasificaciones posteriores del proveedor, que conviene revisar antes de cerrar el caso
+level: high

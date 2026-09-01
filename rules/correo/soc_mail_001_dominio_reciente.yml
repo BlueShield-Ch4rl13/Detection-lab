@@ -1,0 +1,26 @@
+title: Correo desde un dominio recien registrado
+id: 33dde3fb-2659-5074-b1bc-eda0c47bdb34
+status: experimental
+description: |
+    Los dominios usados en campanas de phishing suelen tener dias de vida. Esta regla
+    marca el correo entrante cuyo dominio remitente aparece en la lista de dominios
+    recien registrados que alimenta el equipo de inteligencia. Sin esa lista la regla
+    no dispara: es una deteccion basada en contexto, no en contenido.
+references:
+    - https://attack.mitre.org/techniques/T1566/002/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.initial-access
+    - attack.t1566.002
+logsource:
+    product: proofpoint
+    service: tap
+detection:
+    selection:
+        eventType: 'message_delivered'
+        senderDomainAge|lt: 30
+    condition: selection
+falsepositives:
+    - Proveedores nuevos y campanas de marketing con dominio propio recien creado
+level: medium

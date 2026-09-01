@@ -1,0 +1,54 @@
+title: Correo entregado desde una cuenta interna
+id: 523d3fe6-1690-5f45-b9f5-7147c720bbfb
+name: soc_mail_007_envio_interno
+status: experimental
+description: |
+    Regla base para detectar el uso de una cuenta comprometida como plataforma de envio.
+    Aisla el correo saliente originado en el propio dominio.
+references:
+    - https://attack.mitre.org/techniques/T1534/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.lateral-movement
+    - attack.t1534
+logsource:
+    product: proofpoint
+    service: tap
+detection:
+    selection:
+        senderIsInternal: true
+        eventType: 'message_delivered'
+    condition: selection
+falsepositives:
+    - Todas: es una regla base sin valor de alerta por si sola
+level: informational
+---
+title: Envio masivo desde una cuenta interna comprometida
+id: fb867dcb-2925-5283-aa61-0acbfe88033f
+status: experimental
+description: |
+    Una cuenta comprometida se usa para distribuir phishing aprovechando la confianza
+    del dominio propio, dentro y fuera de la organizacion. El patron es un numero de
+    destinatarios distintos muy por encima de lo normal para ese remitente, a menudo
+    concentrado en poco tiempo y fuera de horario.
+references:
+    - https://attack.mitre.org/techniques/T1534/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.lateral-movement
+    - attack.t1534
+correlation:
+    type: value_count
+    rules:
+        - soc_mail_007_envio_interno
+    group-by:
+        - sender
+    timespan: 1h
+    condition:
+        gte: 200
+        field: recipient
+falsepositives:
+    - Buzones de notificaciones, facturacion y listas de distribucion, que deben excluirse por remitente
+level: medium

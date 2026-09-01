@@ -1,0 +1,212 @@
+<!--
+  Paquete de cumplimiento normativo - reglas de Wazuh
+  Marcos: ENS (RD 311/2022), NIS2 (Dir. UE 2022/2555), ISO 27001:2022,
+          ISO 22301:2019, DORA (Reg. UE 2022/2554), RGPD y LOPDGDD
+  Rango de IDs: 100700-100799
+
+  Alcance de Wazuh en este paquete: Wazuh detecta el HECHO (un incidente
+  clasificable, un backup fallido, un borrado de log, una exportacion de
+  datos personales). Los RELOJES de notificacion -saber que han pasado 24
+  o 72 horas sin notificar- se calculan en Splunk, porque un motor de
+  reglas sobre eventos no puede alertar por la ausencia de un evento.
+
+  Mapeo normativo: Wazuh admite <nist_800_53>, <gdpr>, <pci_dss>, <hipaa>,
+  <tsc> y <gpg13>. De los seis marcos de este paquete, solo el RGPD tiene
+  etiqueta nativa (<gdpr>). El resto va en <group> con prefijos cmp_,
+  ens_, nis2_, dora_, iso27001_ e iso22301_.
+
+  Listas CDB adicionales:
+      etc/lists/cmp_datos_personales
+      etc/lists/cmp_paises_adecuados
+      etc/lists/cmp_proveedores
+-->
+<group name="cmp,cumplimiento,">
+
+  <!-- ================================================================
+       CMP-NOT-007 | Violacion de seguridad sobre datos personales
+       RGPD art. 33 y 34 | ENS mp.info.1 | NIS2 art. 23.7
+
+       Nota de diseno: la clasificacion generica de "incidente notificable"
+       (CMP-NOT-001) NO se hace aqui. Una regla que dispare sobre cualquier
+       alerta de nivel 12 o superior duplicaria el volumen de alertas sin
+       aportar informacion nueva. Esa clasificacion se hace en Splunk, que
+       ya tiene todas las alertas indexadas y puede cruzarlas con el
+       registro de incidentes. Wazuh cubre aqui el caso especifico que si
+       necesita deteccion en el endpoint: la afectacion a datos personales,
+       que es la que activa el plazo de 72 horas del RGPD art. 33.
+       ================================================================ -->
+  <rule id="100700" level="13">
+    <if_group>syscheck</if_group>
+    <list field="file" lookup="match_key">etc/lists/cmp_datos_personales</list>
+    <field name="syscheck.event" type="pcre2">^(deleted|modified)$</field>
+    <description>CMP-NOT-007: Modificacion o borrado sobre un almacen de datos personales en $(hostname): $(file). Posible violacion de seguridad de datos personales.</description>
+    <gdpr>IV_33.1,IV_32.1.b</gdpr>
+    <nist_800_53>SI.7,AU.6</nist_800_53>
+    <group>cmp_notificacion,cmp_NOT-007,rgpd_art33,rgpd_art34,ens_mp.info.1,nis2_art23,</group>
+  </rule>
+
+  <rule id="100701" level="14">
+    <if_group>audit</if_group>
+    <list field="audit.file.name" lookup="match_key">etc/lists/cmp_datos_personales</list>
+    <field name="audit.key">^cmp_datos_personales$</field>
+    <field name="audit.type" type="pcre2">^(DELETE|UNLINK)$</field>
+    <description>CMP-NOT-007: Borrado auditado sobre datos personales en $(hostname) por el usuario $(audit.uid). Activa el plazo de 72 h del RGPD art. 33.</description>
+    <gdpr>IV_33.1,IV_34.1</gdpr>
+    <nist_800_53>IR.6,AU.6</nist_800_53>
+    <group>cmp_notificacion,cmp_NOT-007,rgpd_art33,rgpd_art34,ens_mp.info.1,</group>
+  </rule>
+
+  <!-- ================================================================
+       CMP-CON-001 | Copia de seguridad fallida
+       ISO 22301 cl. 8.3 | ENS mp.info.9 | DORA art. 12 | NIS2 art. 21.2.c
+       ================================================================ -->
+  <rule id="100720" level="12">
+    <if_group>syslog</if_group>
+    <regex type="pcre2">(?i)(backup (failed|error|aborted)|borg: Error|restic: Fatal|bacula-dir.*Backup Error|duplicity.*Fatal|rsync error: |veeam.*Failed|mysqldump: Got error)</regex>
+    <description>CMP-CON-001: Fallo en el proceso de copia de seguridad de $(hostname). Se compromete el RPO comprometido.</description>
+    <nist_800_53>CP.9,CP.10</nist_800_53>
+    <group>cmp_continuidad,cmp_CON-001,ens_mp.info.9,iso22301_8.3,dora_art12,nis2_art21,</group>
+  </rule>
+
+  <!-- ================================================================
+       CMP-CON-004 | Copia de seguridad accesible o modificada desde produccion
+       ISO 22301 cl. 8.3 | ENS mp.info.9 | DORA art. 12.3
+
+       Es la diferencia entre tener copias y poder recuperarse: si el
+       ransomware alcanza el repositorio de backup, la copia no existe.
+       ================================================================ -->
+  <rule id="100721" level="14">
+    <if_group>syscheck</if_group>
+    <field name="file" type="pcre2">(/backup/|/mnt/backup|/srv/backups?/|\.borg/|restic-repo|/veeam/)</field>
+    <field name="syscheck.event" type="pcre2">^(deleted|modified)$</field>
+    <description>CMP-CON-004: Fichero del repositorio de copias modificado o borrado en $(hostname): $(file). La copia deja de ser fiable.</description>
+    <nist_800_53>CP.9,SI.7</nist_800_53>
+    <group>cmp_continuidad,cmp_CON-004,ens_mp.info.9,iso22301_8.3,dora_art12,</group>
+  </rule>
+
+  <rule id="100722" level="13">
+    <if_group>syslog|audit</if_group>
+    <regex type="pcre2">(?i)(borg (delete|prune).*--force|restic forget.*--prune|rm -rf /(backup|srv/backups)|vssadmin delete shadows|wbadmin delete catalog|bcdedit.*recoveryenabled No)</regex>
+    <description>CMP-CON-004: Comando de destruccion de copias de seguridad o instantaneas ejecutado en $(hostname). Patron habitual previo a un cifrado por ransomware.</description>
+    <mitre>
+      <id>T1490</id>
+    </mitre>
+    <nist_800_53>CP.9,SI.7</nist_800_53>
+    <group>cmp_continuidad,cmp_CON-004,ens_mp.info.9,iso22301_8.3,dora_art12,</group>
+  </rule>
+
+  <!-- ================================================================
+       CMP-LOG-002 | Manipulacion del registro de actividad
+       ENS op.exp.10 | NIS2 art. 21.2.b | ISO 27001 A.8.15 | DORA art. 12.3
+
+       Amplia ZTA-VIS-002 con el angulo de evidencia: en un procedimiento
+       sancionador, un registro manipulado no vale como prueba.
+       ================================================================ -->
+  <rule id="100740" level="14">
+    <if_group>syscheck</if_group>
+    <field name="file" type="pcre2">^/var/log/(auth\.log|secure|syslog|messages|audit/audit\.log)$</field>
+    <field name="syscheck.event" type="pcre2">^(deleted|modified)$</field>
+    <field name="syscheck.size_after" type="pcre2">^0$</field>
+    <description>CMP-LOG-002: Fichero de registro truncado a cero en $(hostname): $(file). Perdida de evidencia exigida por ENS op.exp.10.</description>
+    <mitre>
+      <id>T1070.002</id>
+    </mitre>
+    <nist_800_53>AU.9,AU.11</nist_800_53>
+    <group>cmp_trazabilidad,cmp_LOG-002,ens_op.exp.10,nis2_art21,iso27001_A.8.15,dora_art12,</group>
+  </rule>
+
+  <rule id="100741" level="13">
+    <if_group>audit|syslog</if_group>
+    <regex type="pcre2">(?i)(chattr -[ia] /var/log|chmod 7?77 /var/log|auditctl -e 0|systemctl mask (auditd|rsyslog))</regex>
+    <description>CMP-LOG-002: Manipulacion de la proteccion del registro de actividad en $(hostname). Incumple ENS op.exp.10.</description>
+    <mitre>
+      <id>T1562.006</id>
+    </mitre>
+    <nist_800_53>AU.9,CM.5</nist_800_53>
+    <group>cmp_trazabilidad,cmp_LOG-002,ens_op.exp.10,nis2_art21,iso27001_A.8.15,</group>
+  </rule>
+
+  <!-- ================================================================
+       CMP-RGP-001 | Exportacion masiva de datos personales
+       RGPD art. 5.1.f y 32 | LOPDGDD | ENS mp.info.1
+       ================================================================ -->
+  <rule id="100760" level="0">
+    <if_group>audit</if_group>
+    <list field="audit.file.name" lookup="match_key">etc/lists/cmp_datos_personales</list>
+    <description>CMP base: acceso a un almacen de datos personales.</description>
+    <group>cmp_base,</group>
+  </rule>
+
+  <rule id="100761" level="12" frequency="30" timeframe="300">
+    <if_matched_sid>100760</if_matched_sid>
+    <same_user />
+    <description>CMP-RGP-001: Acceso masivo a datos personales por parte de $(audit.uid) en $(hostname). Revisar licitud y minimizacion.</description>
+    <gdpr>II_5.1.f,IV_32.1.b</gdpr>
+    <nist_800_53>AC.3,AU.6</nist_800_53>
+    <group>cmp_datos_personales,cmp_RGP-001,rgpd_art5,rgpd_art32,ens_mp.info.1,</group>
+  </rule>
+
+  <rule id="100762" level="13">
+    <if_group>audit|syslog</if_group>
+    <regex type="pcre2">(?i)(mysqldump|pg_dump|mongodump|sqlcmd.*-Q.*select \*|SELECT \* INTO OUTFILE|COPY .* TO '/)</regex>
+    <description>CMP-RGP-001: Volcado completo de base de datos ejecutado en $(hostname). Si contiene datos personales, es una exportacion masiva que debe estar justificada.</description>
+    <gdpr>II_5.1.c,IV_32.1.b</gdpr>
+    <nist_800_53>AC.3,AU.6</nist_800_53>
+    <group>cmp_datos_personales,cmp_RGP-001,rgpd_art5,rgpd_art32,ens_mp.info.1,</group>
+  </rule>
+
+  <!-- ================================================================
+       CMP-RGP-002 | Transferencia de datos personales fuera del EEE
+       RGPD art. 44 a 49 | LOPDGDD
+
+       La regla marca la salida hacia un destino no adecuado; la
+       geolocalizacion fina se resuelve en Splunk con iplocation.
+       ================================================================ -->
+  <rule id="100763" level="12">
+    <if_group>suricata</if_group>
+    <list field="data.src_ip" lookup="address_match_key">etc/lists/cmp_sistemas_datos_personales</list>
+    <field name="data.dest_ip" negate="yes">^10\.|^172\.(1[6-9]|2[0-9]|3[01])\.|^192\.168\.</field>
+    <field name="data.flow.bytes_toserver" type="pcre2">^[0-9]{7,}$</field>
+    <description>CMP-RGP-002: Transferencia saliente relevante desde un sistema con datos personales ($(data.src_ip)) hacia $(data.dest_ip). Verificar base juridica de la transferencia internacional.</description>
+    <gdpr>V_44,V_45,V_46</gdpr>
+    <nist_800_53>AC.4,SC.7</nist_800_53>
+    <group>cmp_datos_personales,cmp_RGP-002,rgpd_art44,rgpd_art45,</group>
+  </rule>
+
+  <!-- ================================================================
+       CMP-RGP-003 | Datos personales sin cifrado en reposo
+       RGPD art. 32.1.a | ENS mp.info.3 | DORA art. 9.2
+       Se apoya en el check 1004 de la politica SCA zta_baseline.
+       ================================================================ -->
+  <rule id="100764" level="12">
+    <if_sid>100203</if_sid>
+    <field name="sca.check.id">^1004$</field>
+    <description>CMP-RGP-003: El equipo $(hostname) no tiene cifrado el volumen del sistema. Si trata datos personales, incumple el RGPD art. 32.1.a y el ENS mp.info.3.</description>
+    <gdpr>IV_32.1.a</gdpr>
+    <nist_800_53>SC.28</nist_800_53>
+    <group>cmp_datos_personales,cmp_RGP-003,rgpd_art32,ens_mp.info.3,dora_art9,</group>
+  </rule>
+
+  <!-- ================================================================
+       CMP-TER-001 | Acceso de proveedor fuera de ventana autorizada
+       DORA art. 28 y 30 | NIS2 art. 21.2.d | ENS op.acc.5 | ISO A.5.19
+       ================================================================ -->
+  <rule id="100780" level="12">
+    <if_group>authentication_success</if_group>
+    <list field="user" lookup="match_key">etc/lists/cmp_proveedores</list>
+    <time>20:00-07:00</time>
+    <description>CMP-TER-001: Acceso de la cuenta de proveedor $(user) desde $(srcip) fuera del horario laboral. Verificar contra la ventana autorizada en el contrato.</description>
+    <nist_800_53>AC.2,PS.7</nist_800_53>
+    <group>cmp_terceros,cmp_TER-001,dora_art28,nis2_art21,ens_op.acc.5,iso27001_A.5.19,</group>
+  </rule>
+
+  <rule id="100781" level="12">
+    <if_group>authentication_success</if_group>
+    <list field="user" lookup="match_key">etc/lists/cmp_proveedores</list>
+    <weekday>weekends</weekday>
+    <description>CMP-TER-001: Acceso de la cuenta de proveedor $(user) en fin de semana desde $(srcip). Verificar autorizacion previa.</description>
+    <nist_800_53>AC.2,PS.7</nist_800_53>
+    <group>cmp_terceros,cmp_TER-001,dora_art28,nis2_art21,ens_op.acc.5,iso27001_A.5.19,</group>
+  </rule>
+
+</group>

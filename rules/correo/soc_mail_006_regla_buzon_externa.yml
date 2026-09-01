@@ -1,0 +1,40 @@
+title: Regla de buzon con reenvio externo creada
+id: bcf30b1b-b97c-5250-87b0-37f674d7971d
+status: stable
+description: |
+    Tras comprometer un buzon, el atacante crea una regla que reenvia el correo fuera o
+    que mueve a la papelera los avisos de seguridad y las respuestas de la victima. Es
+    el indicador mas fiable de compromiso de cuenta de correo y suele preceder al fraude
+    del pago desviado.
+references:
+    - https://attack.mitre.org/techniques/T1114/003/
+    - https://attack.mitre.org/techniques/T1564/008/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.collection
+    - attack.defense-evasion
+    - attack.t1114.003
+    - attack.t1564.008
+logsource:
+    product: m365
+    service: exchange
+detection:
+    selection_operacion:
+        Operation:
+            - 'New-InboxRule'
+            - 'Set-InboxRule'
+            - 'Set-Mailbox'
+            - 'UpdateInboxRules'
+    selection_reenvio:
+        Parameters|contains:
+            - 'ForwardTo'
+            - 'ForwardAsAttachmentTo'
+            - 'RedirectTo'
+            - 'ForwardingSmtpAddress'
+            - 'DeleteMessage'
+            - 'MoveToFolder'
+    condition: selection_operacion and selection_reenvio
+falsepositives:
+    - Reglas de reenvio creadas por el propio usuario hacia otra cuenta corporativa
+level: high

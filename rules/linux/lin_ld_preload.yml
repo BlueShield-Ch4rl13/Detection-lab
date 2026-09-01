@@ -3,7 +3,7 @@ id: dad88192-8cd4-5e0e-84e1-cfd83f7db605
 status: experimental
 description: Escritura en /etc/ld.so.preload, secuestro del enlazador dinamico.
 references:
-- https://attack.mitre.org/techniques/006
+- https://attack.mitre.org/techniques/T1574/006/
 author: C. Villalba
 date: 2026/07/16
 tags:

@@ -1,0 +1,1652 @@
+<!--
+  Reglas de Wazuh GENERADAS AUTOMATICAMENTE desde las reglas Sigma de sigma/.
+
+  NO EDITAR A MANO: cualquier cambio se pierde en la siguiente ejecucion de
+      python3 scripts/sigma_to_wazuh.py
+  Para cambiar una deteccion, edita su fichero .yml en sigma/ y regenera.
+
+  Rango de IDs: 101000-101999. Las reglas escritas a mano ocupan
+  100100-100799, asi que no hay colision posible entre ambos conjuntos.
+
+  Una regla Sigma puede producir varias reglas de Wazuh: Wazuh conjuga con AND
+  todas las condiciones de una regla, de modo que un OR de Sigma se convierte en
+  varias reglas que comparten identificador SOC y grupos.
+
+  Reglas generadas: 139  |  desde 87 ficheros Sigma
+-->
+<group name="soc,soc_sigma,">
+
+  <rule id="101000" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="data.properties_message" type="pcre2">(?i)^(Consent\ to\ application|Add\ delegated\ permission\ grant|Add\ app\ role\ assignment\ grant\ to\ user)$</field>
+    <field name="data.TargetResources" type="pcre2">(?i)(Mail\.Read|Mail\.ReadWrite|Mail\.Send|Files\.ReadWrite\.All|Directory\.ReadWrite\.All|User\.ReadWrite\.All|offline_access)</field>
+    <description>SOC-CLD-001: Consentimiento concedido a una aplicacion no verificada</description>
+    <mitre>
+      <id>T1550.001</id>
+    </mitre>
+    <group>soc_sigma,soc_cld,soc_cld_001,</group>
+  </rule>
+
+  <rule id="101001" level="8">
+    <decoded_as>json</decoded_as>
+    <field name="data.properties_message" type="pcre2">(?i)^(User\ registered\ security\ info|Admin\ registered\ security\ info|User\ registered\ all\ required\ security\ info|User\ changed\ default\ security\ info)$</field>
+    <description>SOC-CLD-002: Metodo MFA registrado tras un inicio de sesion de riesgo</description>
+    <mitre>
+      <id>T1098.005</id>
+    </mitre>
+    <group>soc_sigma,soc_cld,soc_cld_002,</group>
+  </rule>
+
+  <rule id="101002" level="0">
+    <decoded_as>json</decoded_as>
+    <field name="data.ResultType" type="pcre2">(?i)^(50126|50053|50055)$</field>
+    <description>SOC-CLD-003: Fallo de autenticacion en Entra ID por credencial invalida</description>
+    <mitre>
+      <id>T1110.003</id>
+    </mitre>
+    <group>soc_sigma,soc_cld,soc_cld_003,</group>
+  </rule>
+
+  <rule id="101003" level="0">
+    <decoded_as>json</decoded_as>
+    <field name="data.ResultType" type="pcre2">(?i)^0$</field>
+    <description>SOC-CLD-004: Inicio de sesion correcto en Entra ID</description>
+    <mitre>
+      <id>T1539</id>
+    </mitre>
+    <group>soc_sigma,soc_cld,soc_cld_004,</group>
+  </rule>
+
+  <rule id="101004" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="data.properties_message" type="pcre2">(?i)^(Add\ member\ to\ role|Add\ eligible\ member\ to\ role|Add\ member\ to\ role\ outside\ of\ PIM)$</field>
+    <field name="data.TargetResources" type="pcre2">(?i)(Global\ Administrator|Privileged\ Role\ Administrator|Security\ Administrator|Exchange\ Administrator|Application\ Administrator|Cloud\ Application\ Administrator|User\ Administrator)</field>
+    <description>SOC-CLD-005: Alta en un rol privilegiado de Entra ID</description>
+    <mitre>
+      <id>T1098.003</id>
+    </mitre>
+    <group>soc_sigma,soc_cld,soc_cld_005,</group>
+  </rule>
+
+  <rule id="101005" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="data.properties_message" type="pcre2">(?i)^(Update\ conditional\ access\ policy|Delete\ conditional\ access\ policy|Update\ policy|Disable\ Strong\ Authentication)$</field>
+    <description>SOC-CLD-006: Politica de acceso condicional modificada o deshabilitada</description>
+    <mitre>
+      <id>T1556.009</id>
+    </mitre>
+    <group>soc_sigma,soc_cld,soc_cld_006,</group>
+  </rule>
+
+  <rule id="101006" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="data.properties_message" type="pcre2">(?i)^(Add\ service\ principal\ credentials|Update\ application\ \-\ Certificates\ and\ secrets\ management|Update\ application)$</field>
+    <field name="data.TargetResources" type="pcre2">(?i)(KeyDescription|PasswordCredentials|KeyCredentials)</field>
+    <description>SOC-CLD-007: Credencial anadida a una aplicacion o service principal</description>
+    <mitre>
+      <id>T1098.001</id>
+    </mitre>
+    <group>soc_sigma,soc_cld,soc_cld_007,</group>
+  </rule>
+
+  <rule id="101007" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="data.ResultType" type="pcre2">(?i)^0$</field>
+    <field name="data.RiskEventTypes" type="pcre2">(?i)(anonymizedIPAddress|maliciousIPAddress|unfamiliarFeatures|adminConfirmedUserCompromised)</field>
+    <description>SOC-CLD-008: Inicio de sesion desde una red de anonimizacion</description>
+    <mitre>
+      <id>T1090.003</id>
+    </mitre>
+    <group>soc_sigma,soc_cld,soc_cld_008,</group>
+  </rule>
+
+  <rule id="101008" level="8">
+    <decoded_as>json</decoded_as>
+    <field name="data.activity" type="pcre2">(?i)^(Upload|Share|Post)$</field>
+    <field name="data.app_category" type="pcre2">(?i)^(Cloud\ Storage|File\ Sharing|Webmail)$</field>
+    <field name="data.ccl" type="pcre2">(?i)^(poor|low)$</field>
+    <description>SOC-CLD-010: Subida de datos a un servicio SaaS no aprobado</description>
+    <mitre>
+      <id>T1567.002</id>
+    </mitre>
+    <group>soc_sigma,soc_cld,soc_cld_010,</group>
+  </rule>
+
+  <rule id="101009" level="14">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.image" type="pcre2">(?i)/nsenter$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(\-t\ 1|\-\-target\ 1|\-\-mount=/proc/1/ns/mnt)</field>
+    <description>CONT-ESCAPE-A: Escape de contenedor hacia los namespaces del host [1/4]</description>
+    <mitre>
+      <id>T1611</id>
+    </mitre>
+    <group>soc_sigma,soc_escape,cont_escape_a,</group>
+  </rule>
+
+  <rule id="101010" level="14">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.image" type="pcre2">(?i)/chroot$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(/host|/mnt/host|/proc/1/root)</field>
+    <description>CONT-ESCAPE-A: Escape de contenedor hacia los namespaces del host [2/4]</description>
+    <mitre>
+      <id>T1611</id>
+    </mitre>
+    <group>soc_sigma,soc_escape,cont_escape_a,</group>
+  </rule>
+
+  <rule id="101011" level="14">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(release_agent|notify_on_release)</field>
+    <description>CONT-ESCAPE-A: Escape de contenedor hacia los namespaces del host [3/4]</description>
+    <mitre>
+      <id>T1611</id>
+    </mitre>
+    <group>soc_sigma,soc_escape,cont_escape_a,</group>
+  </rule>
+
+  <rule id="101012" level="14">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)/proc/1/root</field>
+    <description>CONT-ESCAPE-A: Escape de contenedor hacia los namespaces del host [4/4]</description>
+    <mitre>
+      <id>T1611</id>
+    </mitre>
+    <group>soc_sigma,soc_escape,cont_escape_a,</group>
+  </rule>
+
+  <rule id="101013" level="14">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(/var/run/docker\.sock|/run/docker\.sock|/run/containerd/containerd\.sock|/var/run/crio/crio\.sock)</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(curl|wget|nc\ |socat|docker\ run|ctr\ |crictl)</field>
+    <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(/dockerd|/containerd|/kubelet)$</field>
+    <description>CONT-SOCKET-RUNTIME: Acceso al socket del runtime de contenedores</description>
+    <mitre>
+      <id>T1610</id>
+      <id>T1611</id>
+    </mitre>
+    <group>soc_sigma,soc_socket,cont_socket_runtime,</group>
+  </rule>
+
+  <rule id="101014" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.verb" type="pcre2">(?i)^(create|update|patch)$</field>
+    <field name="win.eventdata.resource" type="pcre2">(?i)^pods$</field>
+    <field name="win.eventdata.capabilities" type="pcre2">(?i)(SYS_ADMIN|SYS_PTRACE|SYS_MODULE|SYS_RAWIO|DAC_READ_SEARCH|ALL)</field>
+    <description>K8S-CAPACIDADES-PELIGROSAS: Contenedor con capacidades de kernel peligrosas</description>
+    <mitre>
+      <id>T1611</id>
+    </mitre>
+    <group>soc_sigma,soc_capacidades,k8s_capacidades_peligrosas,</group>
+  </rule>
+
+  <rule id="101015" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.verb" type="pcre2">(?i)^(create|update|patch)$</field>
+    <field name="win.eventdata.apiGroup" type="pcre2">(?i)^rbac\.authorization\.k8s\.io$</field>
+    <field name="win.eventdata.resource" type="pcre2">(?i)^(clusterrolebindings|rolebindings)$</field>
+    <field name="win.eventdata.username" negate="yes" type="pcre2">(?i)^system:serviceaccount:kube\-system:</field>
+    <description>K8S-ESCALADA-POR: Enlace a un rol con privilegios de administrador del cluster</description>
+    <mitre>
+      <id>T1078.003</id>
+    </mitre>
+    <group>soc_sigma,soc_escalada,k8s_escalada_por,</group>
+  </rule>
+
+  <rule id="101016" level="8">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.verb" type="pcre2">(?i)^create$</field>
+    <field name="win.eventdata.resource" type="pcre2">(?i)^pods$</field>
+    <field name="win.eventdata.subresource" type="pcre2">(?i)^(exec|attach)$</field>
+    <field name="win.eventdata.username" negate="yes" type="pcre2">(?i)^system:serviceaccount:kube\-system:</field>
+    <description>K8S-EXEC-EN: Ejecucion interactiva dentro de un pod</description>
+    <mitre>
+      <id>T1609</id>
+    </mitre>
+    <group>soc_sigma,soc_exec,k8s_exec_en,</group>
+  </rule>
+
+  <rule id="101017" level="8">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.verb" type="pcre2">(?i)^(get|list|watch)$</field>
+    <field name="win.eventdata.resource" type="pcre2">(?i)^secrets$</field>
+    <field name="win.eventdata.username" negate="yes" type="pcre2">(?i)^(system:serviceaccount:kube\-system:|system:kube\-controller\-manager|system:apiserver)</field>
+    <description>K8S-LECTURA-MASIVA: Lectura de secretos de Kubernetes</description>
+    <mitre>
+      <id>T1552.007</id>
+    </mitre>
+    <group>soc_sigma,soc_lectura,k8s_lectura_masiva,</group>
+  </rule>
+
+  <rule id="101018" level="14">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.verb" type="pcre2">(?i)^(create|update|patch)$</field>
+    <field name="win.eventdata.resource" type="pcre2">(?i)^pods$</field>
+    <field name="win.eventdata.hostPath" type="pcre2">(?i)(/var/run/docker\.sock|/var/run/containerd|/var/run/crio|/etc/kubernetes|/root|/proc)</field>
+    <description>K8S-MONTAJE-HOSTPATH: Pod que monta una ruta sensible del nodo [1/2]</description>
+    <mitre>
+      <id>T1611</id>
+    </mitre>
+    <group>soc_sigma,soc_montaje,k8s_montaje_hostpath,</group>
+  </rule>
+
+  <rule id="101019" level="14">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.verb" type="pcre2">(?i)^(create|update|patch)$</field>
+    <field name="win.eventdata.resource" type="pcre2">(?i)^pods$</field>
+    <field name="win.eventdata.hostPath" type="pcre2">(?i)^/$</field>
+    <description>K8S-MONTAJE-HOSTPATH: Pod que monta una ruta sensible del nodo [2/2]</description>
+    <mitre>
+      <id>T1611</id>
+    </mitre>
+    <group>soc_sigma,soc_montaje,k8s_montaje_hostpath,</group>
+  </rule>
+
+  <rule id="101020" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.verb" type="pcre2">(?i)^(create|update|patch)$</field>
+    <field name="win.eventdata.resource" type="pcre2">(?i)^pods$</field>
+    <field name="win.eventdata.privileged" type="pcre2">(?i)^true$</field>
+    <field name="win.eventdata.namespace" negate="yes" type="pcre2">(?i)^(kube\-system|monitoring)$</field>
+    <description>K8S-POD-PRIVILEGIADO: Creacion de pod privilegiado</description>
+    <mitre>
+      <id>T1610</id>
+      <id>T1611</id>
+    </mitre>
+    <group>soc_sigma,soc_pod,k8s_pod_privilegiado,</group>
+  </rule>
+
+  <rule id="101021" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="data.headerFrom" type="pcre2">(?i)(Director\ General|Direccion\ Financiera|CEO|CFO)</field>
+    <field name="data.senderIsInternal" type="pcre2">(?i)^False$</field>
+    <field name="data.sender" negate="yes" type="pcre2">(?i)@midominio\.local$</field>
+    <description>SOC-MAIL-002: Suplantacion de directivo en el nombre para mostrar</description>
+    <mitre>
+      <id>T1534</id>
+    </mitre>
+    <group>soc_sigma,soc_mail,soc_mail_002,</group>
+  </rule>
+
+  <rule id="101022" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="data.senderDomain" type="pcre2">(?i)midominio\.local$</field>
+    <field name="data.dmarcResult" type="pcre2">(?i)^fail$</field>
+    <field name="data.spfResult" type="pcre2">(?i)^fail$</field>
+    <description>SOC-MAIL-003: Fallo de autenticacion de correo en el dominio propio [1/2]</description>
+    <mitre>
+      <id>T1566.002</id>
+    </mitre>
+    <group>soc_sigma,soc_mail,soc_mail_003,</group>
+  </rule>
+
+  <rule id="101023" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="data.senderDomain" type="pcre2">(?i)midominio\.local$</field>
+    <field name="data.dmarcResult" type="pcre2">(?i)^fail$</field>
+    <field name="data.dkimResult" type="pcre2">(?i)^fail$</field>
+    <description>SOC-MAIL-003: Fallo de autenticacion de correo en el dominio propio [2/2]</description>
+    <mitre>
+      <id>T1566.002</id>
+    </mitre>
+    <group>soc_sigma,soc_mail,soc_mail_003,</group>
+  </rule>
+
+  <rule id="101024" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="data.attachmentName" type="pcre2">(?i)(\.iso|\.img|\.vhd|\.vhdx|\.one|\.lnk|\.chm|\.hta)$</field>
+    <description>SOC-MAIL-004: Adjunto con formato usado para entrega de malware [1/3]</description>
+    <mitre>
+      <id>T1566.001</id>
+    </mitre>
+    <group>soc_sigma,soc_mail,soc_mail_004,</group>
+  </rule>
+
+  <rule id="101025" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="data.attachmentName" type="pcre2">(?i).*\.(pdf|doc|docx|xls|xlsx|jpg|png)\s*\.(exe|scr|js|vbs|bat|cmd|ps1)$</field>
+    <description>SOC-MAIL-004: Adjunto con formato usado para entrega de malware [2/3]</description>
+    <mitre>
+      <id>T1566.001</id>
+    </mitre>
+    <group>soc_sigma,soc_mail,soc_mail_004,</group>
+  </rule>
+
+  <rule id="101026" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="data.attachmentName" type="pcre2">(?i)(\.docm|\.xlsm|\.pptm|\.xlam)$</field>
+    <description>SOC-MAIL-004: Adjunto con formato usado para entrega de malware [3/3]</description>
+    <mitre>
+      <id>T1566.001</id>
+    </mitre>
+    <group>soc_sigma,soc_mail,soc_mail_004,</group>
+  </rule>
+
+  <rule id="101027" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="data.eventType" type="pcre2">(?i)^(click_permitted|click_blocked)$</field>
+    <field name="data.threatStatus" type="pcre2">(?i)^(active|falsePositive)$</field>
+    <description>SOC-MAIL-005: Usuario pulsa una URL de phishing bloqueada o permitida</description>
+    <mitre>
+      <id>T1566.002</id>
+    </mitre>
+    <group>soc_sigma,soc_mail,soc_mail_005,</group>
+  </rule>
+
+  <rule id="101028" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="data.Operation" type="pcre2">(?i)^(New\-InboxRule|Set\-InboxRule|Set\-Mailbox|UpdateInboxRules)$</field>
+    <field name="data.Parameters" type="pcre2">(?i)(ForwardTo|ForwardAsAttachmentTo|RedirectTo|ForwardingSmtpAddress|DeleteMessage|MoveToFolder)</field>
+    <description>SOC-MAIL-006: Regla de buzon con reenvio externo creada</description>
+    <mitre>
+      <id>T1114.003</id>
+      <id>T1564.008</id>
+    </mitre>
+    <group>soc_sigma,soc_mail,soc_mail_006,</group>
+  </rule>
+
+  <rule id="101029" level="0">
+    <decoded_as>json</decoded_as>
+    <field name="data.senderIsInternal" type="pcre2">(?i)^True$</field>
+    <field name="data.eventType" type="pcre2">(?i)^message_delivered$</field>
+    <description>SOC-MAIL-007: Correo entregado desde una cuenta interna</description>
+    <mitre>
+      <id>T1534</id>
+    </mitre>
+    <group>soc_sigma,soc_mail,soc_mail_007,</group>
+  </rule>
+
+  <rule id="101030" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="data.attachmentName" type="pcre2">(?i)(\.html|\.htm|\.svg)$</field>
+    <field name="data.attachmentContent" type="pcre2">(?i)(msSaveOrOpenBlob|new\ Blob\(|application/octet\-stream|download=|atob\(|base64,)</field>
+    <description>SOC-MAIL-008: HTML smuggling en adjunto</description>
+    <mitre>
+      <id>T1027.006</id>
+    </mitre>
+    <group>soc_sigma,soc_mail,soc_mail_008,</group>
+  </rule>
+
+  <rule id="101031" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(base64\ \-d|base64\ \-\-decode|base64\ \-di)</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(\|bash|\|\ bash|\|sh|\|\ sh|eval)</field>
+    <description>LIN-BASE64-DECODE: Ejecucion de payload codificado en base64</description>
+    <mitre>
+      <id>T1059.004</id>
+      <id>T1140</id>
+    </mitre>
+    <group>soc_sigma,soc_base64,lin_base64_decode,</group>
+  </rule>
+
+  <rule id="101032" level="8">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*chmod)</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(/tmp/|/dev/shm/|/var/tmp/)</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(\+x|0755|777)</field>
+    <description>LIN-CHMOD-TMP: Permisos de ejecucion en /tmp o /dev/shm</description>
+    <mitre>
+      <id>T1222.002</id>
+    </mitre>
+    <group>soc_sigma,soc_chmod,lin_chmod_tmp,</group>
+  </rule>
+
+  <rule id="101033" level="8">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(crontab\ \-|/etc/cron\.d/|/etc/crontab|/var/spool/cron)</field>
+    <description>LIN-CRON-PERSISTENCE: Persistencia por cron</description>
+    <mitre>
+      <id>T1053.003</id>
+    </mitre>
+    <group>soc_sigma,soc_cron,lin_cron_persistence,</group>
+  </rule>
+
+  <rule id="101034" level="8">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(unset\ HISTFILE|HISTFILE=/dev/null|HISTSIZE=0|export\ HISTSIZE=0)</field>
+    <description>LIN-DISABLE-HISTORY: Deshabilitar historial de shell (anti-forense)</description>
+    <mitre>
+      <id>T1070.003</id>
+    </mitre>
+    <group>soc_sigma,soc_disable,lin_disable_history,</group>
+  </rule>
+
+  <rule id="101035" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(curl|wget)</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(\|bash|\|\ bash|\|sh|\|\ sh)</field>
+    <description>LIN-DOWNLOAD-PIPE: Descarga tuberia a shell (curl|bash)</description>
+    <mitre>
+      <id>T1059.004</id>
+      <id>T1105</id>
+    </mitre>
+    <group>soc_sigma,soc_download,lin_download_pipe,</group>
+  </rule>
+
+  <rule id="101036" level="14">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)/etc/ld\.so\.preload</field>
+    <description>LIN-LD-PRELOAD: Modificacion de ld.so.preload (rootkit)</description>
+    <mitre>
+      <id>T1574.006</id>
+    </mitre>
+    <group>soc_sigma,soc_ld,lin_ld_preload,</group>
+  </rule>
+
+  <rule id="101037" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)/etc/shadow</field>
+    <description>LIN-READ-SHADOW: Lectura de /etc/shadow</description>
+    <mitre>
+      <id>T1003.008</id>
+    </mitre>
+    <group>soc_sigma,soc_read,lin_read_shadow,</group>
+  </rule>
+
+  <rule id="101038" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(/dev/tcp/|/dev/udp/|bash\ \-i|sh\ \-i)</field>
+    <description>LIN-REVERSE-SHELL: Shell inversa (bash /dev/tcp)</description>
+    <mitre>
+      <id>T1059.004</id>
+    </mitre>
+    <group>soc_sigma,soc_reverse,lin_reverse_shell,</group>
+  </rule>
+
+  <rule id="101039" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)authorized_keys</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(echo|tee|&gt;&gt;|&gt;|cat)</field>
+    <description>LIN-SSH-AUTHORIZED: Adicion de clave SSH (authorized_keys)</description>
+    <mitre>
+      <id>T1098.004</id>
+    </mitre>
+    <group>soc_sigma,soc_ssh,lin_ssh_authorized,</group>
+  </rule>
+
+  <rule id="101040" level="8">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.image" type="pcre2">(?i)(/useradd|/usermod|/adduser)$</field>
+    <description>LIN-USERADD: Creacion o modificacion de cuenta</description>
+    <mitre>
+      <id>T1136.001</id>
+    </mitre>
+    <group>soc_sigma,soc_useradd,lin_useradd,</group>
+  </rule>
+
+  <rule id="101041" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.image" type="pcre2">(?i)/log$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)erase</field>
+    <description>MAC-BORRADO-DE: Borrado de registros del sistema en macOS [1/3]</description>
+    <mitre>
+      <id>T1070.002</id>
+      <id>T1070.003</id>
+    </mitre>
+    <group>soc_sigma,soc_borrado,mac_borrado_de,</group>
+  </rule>
+
+  <rule id="101042" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(/var/log/asl|/private/var/log/|/var/db/diagnostics|\.zsh_history|\.bash_history)</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)(/rm|/shred|/srm)$</field>
+    <description>MAC-BORRADO-DE: Borrado de registros del sistema en macOS [2/3]</description>
+    <mitre>
+      <id>T1070.002</id>
+      <id>T1070.003</id>
+    </mitre>
+    <group>soc_sigma,soc_borrado,mac_borrado_de,</group>
+  </rule>
+
+  <rule id="101043" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(unset\ HISTFILE|HISTSIZE=0|set\ \+o\ history)</field>
+    <description>MAC-BORRADO-DE: Borrado de registros del sistema en macOS [3/3]</description>
+    <mitre>
+      <id>T1070.002</id>
+      <id>T1070.003</id>
+    </mitre>
+    <group>soc_sigma,soc_borrado,mac_borrado_de,</group>
+  </rule>
+
+  <rule id="101044" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(curl\ |wget\ |nscurl\ )</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(\|\ bash|\|\ sh|\|\ zsh|\|\ python|\|bash|\|sh|\|\ osascript)</field>
+    <description>MAC-DESCARGA-Y: Descarga y ejecucion directa en macOS</description>
+    <mitre>
+      <id>T1059.004</id>
+      <id>T1105</id>
+    </mitre>
+    <group>soc_sigma,soc_descarga,mac_descarga_y,</group>
+  </rule>
+
+  <rule id="101045" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.image" type="pcre2">(?i)/spctl$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(\-\-master\-disable|\-\-global\-disable|\-\-add)</field>
+    <description>MAC-GATEKEEPER-DESHABILITADO: Gatekeeper deshabilitado o cuarentena eliminada [1/3]</description>
+    <mitre>
+      <id>T1553.001</id>
+      <id>T1562.001</id>
+    </mitre>
+    <group>soc_sigma,soc_gatekeeper,mac_gatekeeper_deshabilitado,</group>
+  </rule>
+
+  <rule id="101046" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.image" type="pcre2">(?i)/xattr$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)com\.apple\.quarantine</field>
+    <description>MAC-GATEKEEPER-DESHABILITADO: Gatekeeper deshabilitado o cuarentena eliminada [2/3]</description>
+    <mitre>
+      <id>T1553.001</id>
+      <id>T1562.001</id>
+    </mitre>
+    <group>soc_sigma,soc_gatekeeper,mac_gatekeeper_deshabilitado,</group>
+  </rule>
+
+  <rule id="101047" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.image" type="pcre2">(?i)/csrutil$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)disable</field>
+    <description>MAC-GATEKEEPER-DESHABILITADO: Gatekeeper deshabilitado o cuarentena eliminada [3/3]</description>
+    <mitre>
+      <id>T1553.001</id>
+      <id>T1562.001</id>
+    </mitre>
+    <group>soc_sigma,soc_gatekeeper,mac_gatekeeper_deshabilitado,</group>
+  </rule>
+
+  <rule id="101048" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.image" type="pcre2">(?i)/osascript$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(do\ shell\ script|with\ administrator\ privileges)</field>
+    <description>MAC-OSASCRIPT-SOSPECHOSO: AppleScript ejecutando shell o descargando codigo [1/3]</description>
+    <mitre>
+      <id>T1059.002</id>
+    </mitre>
+    <group>soc_sigma,soc_osascript,mac_osascript_sospechoso,</group>
+  </rule>
+
+  <rule id="101049" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.image" type="pcre2">(?i)/osascript$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(curl\ |wget\ |nscurl|base64\ \-d|python\ \-c)</field>
+    <description>MAC-OSASCRIPT-SOSPECHOSO: AppleScript ejecutando shell o descargando codigo [2/3]</description>
+    <mitre>
+      <id>T1059.002</id>
+    </mitre>
+    <group>soc_sigma,soc_osascript,mac_osascript_sospechoso,</group>
+  </rule>
+
+  <rule id="101050" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.image" type="pcre2">(?i)/osascript$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*display\ dialog)(?=.*with\ hidden\ answer)</field>
+    <description>MAC-OSASCRIPT-SOSPECHOSO: AppleScript ejecutando shell o descargando codigo [3/3]</description>
+    <mitre>
+      <id>T1059.002</id>
+    </mitre>
+    <group>soc_sigma,soc_osascript,mac_osascript_sospechoso,</group>
+  </rule>
+
+  <rule id="101051" level="8">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)(/Library/LaunchAgents/|/Library/LaunchDaemons/|/Library/StartupItems/)</field>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)\.plist$</field>
+    <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)^(/usr/sbin/installer|/System/Library/PrivateFrameworks/PackageKit\.framework/|/usr/libexec/xpcproxy)</field>
+    <description>MAC-PERSISTENCIA-LAUNCHAGENT: Persistencia por LaunchAgent o LaunchDaemon</description>
+    <mitre>
+      <id>T1543.001</id>
+      <id>T1543.004</id>
+    </mitre>
+    <group>soc_sigma,soc_persistencia,mac_persistencia_launchagent,</group>
+  </rule>
+
+  <rule id="101052" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(TCC\.db|/Library/Application\ Support/com\.apple\.TCC)</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)(/sqlite3|/cp|/mv|/dd)$</field>
+    <description>MAC-TCC-MANIPULACION: Manipulacion de la base de datos TCC [1/2]</description>
+    <mitre>
+      <id>T1548.006</id>
+    </mitre>
+    <group>soc_sigma,soc_tcc,mac_tcc_manipulacion,</group>
+  </rule>
+
+  <rule id="101053" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.image" type="pcre2">(?i)/tccutil$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)reset</field>
+    <description>MAC-TCC-MANIPULACION: Manipulacion de la base de datos TCC [2/2]</description>
+    <mitre>
+      <id>T1548.006</id>
+    </mitre>
+    <group>soc_sigma,soc_tcc,mac_tcc_manipulacion,</group>
+  </rule>
+
+  <rule id="101054" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.image" type="pcre2">(?i)/dscl$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(\-create\ /Users/|\-append\ /Groups/admin)</field>
+    <description>MAC-USUARIO-OCULTO: Creacion de usuario local u oculto en macOS [1/3]</description>
+    <mitre>
+      <id>T1136.001</id>
+    </mitre>
+    <group>soc_sigma,soc_usuario,mac_usuario_oculto,</group>
+  </rule>
+
+  <rule id="101055" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.image" type="pcre2">(?i)/sysadminctl$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)\-addUser</field>
+    <description>MAC-USUARIO-OCULTO: Creacion de usuario local u oculto en macOS [2/3]</description>
+    <mitre>
+      <id>T1136.001</id>
+    </mitre>
+    <group>soc_sigma,soc_usuario,mac_usuario_oculto,</group>
+  </rule>
+
+  <rule id="101056" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(IsHidden|dscl\ \.\ create\ /Users/)</field>
+    <description>MAC-USUARIO-OCULTO: Creacion de usuario local u oculto en macOS [3/3]</description>
+    <mitre>
+      <id>T1136.001</id>
+    </mitre>
+    <group>soc_sigma,soc_usuario,mac_usuario_oculto,</group>
+  </rule>
+
+  <rule id="101057" level="14">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.image" type="pcre2">(?i)/security$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(dump\-keychain|find\-generic\-password|find\-internet\-password|unlock\-keychain)</field>
+    <description>MAC-VOLCADO-LLAVERO: Acceso o volcado del llavero de macOS [1/2]</description>
+    <mitre>
+      <id>T1555.001</id>
+    </mitre>
+    <group>soc_sigma,soc_volcado,mac_volcado_llavero,</group>
+  </rule>
+
+  <rule id="101058" level="14">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(login\.keychain\-db|/Library/Keychains/)</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)(/cat|/cp|/dd|/base64|/curl)$</field>
+    <description>MAC-VOLCADO-LLAVERO: Acceso o volcado del llavero de macOS [2/2]</description>
+    <mitre>
+      <id>T1555.001</id>
+    </mitre>
+    <group>soc_sigma,soc_volcado,mac_volcado_llavero,</group>
+  </rule>
+
+  <rule id="101059" level="8">
+    <decoded_as>json</decoded_as>
+    <field name="data.c-uri" type="pcre2">(?i)/</field>
+    <field name="data.cs-categories" negate="yes" type="pcre2">(?i)^(Business|Search\ Engines|Software\ Updates)$</field>
+    <description>SOC-NET-001: Patron de beaconing hacia un destino externo</description>
+    <mitre>
+      <id>T1071.001</id>
+    </mitre>
+    <group>soc_sigma,soc_net,soc_net_001,</group>
+  </rule>
+
+  <rule id="101060" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="data.c-uri" type="pcre2">(?i)(discord\.com/api/webhooks|discordapp\.com/api/webhooks|hooks\.slack\.com/services|api\.telegram\.org/bot)</field>
+    <description>SOC-NET-002: Canal de mando sobre un servicio legitimo [1/3]</description>
+    <mitre>
+      <id>T1102</id>
+    </mitre>
+    <group>soc_sigma,soc_net,soc_net_002,</group>
+  </rule>
+
+  <rule id="101061" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="data.c-uri" type="pcre2">(?i)(pastebin\.com/raw|hastebin\.com/raw|ghostbin\.co/paste|transfer\.sh/|anonfiles\.com/|gofile\.io/uploadFile)</field>
+    <description>SOC-NET-002: Canal de mando sobre un servicio legitimo [2/3]</description>
+    <mitre>
+      <id>T1102</id>
+    </mitre>
+    <group>soc_sigma,soc_net,soc_net_002,</group>
+  </rule>
+
+  <rule id="101062" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="data.c-uri" type="pcre2">(?i)(\.ngrok\.io|\.ngrok\-free\.app|\.trycloudflare\.com|\.loca\.lt|\.serveo\.net)</field>
+    <description>SOC-NET-002: Canal de mando sobre un servicio legitimo [3/3]</description>
+    <mitre>
+      <id>T1102</id>
+    </mitre>
+    <group>soc_sigma,soc_net,soc_net_002,</group>
+  </rule>
+
+  <rule id="101063" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="data.query_type" type="pcre2">(?i)^(TXT|NULL)$</field>
+    <description>SOC-NET-003: Tunelizacion o exfiltracion por DNS [1/2]</description>
+    <mitre>
+      <id>T1071.004</id>
+    </mitre>
+    <group>soc_sigma,soc_net,soc_net_003,</group>
+  </rule>
+
+  <rule id="101064" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="data.query" type="pcre2">(?i)^[A-Za-z0-9+/=_-]{45,}\..*</field>
+    <description>SOC-NET-003: Tunelizacion o exfiltracion por DNS [2/2]</description>
+    <mitre>
+      <id>T1071.004</id>
+    </mitre>
+    <group>soc_sigma,soc_net,soc_net_003,</group>
+  </rule>
+
+  <rule id="101065" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="data.c-uri" type="pcre2">(?i)(\$\{jndi:|%24%7Bjndi|\$\{lower:j\})</field>
+    <description>SOC-NET-004: Explotacion de vulnerabilidad web contra un servicio publicado [1/5]</description>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+    <group>soc_sigma,soc_net,soc_net_004,</group>
+  </rule>
+
+  <rule id="101066" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="data.c-uri" type="pcre2">(?i)(\.\./\.\./|\.\.%2f\.\.%2f|%2e%2e%2f|/etc/passwd|c:\\windows\\win\.ini)</field>
+    <description>SOC-NET-004: Explotacion de vulnerabilidad web contra un servicio publicado [2/5]</description>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+    <group>soc_sigma,soc_net,soc_net_004,</group>
+  </rule>
+
+  <rule id="101067" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="data.c-uri" type="pcre2">(?i)(\ union\ select|union\+select|'\ or\ 1=1|sleep\(5\)|benchmark\(|waitfor\ delay)</field>
+    <description>SOC-NET-004: Explotacion de vulnerabilidad web contra un servicio publicado [3/5]</description>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+    <group>soc_sigma,soc_net,soc_net_004,</group>
+  </rule>
+
+  <rule id="101068" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="data.c-uri" type="pcre2">(?i)(rO0AB|aced0005|__proto__)</field>
+    <description>SOC-NET-004: Explotacion de vulnerabilidad web contra un servicio publicado [4/5]</description>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+    <group>soc_sigma,soc_net,soc_net_004,</group>
+  </rule>
+
+  <rule id="101069" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="data.c-uri" type="pcre2">(?i)(\$\{T\(java\.lang\.Runtime\)|\{\{7.*7\}\}|&lt;%=\ )</field>
+    <description>SOC-NET-004: Explotacion de vulnerabilidad web contra un servicio publicado [5/5]</description>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+    <group>soc_sigma,soc_net,soc_net_004,</group>
+  </rule>
+
+  <rule id="101070" level="14">
+    <decoded_as>json</decoded_as>
+    <field name="data.c-uri" type="pcre2">(?i)(\.php|\.jsp|\.jspx|\.aspx|\.ashx)</field>
+    <field name="data.c-uri" type="pcre2">(?i)(cmd=|exec=|shell=|passthru\(|system\(|whoami|net\ user|powershell|/bin/bash|eval\()</field>
+    <description>SOC-NET-005: Interaccion con webshell</description>
+    <mitre>
+      <id>T1505.003</id>
+    </mitre>
+    <group>soc_sigma,soc_net,soc_net_005,</group>
+  </rule>
+
+  <rule id="101071" level="8">
+    <decoded_as>json</decoded_as>
+    <field name="data.cs-method" type="pcre2">(?i)^(POST|PUT)$</field>
+    <field name="data.c-uri" negate="yes" type="pcre2">(?i)(sharepoint\.com|onedrive\.live\.com|\.midominio\.local)</field>
+    <description>SOC-NET-006: Volumen de subida anomalo hacia el exterior</description>
+    <mitre>
+      <id>T1048</id>
+    </mitre>
+    <group>soc_sigma,soc_net,soc_net_006,</group>
+  </rule>
+
+  <rule id="101072" level="8">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(3)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)(\\rundll32\.exe|\\regsvr32\.exe|\\mshta\.exe)$</field>
+    <field name="win.eventdata.initiated" type="pcre2">(?i)^True$</field>
+    <description>NET-RARE-PROCESS: Proceso del sistema con conexion saliente inusual</description>
+    <mitre>
+      <id>T1071.001</id>
+    </mitre>
+    <group>soc_sigma,soc_rare,net_rare_process,</group>
+  </rule>
+
+  <rule id="101073" level="8">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*net)(?=.*user)</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)/add</field>
+    <description>PROC-NET-USER: Creacion de cuenta local</description>
+    <mitre>
+      <id>T1136.001</id>
+    </mitre>
+    <group>soc_sigma,soc_net,proc_net_user,</group>
+  </rule>
+
+  <rule id="101074" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.parentImage" type="pcre2">(?i)(\\winword\.exe|\\excel\.exe|\\powerpnt\.exe|\\outlook\.exe)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)(\\cmd\.exe|\\powershell\.exe|\\wscript\.exe|\\cscript\.exe|\\mshta\.exe)$</field>
+    <description>PROC-OFFICE-SPAWNING: Documento de Office lanzando shell</description>
+    <mitre>
+      <id>T1204.002</id>
+      <id>T1566.001</id>
+    </mitre>
+    <group>soc_sigma,soc_office,proc_office_spawning,</group>
+  </rule>
+
+  <rule id="101075" level="8">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\sc\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*create)</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(binPath|binpath=)</field>
+    <description>PROC-SERVICE-CREATE: Creacion de servicio via sc.exe</description>
+    <mitre>
+      <id>T1543.003</id>
+    </mitre>
+    <group>soc_sigma,soc_service,proc_service_create,</group>
+  </rule>
+
+  <rule id="101076" level="8">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\wmic\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*process)(?=.*call)(?=.*create)</field>
+    <description>PROC-WMIC-PROCESS: Ejecucion via WMIC process call create</description>
+    <mitre>
+      <id>T1047</id>
+    </mitre>
+    <group>soc_sigma,soc_wmic,proc_wmic_process,</group>
+  </rule>
+
+  <rule id="101077" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">(?i)^4769$</field>
+    <field name="win.eventdata.ticketOptions" type="pcre2">(?i)^0x40810000$</field>
+    <field name="win.eventdata.ticketEncryptionType" type="pcre2">(?i)^0x17$</field>
+    <field name="win.eventdata.serviceName" negate="yes" type="pcre2">(?i)\$$</field>
+    <field name="win.eventdata.serviceName" negate="yes" type="pcre2">(?i)^krbtgt$</field>
+    <description>SOC-AD-001: Kerberoasting - solicitud masiva de tickets de servicio con RC4</description>
+    <mitre>
+      <id>T1558.003</id>
+    </mitre>
+    <group>soc_sigma,soc_ad,soc_ad_001,</group>
+  </rule>
+
+  <rule id="101078" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">(?i)^4768$</field>
+    <field name="win.eventdata.preAuthType" type="pcre2">(?i)^0$</field>
+    <field name="win.eventdata.ticketEncryptionType" type="pcre2">(?i)^0x17$</field>
+    <field name="win.eventdata.targetUserName" negate="yes" type="pcre2">(?i)\$$</field>
+    <description>SOC-AD-002: AS-REP Roasting - peticion sin preautenticacion Kerberos</description>
+    <mitre>
+      <id>T1558.004</id>
+    </mitre>
+    <group>soc_sigma,soc_ad,soc_ad_002,</group>
+  </rule>
+
+  <rule id="101079" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">(?i)^4662$</field>
+    <field name="win.eventdata.properties" type="pcre2">(?i)(1131f6aa\-9c07\-11d1\-f79f\-00c04fc2dcd2|1131f6ad\-9c07\-11d1\-f79f\-00c04fc2dcd2|89e95b76\-444d\-4c62\-991a\-0facbeda640c)</field>
+    <field name="win.eventdata.subjectUserName" negate="yes" type="pcre2">(?i)\$$</field>
+    <field name="win.eventdata.subjectUserName" negate="yes" type="pcre2">(?i)^(ANONYMOUS\ LOGON|SYSTEM)$</field>
+    <description>SOC-AD-003: DCSync - replicacion de directorio desde un equipo que no es DC</description>
+    <mitre>
+      <id>T1003.006</id>
+    </mitre>
+    <group>soc_sigma,soc_ad,soc_ad_003,</group>
+  </rule>
+
+  <rule id="101080" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">(?i)^4769$</field>
+    <field name="win.eventdata.serviceName" type="pcre2">(?i)^krbtgt</field>
+    <field name="win.eventdata.ticketEncryptionType" type="pcre2">(?i)^0x17$</field>
+    <description>SOC-AD-004: Indicio de Golden Ticket - TGS de krbtgt con cifrado degradado</description>
+    <mitre>
+      <id>T1558.001</id>
+    </mitre>
+    <group>soc_sigma,soc_ad,soc_ad_004,</group>
+  </rule>
+
+  <rule id="101081" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)(\\Rubeus\.exe|\\mimikatz\.exe|\\kekeo\.exe|\\GetUserSPNs\.exe)$</field>
+    <description>SOC-AD-005: Herramienta de abuso de Kerberos ejecutada [1/3]</description>
+    <mitre>
+      <id>T1003</id>
+      <id>T1558</id>
+    </mitre>
+    <group>soc_sigma,soc_ad,soc_ad_005,</group>
+  </rule>
+
+  <rule id="101082" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.originalFileName" type="pcre2">(?i)^(Rubeus\.exe|mimikatz\.exe)$</field>
+    <description>SOC-AD-005: Herramienta de abuso de Kerberos ejecutada [2/3]</description>
+    <mitre>
+      <id>T1003</id>
+      <id>T1558</id>
+    </mitre>
+    <group>soc_sigma,soc_ad,soc_ad_005,</group>
+  </rule>
+
+  <rule id="101083" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(kerberoast|asreproast|lsadump::dcsync|sekurlsa::logonpasswords|sekurlsa::tickets|kerberos::golden|kerberos::ptt|GetUserSPNs\.py|GetNPUsers\.py|secretsdump\.py)</field>
+    <description>SOC-AD-005: Herramienta de abuso de Kerberos ejecutada [3/3]</description>
+    <mitre>
+      <id>T1003</id>
+      <id>T1558</id>
+    </mitre>
+    <group>soc_sigma,soc_ad,soc_ad_005,</group>
+  </rule>
+
+  <rule id="101084" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">(?i)^4624$</field>
+    <field name="win.eventdata.logonType" type="pcre2">(?i)^9$</field>
+    <field name="win.eventdata.logonProcessName" type="pcre2">(?i)^seclogo$</field>
+    <field name="win.eventdata.authenticationPackageName" type="pcre2">(?i)^Negotiate$</field>
+    <field name="win.eventdata.targetUserName" negate="yes" type="pcre2">(?i)\$$</field>
+    <description>SOC-AD-006: Pass-the-Hash y Overpass-the-Hash</description>
+    <mitre>
+      <id>T1550.002</id>
+    </mitre>
+    <group>soc_sigma,soc_ad,soc_ad_006,</group>
+  </rule>
+
+  <rule id="101085" level="8">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)(\\SharpHound\.exe|\\AzureHound\.exe)$</field>
+    <description>SOC-AD-007: Enumeracion de Active Directory - BloodHound y comandos de reconocimiento [1/4]</description>
+    <mitre>
+      <id>T1069.002</id>
+      <id>T1087.002</id>
+    </mitre>
+    <group>soc_sigma,soc_ad,soc_ad_007,</group>
+  </rule>
+
+  <rule id="101086" level="8">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(Invoke\-BloodHound|SharpHound\.ps1|\-CollectionMethod\ All)</field>
+    <description>SOC-AD-007: Enumeracion de Active Directory - BloodHound y comandos de reconocimiento [2/4]</description>
+    <mitre>
+      <id>T1069.002</id>
+      <id>T1087.002</id>
+    </mitre>
+    <group>soc_sigma,soc_ad,soc_ad_007,</group>
+  </rule>
+
+  <rule id="101087" level="8">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)(\\net\.exe|\\net1\.exe)$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(group\ "domain\ admins"|group\ "enterprise\ admins"|group\ /domain|user\ /domain|localgroup\ administrators)</field>
+    <description>SOC-AD-007: Enumeracion de Active Directory - BloodHound y comandos de reconocimiento [3/4]</description>
+    <mitre>
+      <id>T1069.002</id>
+      <id>T1087.002</id>
+    </mitre>
+    <group>soc_sigma,soc_ad,soc_ad_007,</group>
+  </rule>
+
+  <rule id="101088" level="8">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\dsquery\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(group|user)</field>
+    <description>SOC-AD-007: Enumeracion de Active Directory - BloodHound y comandos de reconocimiento [4/4]</description>
+    <mitre>
+      <id>T1069.002</id>
+      <id>T1087.002</id>
+    </mitre>
+    <group>soc_sigma,soc_ad,soc_ad_007,</group>
+  </rule>
+
+  <rule id="101089" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.providerName" type="pcre2">(?i)^Service\ Control\ Manager$</field>
+    <field name="win.system.eventID" type="pcre2">(?i)^7045$</field>
+    <field name="win.eventdata.serviceName" type="pcre2">(?i)(PSEXESVC|PAExec|csexec|RemCom)</field>
+    <description>SOC-AD-008: Ejecucion remota tipo PsExec [1/2]</description>
+    <mitre>
+      <id>T1569.002</id>
+    </mitre>
+    <group>soc_sigma,soc_ad,soc_ad_008,</group>
+  </rule>
+
+  <rule id="101090" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.providerName" type="pcre2">(?i)^Service\ Control\ Manager$</field>
+    <field name="win.system.eventID" type="pcre2">(?i)^7045$</field>
+    <field name="win.eventdata.imagePath" type="pcre2">(?i)(\\PSEXESVC|%SystemRoot%\\\{|cmd\.exe\ /c\ echo|\\ADMIN\$\\)</field>
+    <description>SOC-AD-008: Ejecucion remota tipo PsExec [2/2]</description>
+    <mitre>
+      <id>T1569.002</id>
+    </mitre>
+    <group>soc_sigma,soc_ad,soc_ad_008,</group>
+  </rule>
+
+  <rule id="101091" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.parentImage" type="pcre2">(?i)(\\WmiPrvSE\.exe|\\wsmprovhost\.exe|\\winrshost\.exe)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)(\\cmd\.exe|\\powershell\.exe|\\pwsh\.exe|\\wscript\.exe|\\cscript\.exe|\\rundll32\.exe|\\mshta\.exe)$</field>
+    <description>SOC-AD-009: Ejecucion remota por WMI o WinRM</description>
+    <mitre>
+      <id>T1021.006</id>
+      <id>T1047</id>
+    </mitre>
+    <group>soc_sigma,soc_ad,soc_ad_009,</group>
+  </rule>
+
+  <rule id="101092" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)(\\SharpGPOAbuse\.exe|\\pyGPOAbuse\.py)$</field>
+    <description>SOC-AD-010: Modificacion sospechosa de directiva de grupo [1/3]</description>
+    <mitre>
+      <id>T1484.001</id>
+    </mitre>
+    <group>soc_sigma,soc_ad,soc_ad_010,</group>
+  </rule>
+
+  <rule id="101093" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(SharpGPOAbuse|New\-GPOImmediateTask|\-\-AddComputerTask|\-\-AddUserTask)</field>
+    <description>SOC-AD-010: Modificacion sospechosa de directiva de grupo [2/3]</description>
+    <mitre>
+      <id>T1484.001</id>
+    </mitre>
+    <group>soc_sigma,soc_ad,soc_ad_010,</group>
+  </rule>
+
+  <rule id="101094" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*\\SYSVOL\\)(?=.*\\Policies\\)</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(ScheduledTasks\.xml|\\Scripts\\Startup|GptTmpl\.inf)</field>
+    <description>SOC-AD-010: Modificacion sospechosa de directiva de grupo [3/3]</description>
+    <mitre>
+      <id>T1484.001</id>
+    </mitre>
+    <group>soc_sigma,soc_ad,soc_ad_010,</group>
+  </rule>
+
+  <rule id="101095" level="8">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">(?i)^4741$</field>
+    <field name="win.eventdata.subjectUserName" negate="yes" type="pcre2">(?i)\$$</field>
+    <description>SOC-AD-011: Cuenta de equipo creada por un usuario no administrador</description>
+    <mitre>
+      <id>T1136.002</id>
+    </mitre>
+    <group>soc_sigma,soc_ad,soc_ad_011,</group>
+  </rule>
+
+  <rule id="101096" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)(\\Certify\.exe|\\Certipy\.exe)$</field>
+    <description>SOC-AD-012: Abuso de servicios de certificados de Active Directory [1/3]</description>
+    <mitre>
+      <id>T1649</id>
+    </mitre>
+    <group>soc_sigma,soc_ad,soc_ad_012,</group>
+  </rule>
+
+  <rule id="101097" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(Certify\.exe\ request|certipy\ req|certipy\ auth|Rubeus\.exe\ asktgt)</field>
+    <description>SOC-AD-012: Abuso de servicios de certificados de Active Directory [2/3]</description>
+    <mitre>
+      <id>T1649</id>
+    </mitre>
+    <group>soc_sigma,soc_ad,soc_ad_012,</group>
+  </rule>
+
+  <rule id="101098" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*certreq)(?=.*san:)</field>
+    <description>SOC-AD-012: Abuso de servicios de certificados de Active Directory [3/3]</description>
+    <mitre>
+      <id>T1649</id>
+    </mitre>
+    <group>soc_sigma,soc_ad,soc_ad_012,</group>
+  </rule>
+
+  <rule id="101099" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*comsvcs\.dll)(?=.*MiniDump)</field>
+    <description>SOC-EDR-001: Volcado de memoria de LSASS [1/4]</description>
+    <mitre>
+      <id>T1003.001</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_001,</group>
+  </rule>
+
+  <rule id="101100" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)(\\procdump\.exe|\\procdump64\.exe|\\dumpert\.exe|\\nanodump\.exe)$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)lsass</field>
+    <description>SOC-EDR-001: Volcado de memoria de LSASS [2/4]</description>
+    <mitre>
+      <id>T1003.001</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_001,</group>
+  </rule>
+
+  <rule id="101101" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.originalFileName" type="pcre2">(?i)^(procdump|procdump64\.exe)$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)lsass</field>
+    <description>SOC-EDR-001: Volcado de memoria de LSASS [3/4]</description>
+    <mitre>
+      <id>T1003.001</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_001,</group>
+  </rule>
+
+  <rule id="101102" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*rundll32)(?=.*dbghelp)(?=.*MiniDumpWriteDump)</field>
+    <description>SOC-EDR-001: Volcado de memoria de LSASS [4/4]</description>
+    <mitre>
+      <id>T1003.001</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_001,</group>
+  </rule>
+
+  <rule id="101103" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(10)$</field>
+    <field name="win.eventdata.targetImage" type="pcre2">(?i)\\lsass\.exe$</field>
+    <field name="win.eventdata.grantedAccess" type="pcre2">(?i)^(0x1010|0x1410|0x1438|0x143a|0x1fffff)$</field>
+    <field name="win.eventdata.sourceImage" negate="yes" type="pcre2">(?i)^(C:\\Windows\\System32\\|C:\\Windows\\SysWOW64\\|C:\\Program\ Files\\Windows\ Defender\\)</field>
+    <description>SOC-EDR-002: Acceso a memoria de LSASS con permisos de lectura</description>
+    <mitre>
+      <id>T1003.001</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_002,</group>
+  </rule>
+
+  <rule id="101104" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\vssadmin\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*delete)(?=.*shadows)</field>
+    <description>SOC-EDR-003: Destruccion de copias de seguridad y puntos de restauracion [1/5]</description>
+    <mitre>
+      <id>T1490</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_003,</group>
+  </rule>
+
+  <rule id="101105" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\wmic\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*shadowcopy)(?=.*delete)</field>
+    <description>SOC-EDR-003: Destruccion de copias de seguridad y puntos de restauracion [2/5]</description>
+    <mitre>
+      <id>T1490</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_003,</group>
+  </rule>
+
+  <rule id="101106" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\wbadmin\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*delete)(?=.*catalog)</field>
+    <description>SOC-EDR-003: Destruccion de copias de seguridad y puntos de restauracion [3/5]</description>
+    <mitre>
+      <id>T1490</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_003,</group>
+  </rule>
+
+  <rule id="101107" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\bcdedit\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(recoveryenabled\ no|bootstatuspolicy\ ignoreallfailures)</field>
+    <description>SOC-EDR-003: Destruccion de copias de seguridad y puntos de restauracion [4/5]</description>
+    <mitre>
+      <id>T1490</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_003,</group>
+  </rule>
+
+  <rule id="101108" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(Get\-WmiObject\ Win32_Shadowcopy|Remove\-Item\ \-Path\ C:\\Windows\\System32\\Recovery)</field>
+    <description>SOC-EDR-003: Destruccion de copias de seguridad y puntos de restauracion [5/5]</description>
+    <mitre>
+      <id>T1490</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_003,</group>
+  </rule>
+
+  <rule id="101109" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(Set\-MpPreference\ \-DisableRealtimeMonitoring\ \$true|Set\-MpPreference\ \-DisableBehaviorMonitoring\ \$true|Set\-MpPreference\ \-DisableIOAVProtection\ \$true|Add\-MpPreference\ \-ExclusionPath|DisableAntiSpyware|DisableAntiVirus)</field>
+    <description>SOC-EDR-004: Defensas de seguridad deshabilitadas [1/4]</description>
+    <mitre>
+      <id>T1070.001</id>
+      <id>T1562.001</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_004,</group>
+  </rule>
+
+  <rule id="101110" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(netsh\ advfirewall\ set\ allprofiles\ state\ off|netsh\ firewall\ set\ opmode\ disable)</field>
+    <description>SOC-EDR-004: Defensas de seguridad deshabilitadas [2/4]</description>
+    <mitre>
+      <id>T1070.001</id>
+      <id>T1562.001</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_004,</group>
+  </rule>
+
+  <rule id="101111" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(sc\ stop\ WinDefend|sc\ config\ WinDefend\ start=\ disabled|sc\ stop\ Sense|sc\ stop\ wazuh|Stop\-Service\ \-Name\ Sense|net\ stop\ "Windows\ Defender)</field>
+    <description>SOC-EDR-004: Defensas de seguridad deshabilitadas [3/4]</description>
+    <mitre>
+      <id>T1070.001</id>
+      <id>T1562.001</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_004,</group>
+  </rule>
+
+  <rule id="101112" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(auditpol\ /clear|auditpol\ /set\ /category:.*\ /success:disable|wevtutil\ cl\ |wevtutil\ sl\ )</field>
+    <description>SOC-EDR-004: Defensas de seguridad deshabilitadas [4/4]</description>
+    <mitre>
+      <id>T1070.001</id>
+      <id>T1562.001</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_004,</group>
+  </rule>
+
+  <rule id="101113" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\certutil\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(\-urlcache|\-verifyctl|decode)</field>
+    <description>SOC-EDR-005: LOLBin usado para descargar y ejecutar [1/5]</description>
+    <mitre>
+      <id>T1105</id>
+      <id>T1140</id>
+      <id>T1197</id>
+      <id>T1218</id>
+      <id>T1218.005</id>
+      <id>T1218.010</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_005,</group>
+  </rule>
+
+  <rule id="101114" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\bitsadmin\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(/transfer|/create|/addfile)</field>
+    <description>SOC-EDR-005: LOLBin usado para descargar y ejecutar [2/5]</description>
+    <mitre>
+      <id>T1105</id>
+      <id>T1140</id>
+      <id>T1197</id>
+      <id>T1218</id>
+      <id>T1218.005</id>
+      <id>T1218.010</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_005,</group>
+  </rule>
+
+  <rule id="101115" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\mshta\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(http|javascript:|vbscript:)</field>
+    <description>SOC-EDR-005: LOLBin usado para descargar y ejecutar [3/5]</description>
+    <mitre>
+      <id>T1105</id>
+      <id>T1140</id>
+      <id>T1197</id>
+      <id>T1218</id>
+      <id>T1218.005</id>
+      <id>T1218.010</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_005,</group>
+  </rule>
+
+  <rule id="101116" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\regsvr32\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(scrobj\.dll|/i:http)</field>
+    <description>SOC-EDR-005: LOLBin usado para descargar y ejecutar [4/5]</description>
+    <mitre>
+      <id>T1105</id>
+      <id>T1140</id>
+      <id>T1197</id>
+      <id>T1218</id>
+      <id>T1218.005</id>
+      <id>T1218.010</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_005,</group>
+  </rule>
+
+  <rule id="101117" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(DownloadString\(|DownloadFile\(|Invoke\-WebRequest|Net\.WebClient|Start\-BitsTransfer)</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(http://|https://)</field>
+    <description>SOC-EDR-005: LOLBin usado para descargar y ejecutar [5/5]</description>
+    <mitre>
+      <id>T1105</id>
+      <id>T1140</id>
+      <id>T1197</id>
+      <id>T1218</id>
+      <id>T1218.005</id>
+      <id>T1218.010</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_005,</group>
+  </rule>
+
+  <rule id="101118" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)(\\powershell\.exe|\\pwsh\.exe)$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(\ \-enc\ |\ \-EncodedCommand|\ \-e\ JAB|FromBase64String|\[Convert\]::FromBase64|\-nop\ \-w\ hidden|\-NoProfile\ \-WindowStyle\ Hidden|IEX\(New\-Object|iex\ \(New\-Object|\[Reflection\.Assembly\]::Load|\-ExecutionPolicy\ Bypass)</field>
+    <description>SOC-EDR-006: PowerShell codificado u ofuscado</description>
+    <mitre>
+      <id>T1027</id>
+      <id>T1059.001</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_006,</group>
+  </rule>
+
+  <rule id="101119" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(11|23)$</field>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)(\.locked|\.encrypted|\.crypt|\.lockbit|\.blackcat|\.royal|\.akira|\.basta|\.cactus|\.play)$</field>
+    <description>SOC-EDR-007: Cifrado masivo de ficheros por ransomware [1/2]</description>
+    <mitre>
+      <id>T1486</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_007,</group>
+  </rule>
+
+  <rule id="101120" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(11|23)$</field>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)(readme_for_decrypt|how_to_decrypt|recover_your_files|restore\-my\-files|_readme\.txt|HOW\ TO\ BACK\ FILES|RESTORE_FILES_INFO)</field>
+    <description>SOC-EDR-007: Cifrado masivo de ficheros por ransomware [2/2]</description>
+    <mitre>
+      <id>T1486</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_007,</group>
+  </rule>
+
+  <rule id="101121" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\schtasks\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)/create</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(powershell|cmd\.exe\ /c|mshta|rundll32|wscript|cscript|regsvr32|\\AppData\\|\\Users\\Public\\|\\Temp\\|http://|https://)</field>
+    <description>SOC-EDR-008: Tarea programada sospechosa [1/2]</description>
+    <mitre>
+      <id>T1053.005</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_008,</group>
+  </rule>
+
+  <rule id="101122" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\schtasks\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)/create</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(/ru\ system|/ru\ "NT\ AUTHORITY\\SYSTEM")</field>
+    <description>SOC-EDR-008: Tarea programada sospechosa [2/2]</description>
+    <mitre>
+      <id>T1053.005</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_008,</group>
+  </rule>
+
+  <rule id="101123" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(12|13|14)$</field>
+    <field name="win.eventdata.targetObject" type="pcre2">(?i)(\\CurrentVersion\\Run|\\CurrentVersion\\RunOnce|\\Winlogon\\Shell|\\Winlogon\\Userinit|\\CurrentVersion\\Explorer\\User\ Shell\ Folders)</field>
+    <field name="win.eventdata.details" type="pcre2">(?i)(powershell|cmd\.exe|mshta|rundll32|wscript|regsvr32|\\AppData\\|\\Users\\Public\\|\\Temp\\|\\ProgramData\\)</field>
+    <description>SOC-EDR-009: Persistencia por claves de arranque del registro</description>
+    <mitre>
+      <id>T1547.001</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_009,</group>
+  </rule>
+
+  <rule id="101124" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(8)$</field>
+    <field name="win.eventdata.targetImage" type="pcre2">(?i)(\\explorer\.exe|\\svchost\.exe|\\winlogon\.exe|\\lsass\.exe|\\rundll32\.exe|\\dllhost\.exe|\\notepad\.exe|\\werfault\.exe)$</field>
+    <field name="win.eventdata.sourceImage" negate="yes" type="pcre2">(?i)^C:\\Windows\\System32\\</field>
+    <description>SOC-EDR-010: Inyeccion de codigo en proceso remoto [1/2]</description>
+    <mitre>
+      <id>T1055</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_010,</group>
+  </rule>
+
+  <rule id="101125" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(8)$</field>
+    <field name="win.eventdata.targetImage" type="pcre2">(?i)(\\explorer\.exe|\\svchost\.exe|\\winlogon\.exe|\\lsass\.exe|\\rundll32\.exe|\\dllhost\.exe|\\notepad\.exe|\\werfault\.exe)$</field>
+    <field name="win.eventdata.sourceImage" negate="yes" type="pcre2">(?i)(\\csrss\.exe|\\services\.exe|\\wininit\.exe)$</field>
+    <description>SOC-EDR-010: Inyeccion de codigo en proceso remoto [2/2]</description>
+    <mitre>
+      <id>T1055</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_010,</group>
+  </rule>
+
+  <rule id="101126" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(17|18)$</field>
+    <field name="win.eventdata.pipeName" type="pcre2">(?i)^(\\msagent_|\\postex_|\\postex_ssh_|\\status_|\\mojo_|\\wkssvc_|\\ntsvcs_|\\sliver\-|\\MSSE\-)</field>
+    <description>SOC-EDR-011: Named pipe caracteristico de framework de C2</description>
+    <mitre>
+      <id>T1071</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_011,</group>
+  </rule>
+
+  <rule id="101127" level="8">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)(\\AppData\\Local\\Temp\\|\\Windows\\Temp\\|\\Users\\Public\\|\\\$Recycle\.Bin\\|\\AppData\\Roaming\\)</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)(\.exe|\.scr|\.com|\.pif)$</field>
+    <field name="win.eventdata.parentImage" negate="yes" type="pcre2">(?i)(\\msiexec\.exe|\\setup\.exe|\\TrustedInstaller\.exe)$</field>
+    <description>SOC-EDR-012: Ejecucion de binario desde una ruta de escritura de usuario</description>
+    <mitre>
+      <id>T1204.002</id>
+    </mitre>
+    <group>soc_sigma,soc_edr,soc_edr_012,</group>
+  </rule>
+
+  <rule id="101128" level="8">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">(?i)^6416$</field>
+    <field name="win.eventdata.className" type="pcre2">(?i)(DiskDrive|USB|WPD)</field>
+    <description>ZTA-DEV-001: Montaje de almacenamiento extraible</description>
+    <mitre>
+      <id>T1052.001</id>
+      <id>T1091</id>
+    </mitre>
+    <group>soc_sigma,soc_dev,zta_dev_001,</group>
+  </rule>
+
+  <rule id="101129" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="data.ResultType" type="pcre2">(?i)^0$</field>
+    <field name="data.ClientAppUsed" type="pcre2">(?i)^(IMAP4|POP3|SMTP|MAPI\ Over\ HTTP|Exchange\ ActiveSync|Other\ clients|Authenticated\ SMTP|Exchange\ Web\ Services)$</field>
+    <description>ZTA-ID-001: Uso de protocolo de autenticacion heredado</description>
+    <mitre>
+      <id>T1078.004</id>
+      <id>T1556.006</id>
+    </mitre>
+    <group>soc_sigma,soc_id,zta_id_001,</group>
+  </rule>
+
+  <rule id="101130" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">(?i)^4624$</field>
+    <field name="win.eventdata.logonType" type="pcre2">(?i)^(2|7|10|11)$</field>
+    <field name="win.eventdata.targetUserName" type="pcre2">(?i)^(svc_|srv_|sa_|app_)</field>
+    <field name="win.eventdata.targetUserName" negate="yes" type="pcre2">(?i)\$$</field>
+    <description>ZTA-ID-002: Cuenta de servicio con inicio de sesion interactivo</description>
+    <mitre>
+      <id>T1078.002</id>
+    </mitre>
+    <group>soc_sigma,soc_id,zta_id_002,</group>
+  </rule>
+
+  <rule id="101131" level="8">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.destinationPort" type="pcre2">(?i)^(21|23|69|110|143|389|512|513|514)$</field>
+    <field name="win.eventdata.initiated" type="pcre2">(?i)^true$</field>
+    <description>ZTA-NET-001: Protocolo en claro hacia un recurso que exige cifrado</description>
+    <mitre>
+      <id>T1040</id>
+    </mitre>
+    <group>soc_sigma,soc_net,zta_net_001,</group>
+  </rule>
+
+  <rule id="101132" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(7)$</field>
+    <field name="win.eventdata.imageLoaded" type="pcre2">(?i)(\\AppData\\Local\\Temp\\|\\AppData\\Roaming\\|\\Users\\Public\\|\\ProgramData\\|\\Windows\\Temp\\|\\\$Recycle\.Bin\\)</field>
+    <field name="win.eventdata.imageLoaded" type="pcre2">(?i)\.dll$</field>
+    <field name="win.eventdata.signed" negate="yes" type="pcre2">(?i)^true$</field>
+    <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(\\msiexec\.exe|\\TrustedInstaller\.exe|\\setup\.exe)$</field>
+    <description>ZTA-SUP-001: Carga de libreria desde una ruta no estandar [1/2]</description>
+    <mitre>
+      <id>T1574.001</id>
+      <id>T1574.002</id>
+    </mitre>
+    <group>soc_sigma,soc_sup,zta_sup_001,</group>
+  </rule>
+
+  <rule id="101133" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(7)$</field>
+    <field name="win.eventdata.imageLoaded" type="pcre2">(?i)(\\AppData\\Local\\Temp\\|\\AppData\\Roaming\\|\\Users\\Public\\|\\ProgramData\\|\\Windows\\Temp\\|\\\$Recycle\.Bin\\)</field>
+    <field name="win.eventdata.imageLoaded" type="pcre2">(?i)\.dll$</field>
+    <field name="win.eventdata.signatureStatus" negate="yes" type="pcre2">(?i)^Valid$</field>
+    <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(\\msiexec\.exe|\\TrustedInstaller\.exe|\\setup\.exe)$</field>
+    <description>ZTA-SUP-001: Carga de libreria desde una ruta no estandar [2/2]</description>
+    <mitre>
+      <id>T1574.001</id>
+      <id>T1574.002</id>
+    </mitre>
+    <group>soc_sigma,soc_sup,zta_sup_001,</group>
+  </rule>
+
+  <rule id="101134" level="8">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.image" type="pcre2">(?i)(/pip|/pip3|/npm|/yarn|/gem|/go|/cargo|/composer)$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(install\ git\+|install\ http://|install\ https://|\-\-index\-url|\-\-extra\-index\-url|\-\-registry|install\ github\.com/)</field>
+    <field name="win.eventdata.commandLine" negate="yes" type="pcre2">(?i)(repo\.midominio\.local|nexus\.midominio\.local|artifactory\.midominio\.local)</field>
+    <description>ZTA-SUP-002: Instalacion de paquete desde un repositorio no aprobado [1/2]</description>
+    <mitre>
+      <id>T1195.001</id>
+      <id>T1195.002</id>
+    </mitre>
+    <group>soc_sigma,soc_sup,zta_sup_002,</group>
+  </rule>
+
+  <rule id="101135" level="8">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.image" type="pcre2">(?i)(/pip|/pip3|/npm|/yarn|/gem|/go|/cargo|/composer)$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*curl)(?=.*install)</field>
+    <field name="win.eventdata.commandLine" negate="yes" type="pcre2">(?i)(repo\.midominio\.local|nexus\.midominio\.local|artifactory\.midominio\.local)</field>
+    <description>ZTA-SUP-002: Instalacion de paquete desde un repositorio no aprobado [2/2]</description>
+    <mitre>
+      <id>T1195.001</id>
+      <id>T1195.002</id>
+    </mitre>
+    <group>soc_sigma,soc_sup,zta_sup_002,</group>
+  </rule>
+
+  <rule id="101136" level="8">
+    <decoded_as>json</decoded_as>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)(/package\-lock\.json|/yarn\.lock|/pnpm\-lock\.yaml|/poetry\.lock|/Pipfile\.lock|/requirements\.txt|/go\.sum|/Cargo\.lock|/composer\.lock|/Gemfile\.lock)$</field>
+    <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(/git|/npm|/yarn|/pnpm|/poetry|/pip|/pip3|/go|/cargo|/composer|/bundle)$</field>
+    <description>ZTA-SUP-003: Modificacion de un fichero de dependencias o lockfile</description>
+    <mitre>
+      <id>T1195.001</id>
+    </mitre>
+    <group>soc_sigma,soc_sup,zta_sup_003,</group>
+  </rule>
+
+  <rule id="101137" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">(?i)^(1102|1100)$</field>
+    <description>ZTA-VIS-001: Borrado o reduccion del registro de auditoria [1/2]</description>
+    <mitre>
+      <id>T1070.001</id>
+      <id>T1562.002</id>
+    </mitre>
+    <group>soc_sigma,soc_vis,zta_vis_001,</group>
+  </rule>
+
+  <rule id="101138" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">(?i)^4719$</field>
+    <description>ZTA-VIS-001: Borrado o reduccion del registro de auditoria [2/2]</description>
+    <mitre>
+      <id>T1070.001</id>
+      <id>T1562.002</id>
+    </mitre>
+    <group>soc_sigma,soc_vis,zta_vis_001,</group>
+  </rule>
+
+</group>

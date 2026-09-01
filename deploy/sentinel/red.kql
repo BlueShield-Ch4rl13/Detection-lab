@@ -1,0 +1,44 @@
+// Generado por tools/build.py — no editar a mano
+// Dominio: red  ·  pipeline: tools/pipelines/sentinel.yml + sentinel_asim
+
+// ─────────────────────────────────────────────────────────
+// Patron de beaconing hacia un destino externo
+// Severidad: medium  ·  ATT&CK: T1071.001
+// Origen: rules/red/soc_net_001_beaconing.yml
+imWebSession
+| where Url contains "/" and (not((UrlCategory in~ ("Business", "Search Engines", "Software Updates"))))
+
+// ─────────────────────────────────────────────────────────
+// Canal de mando sobre un servicio legitimo
+// Severidad: high  ·  ATT&CK: T1102
+// Origen: rules/red/soc_net_002_c2_servicio_legitimo.yml
+imWebSession
+| where (Url contains "discord.com/api/webhooks" or Url contains "discordapp.com/api/webhooks" or Url contains "hooks.slack.com/services" or Url contains "api.telegram.org/bot") or (Url contains "pastebin.com/raw" or Url contains "hastebin.com/raw" or Url contains "ghostbin.co/paste" or Url contains "transfer.sh/" or Url contains "anonfiles.com/" or Url contains "gofile.io/uploadFile") or (Url contains ".ngrok.io" or Url contains ".ngrok-free.app" or Url contains ".trycloudflare.com" or Url contains ".loca.lt" or Url contains ".serveo.net")
+
+// ─────────────────────────────────────────────────────────
+// Tunelizacion o exfiltracion por DNS
+// Severidad: high  ·  ATT&CK: T1071.004
+// Origen: rules/red/soc_net_003_dns_tunel.yml
+imDns
+| where (DnsQueryTypeName in~ ("TXT", "NULL")) or DnsQuery matches regex "^[A-Za-z0-9+/=_-]{45,}\\..*"
+
+// ─────────────────────────────────────────────────────────
+// Explotacion de vulnerabilidad web contra un servicio publicado
+// Severidad: high  ·  ATT&CK: T1190
+// Origen: rules/red/soc_net_004_explotacion_web.yml
+imWebSession
+| where (Url contains "${jndi:" or Url contains "%24%7Bjndi" or Url contains "${lower:j}") or (Url contains "../../" or Url contains "..%2f..%2f" or Url contains "%2e%2e%2f" or Url contains "/etc/passwd" or Url contains "c:\\windows\\win.ini") or (Url contains " union select" or Url contains "union+select" or Url contains "' or 1=1" or Url contains "sleep(5)" or Url contains "benchmark(" or Url contains "waitfor delay") or (Url contains "rO0AB" or Url contains "aced0005" or Url contains "__proto__") or (Url contains "${T(java.lang.Runtime)" or (Url contains "{{7" and Url contains "7}}") or Url contains "<%= ")
+
+// ─────────────────────────────────────────────────────────
+// Interaccion con webshell
+// Severidad: critical  ·  ATT&CK: T1505.003
+// Origen: rules/red/soc_net_005_webshell.yml
+imWebSession
+| where (Url contains ".php" or Url contains ".jsp" or Url contains ".jspx" or Url contains ".aspx" or Url contains ".ashx") and (Url contains "cmd=" or Url contains "exec=" or Url contains "shell=" or Url contains "passthru(" or Url contains "system(" or Url contains "whoami" or Url contains "net user" or Url contains "powershell" or Url contains "/bin/bash" or Url contains "eval(")
+
+// ─────────────────────────────────────────────────────────
+// Volumen de subida anomalo hacia el exterior
+// Severidad: medium  ·  ATT&CK: T1048
+// Origen: rules/red/soc_net_006_exfiltracion_volumen.yml
+imWebSession
+| where (HttpRequestMethod in~ ("POST", "PUT")) and (not((Url contains "sharepoint.com" or Url contains "onedrive.live.com" or Url contains ".midominio.local")))

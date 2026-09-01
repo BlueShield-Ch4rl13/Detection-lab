@@ -1,0 +1,37 @@
+title: Alta en un rol privilegiado de Entra ID
+id: 908dd089-7e8f-5b57-a6dc-6a877ac8b66b
+status: stable
+description: |
+    La concesion de un rol de administrador es el objetivo final de la mayoria de los
+    ataques de identidad en la nube. Debe generar alerta siempre, incluso cuando es
+    legitima, porque el coste de revisarla es minimo y el de perderla es total.
+references:
+    - https://attack.mitre.org/techniques/T1098/003/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1098.003
+logsource:
+    product: azure
+    service: auditlogs
+detection:
+    selection:
+        properties.message:
+            - 'Add member to role'
+            - 'Add eligible member to role'
+            - 'Add member to role outside of PIM'
+    selection_rol:
+        TargetResources|contains:
+            - 'Global Administrator'
+            - 'Privileged Role Administrator'
+            - 'Security Administrator'
+            - 'Exchange Administrator'
+            - 'Application Administrator'
+            - 'Cloud Application Administrator'
+            - 'User Administrator'
+    condition: selection and selection_rol
+falsepositives:
+    - Activacion planificada por PIM, que conviene distinguir del alta permanente
+level: high

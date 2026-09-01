@@ -1,0 +1,30 @@
+title: Volumen de subida anomalo hacia el exterior
+id: db9eabc7-c1f0-5049-a439-c27e7eb985ab
+status: experimental
+description: |
+    Marca el trafico saliente candidato a exfiltracion por volumen. El umbral y la
+    comparacion con la linea base del propio equipo se resuelven en la busqueda del
+    SIEM, ya que Sigma no expresa agregacion sobre ventanas moviles.
+references:
+    - https://attack.mitre.org/techniques/T1048/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.exfiltration
+    - attack.t1048
+logsource:
+    category: proxy
+detection:
+    selection:
+        cs-method:
+            - 'POST'
+            - 'PUT'
+    filter_corporativo:
+        c-uri|contains:
+            - 'sharepoint.com'
+            - 'onedrive.live.com'
+            - '.midominio.local'
+    condition: selection and not filter_corporativo
+falsepositives:
+    - Copias a servicios corporativos no incluidos en el filtro, que hay que anadir al desplegar
+level: medium

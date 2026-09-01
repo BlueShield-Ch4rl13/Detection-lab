@@ -1,0 +1,33 @@
+title: Credencial anadida a una aplicacion o service principal
+id: da193677-3359-5252-bcd8-9f6063c42b91
+status: stable
+description: |
+    Anadir un secreto o un certificado a una aplicacion existente da acceso permanente
+    con los permisos de esa aplicacion, sin usuario y sin MFA. Es una de las
+    persistencias mas dificiles de detectar despues del hecho y de las mas usadas en
+    intrusiones avanzadas en la nube.
+references:
+    - https://attack.mitre.org/techniques/T1098/001/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.persistence
+    - attack.t1098.001
+logsource:
+    product: azure
+    service: auditlogs
+detection:
+    selection:
+        properties.message:
+            - 'Add service principal credentials'
+            - 'Update application - Certificates and secrets management'
+            - 'Update application'
+    selection_credencial:
+        TargetResources|contains:
+            - 'KeyDescription'
+            - 'PasswordCredentials'
+            - 'KeyCredentials'
+    condition: selection and selection_credencial
+falsepositives:
+    - Rotacion planificada de secretos, que conviene concentrar en ventanas conocidas
+level: high

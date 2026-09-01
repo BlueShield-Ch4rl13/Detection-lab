@@ -1,0 +1,132 @@
+<!--
+  ZTA Detection Pack - Pilar 2: Dispositivos
+  Marco: NIST SP 800-207 + CISA ZTMM 2.0
+  Rango de IDs: 100200-100299
+
+  Listas CDB necesarias:
+      etc/lists/zta_asset_inventory   (clave = hostname del agente)
+-->
+<group name="zta,zta_devices,">
+
+  <!-- ================================================================
+       ZTA-DEV-001 | Agente de seguridad desconectado o detenido
+       CISA: Devices > Device Threat Protection | Initial
+       Sin telemetria del equipo no hay verificacion continua: en Zero
+       Trust la perdida del agente debe degradar el nivel de acceso.
+       ================================================================ -->
+  <rule id="100200" level="12">
+    <if_sid>504</if_sid>
+    <description>ZTA-DEV-001: Agente Wazuh desconectado en $(hostname). El equipo pierde verificacion continua de postura.</description>
+    <mitre>
+      <id>T1562.001</id>
+    </mitre>
+    <nist_800_53>SI.4,CM.6</nist_800_53>
+    <group>zta_devices,zta_DEV-001,cisa_device_threat_protection,ztmm_initial,</group>
+  </rule>
+
+  <rule id="100201" level="12">
+    <if_group>syslog</if_group>
+    <match>Stopped Wazuh|wazuh-agentd: Stopping|Stopping Falco|Stopped Suricata|systemctl stop wazuh-agent|Stopped auditd</match>
+    <description>ZTA-DEV-001: Servicio de seguridad detenido en $(hostname). Posible evasion de defensas.</description>
+    <mitre>
+      <id>T1562.001</id>
+    </mitre>
+    <nist_800_53>SI.4,CM.6</nist_800_53>
+    <group>zta_devices,zta_DEV-001,cisa_device_threat_protection,ztmm_initial,</group>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-DEV-002 | Equipo no inventariado generando eventos
+       CISA: Devices > Asset & Supply Chain Risk Management | Initial
+       Tenet 1 de NIST 800-207: todo recurso debe estar inventariado.
+       ================================================================ -->
+  <rule id="100202" level="8">
+    <if_sid>503</if_sid>
+    <list field="hostname" lookup="not_match_key">etc/lists/zta_asset_inventory</list>
+    <description>ZTA-DEV-002: El equipo $(hostname) envia eventos pero no figura en el inventario de activos aprobado.</description>
+    <mitre>
+      <id>T1200</id>
+    </mitre>
+    <nist_800_53>CM.8,AC.19</nist_800_53>
+    <group>zta_devices,zta_DEV-002,cisa_asset_supply_chain,ztmm_initial,</group>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-DEV-003 | Fallo del baseline Zero Trust (SCA)
+       CISA: Devices > Policy Enforcement & Compliance Monitoring | Advanced
+       Se apoya en la politica SCA incluida en wazuh/sca/zta_baseline.yml
+       ================================================================ -->
+  <rule id="100203" level="10">
+    <if_group>sca</if_group>
+    <field name="sca.policy_id">zta_baseline</field>
+    <field name="sca.check.result">^failed$</field>
+    <description>ZTA-DEV-003: Fallo del baseline Zero Trust en $(hostname): $(sca.check.title)</description>
+    <nist_800_53>CM.6,SI.7</nist_800_53>
+    <group>zta_devices,zta_DEV-003,cisa_policy_enforcement,ztmm_advanced,</group>
+  </rule>
+
+  <rule id="100204" level="12">
+    <if_sid>100203</if_sid>
+    <field name="sca.check.id">^1001$|^1002$|^1003$</field>
+    <description>ZTA-DEV-003: Fallo de un control critico del baseline Zero Trust en $(hostname): $(sca.check.title). El equipo no deberia acceder a recursos protegidos.</description>
+    <nist_800_53>CM.6,AC.3</nist_800_53>
+    <group>zta_devices,zta_DEV-003,cisa_policy_enforcement,ztmm_advanced,</group>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-DEV-004 | Modificacion de fichero critico del sistema (FIM)
+       CISA: Devices > Policy Enforcement & Compliance Monitoring | Initial
+       ================================================================ -->
+  <rule id="100205" level="12">
+    <if_group>syscheck</if_group>
+    <field name="file">/etc/sudoers|/etc/ssh/sshd_config|/etc/pam\.d/|/etc/passwd|/etc/shadow|/etc/systemd/system/|/etc/crontab</field>
+    <description>ZTA-DEV-004: Modificacion de un fichero critico de control de acceso en $(hostname): $(file)</description>
+    <mitre>
+      <id>T1543</id>
+    </mitre>
+    <nist_800_53>SI.7,CM.3</nist_800_53>
+    <group>zta_devices,zta_DEV-004,cisa_policy_enforcement,ztmm_initial,</group>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-DEV-005 | Vulnerabilidad critica en equipo con acceso a recursos
+       CISA: Devices > Asset & Supply Chain Risk Management | Advanced
+       ================================================================ -->
+  <rule id="100206" level="12">
+    <if_group>vulnerability-detector</if_group>
+    <field name="data.vulnerability.severity">^Critical$</field>
+    <description>ZTA-DEV-005: Vulnerabilidad critica $(data.vulnerability.cve) en $(hostname). La postura del equipo deja de cumplir la politica de acceso.</description>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+    <nist_800_53>RA.5,SI.2</nist_800_53>
+    <group>zta_devices,zta_DEV-005,cisa_asset_supply_chain,ztmm_advanced,</group>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-DEV-006 | Montaje de almacenamiento extraible
+       CISA: Devices > Resource Access | Initial
+       ================================================================ -->
+  <rule id="100207" level="8">
+    <if_group>syslog</if_group>
+    <match>USB disconnect|new full-speed USB device|usb-storage: device found|Attached SCSI removable disk</match>
+    <description>ZTA-DEV-006: Dispositivo de almacenamiento extraible conectado en $(hostname).</description>
+    <mitre>
+      <id>T1091</id>
+    </mitre>
+    <nist_800_53>MP.7,AC.19</nist_800_53>
+    <group>zta_devices,zta_DEV-006,cisa_resource_access,ztmm_initial,</group>
+  </rule>
+
+  <rule id="100208" level="8">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID">^6416$</field>
+    <description>ZTA-DEV-006: Nuevo dispositivo externo reconocido por Windows en $(hostname): $(win.eventdata.deviceDescription)</description>
+    <mitre>
+      <id>T1091</id>
+    </mitre>
+    <nist_800_53>MP.7,AC.19</nist_800_53>
+    <group>zta_devices,zta_DEV-006,cisa_resource_access,ztmm_initial,</group>
+  </rule>
+
+</group>

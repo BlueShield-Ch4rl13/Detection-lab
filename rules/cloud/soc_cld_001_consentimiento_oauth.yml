@@ -1,0 +1,38 @@
+title: Consentimiento concedido a una aplicacion no verificada
+id: 95f7a7fa-56a0-5b5e-9dca-02cbde4b8404
+status: stable
+description: |
+    El illicit consent grant no roba la contrasena: convence al usuario de dar permisos
+    a una aplicacion controlada por el atacante, que a partir de ahi lee correo y
+    ficheros sin necesitar credenciales ni MFA. Sobrevive a un cambio de contrasena, lo
+    que lo hace especialmente incomodo en respuesta a incidentes.
+references:
+    - https://attack.mitre.org/techniques/T1550/001/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.persistence
+    - attack.credential-access
+    - attack.t1550.001
+logsource:
+    product: azure
+    service: auditlogs
+detection:
+    selection:
+        properties.message:
+            - 'Consent to application'
+            - 'Add delegated permission grant'
+            - 'Add app role assignment grant to user'
+    selection_permisos:
+        TargetResources|contains:
+            - 'Mail.Read'
+            - 'Mail.ReadWrite'
+            - 'Mail.Send'
+            - 'Files.ReadWrite.All'
+            - 'Directory.ReadWrite.All'
+            - 'User.ReadWrite.All'
+            - 'offline_access'
+    condition: selection and selection_permisos
+falsepositives:
+    - Aplicaciones corporativas aprobadas, que deben estar en el inventario de aplicaciones empresariales
+level: high

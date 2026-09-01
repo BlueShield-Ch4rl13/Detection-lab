@@ -1,0 +1,130 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// Correlaciones Sigma escritas a mano en KQL
+//
+// Este es el UNICO fichero de deploy/ que no genera tools/build.py, y el motivo
+// esta escrito aqui para que nadie lo regenere por error:
+//
+//   El backend de Kusto (pySigma-backend-kusto) no convierte correlaciones
+//   Sigma. Una correlacion de tipo value_count cuenta cuantos valores DISTINTOS
+//   toma un campo dentro de una ventana temporal; eso en KQL es un summarize
+//   con dcount, y el backend no lo emite.
+//
+// Las tres reglas de abajo son las unicas de la biblioteca que lo necesitan.
+// La alternativa habria sido convertir solo la regla base y llamarlo detectado,
+// pero la regla base tiene nivel informational a proposito: por si sola no es
+// una senal, solo cuenta fallos de autenticacion o correos salientes. Publicar
+// eso como deteccion seria decir que se cubre algo que no se cubre.
+//
+// Cada consulta reproduce exactamente los parametros del fichero Sigma de
+// origen: si cambias el umbral o la ventana alli, cambialos aqui tambien.
+// tools/validate.py comprueba que los tres pares sigan sincronizados.
+// ═══════════════════════════════════════════════════════════════════════════
+
+
+// ───────────────────────────────────────────────────────────────────────────
+// Password spraying contra Entra ID
+// Origen : rules/cloud/soc_cld_003_password_spraying.yml
+// Sigma  : value_count · group-by IPAddress · timespan 1h · dcount(UPN) >= 15
+// ATT&CK : T1110.003        Severidad: high
+//
+// El patron evade el bloqueo por cuenta porque nunca acumula fallos suficientes
+// sobre un solo usuario. Se cuenta al reves: cuantos usuarios distintos falla
+// una misma IP.
+//   50126 credencial invalida · 50053 cuenta bloqueada · 50055 cuenta deshabilitada
+// ───────────────────────────────────────────────────────────────────────────
+let ventana = 1h;
+let umbral_usuarios = 15;
+SigninLogs
+| where TimeGenerated > ago(ventana)
+| where ResultType in ("50126", "50053", "50055")
+| summarize
+    UsuariosDistintos = dcount(UserPrincipalName),
+    Intentos          = count(),
+    Usuarios          = make_set(UserPrincipalName, 30),
+    Aplicaciones      = make_set(AppDisplayName, 10),
+    Paises            = make_set(tostring(LocationDetails.countryOrRegion), 10),
+    Inicio            = min(TimeGenerated),
+    Fin               = max(TimeGenerated)
+  by IPAddress
+| where UsuariosDistintos >= umbral_usuarios
+// Una IP con muchos usuarios y pocos intentos por usuario es rociado.
+// Muchos intentos sobre pocos usuarios es fuerza bruta: otra deteccion.
+| extend IntentosPorUsuario = round(todouble(Intentos) / UsuariosDistintos, 2)
+| order by UsuariosDistintos desc
+// Excluir aqui las salidas NAT compartidas, por IP:
+// | where IPAddress !in ("203.0.113.10", "203.0.113.11")
+
+
+// ───────────────────────────────────────────────────────────────────────────
+// Reutilizacion de sesion desde redes distintas (robo de token)
+// Origen : rules/cloud/soc_cld_004_token_robado.yml
+// Sigma  : value_count · group-by CorrelationId · timespan 30m · dcount(ASN) >= 2
+// ATT&CK : T1539           Severidad: high
+//
+// El robo de token por adversary-in-the-middle permite entrar sin credenciales
+// y sin repetir MFA. La senal es una misma sesion usada desde dos sistemas
+// autonomos distintos. Ve lo que el viaje imposible no ve cuando el atacante
+// proxifica dentro del mismo pais.
+//
+// SigninLogs no trae el ASN como columna propia: se saca de AutonomousSystemNumber
+// cuando el tenant tiene Identity Protection, y si no, de NetworkLocationDetails.
+// ───────────────────────────────────────────────────────────────────────────
+let ventana_sesion = 30m;
+SigninLogs
+| where TimeGenerated > ago(ventana_sesion)
+| where ResultType == "0"
+| extend ASN = coalesce(
+        tostring(AutonomousSystemNumber),
+        tostring(parse_json(tostring(NetworkLocationDetails))[0].networkNames))
+| where isnotempty(ASN)
+| summarize
+    RedesDistintas = dcount(ASN),
+    Redes          = make_set(ASN, 10),
+    IPs            = make_set(IPAddress, 10),
+    Paises         = make_set(tostring(LocationDetails.countryOrRegion), 10),
+    Usuario        = any(UserPrincipalName),
+    Aplicaciones   = make_set(AppDisplayName, 10),
+    Inicio         = min(TimeGenerated),
+    Fin            = max(TimeGenerated)
+  by CorrelationId
+| where RedesDistintas >= 2
+// Un cambio de oficina a red movil produce esto de forma legitima. Lo que lo
+// distingue es el salto en segundos y el pais distinto: se deja visible para
+// que el analista lo juzgue, no se filtra automaticamente.
+| extend SegundosEntreRedes = datetime_diff('second', Fin, Inicio)
+| order by SegundosEntreRedes asc
+
+
+// ───────────────────────────────────────────────────────────────────────────
+// Envio masivo desde una cuenta interna comprometida
+// Origen : rules/correo/soc_mail_007_envio_masivo_interno.yml
+// Sigma  : value_count · group-by sender · timespan 1h · dcount(recipient) >= 200
+// ATT&CK : T1534           Severidad: medium
+//
+// AJUSTAR LA TABLA: aqui esta escrita contra el conector nativo de Proofpoint
+// TAP. Si el correo llega por CEF, cambia la tabla por CommonSecurityLog y los
+// nombres de campo por los del mapeo CEF. Si el origen es Defender for Office,
+// usa EmailEvents con SenderFromAddress / RecipientEmailAddress.
+// ───────────────────────────────────────────────────────────────────────────
+let ventana_correo = 1h;
+let umbral_destinatarios = 200;
+ProofpointTAPMessagesDelivered_CL
+| where TimeGenerated > ago(ventana_correo)
+| where senderIsInternal_b == true
+| where eventType_s == "message_delivered"
+| summarize
+    DestinatariosDistintos = dcount(recipient_s),
+    Mensajes               = count(),
+    Asuntos                = make_set(subject_s, 10),
+    DominiosDestino        = make_set(tostring(split(recipient_s, "@")[1]), 20),
+    Inicio                 = min(TimeGenerated),
+    Fin                    = max(TimeGenerated)
+  by sender_s
+| where DestinatariosDistintos >= umbral_destinatarios
+// Pocos asuntos distintos y muchos destinatarios es envio masivo automatizado;
+// es la senal que separa una cuenta comprometida de una persona escribiendo.
+| extend AsuntosDistintos = array_length(Asuntos)
+| extend FueraDeHorario = hourofday(Inicio) < 7 or hourofday(Inicio) > 20
+| order by DestinatariosDistintos desc
+// Excluir aqui buzones de notificaciones, facturacion y listas:
+// | where sender_s !in ("noreply@midominio.local", "facturacion@midominio.local")

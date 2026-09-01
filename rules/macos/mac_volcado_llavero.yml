@@ -1,0 +1,40 @@
+title: Acceso o volcado del llavero de macOS
+id: 652db084-3fca-583c-8d62-745dfe04ef45
+status: experimental
+description: |
+    El llavero guarda credenciales de navegador, wifi, certificados y tokens. Un
+    volcado con la utilidad security, o la lectura directa del fichero
+    login.keychain-db, es un indicador claro de robo de credenciales.
+references:
+    - https://attack.mitre.org/techniques/T1555/001/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.credential-access
+    - attack.t1555.001
+logsource:
+    category: process_creation
+    product: macos
+detection:
+    selection_security:
+        Image|endswith: '/security'
+        CommandLine|contains:
+            - 'dump-keychain'
+            - 'find-generic-password'
+            - 'find-internet-password'
+            - 'unlock-keychain'
+    selection_fichero:
+        CommandLine|contains:
+            - 'login.keychain-db'
+            - '/Library/Keychains/'
+    selection_lectura:
+        Image|endswith:
+            - '/cat'
+            - '/cp'
+            - '/dd'
+            - '/base64'
+            - '/curl'
+    condition: selection_security or (selection_fichero and selection_lectura)
+falsepositives:
+    - Copias de seguridad o migraciones asistidas, poco frecuentes y en ventana
+level: critical

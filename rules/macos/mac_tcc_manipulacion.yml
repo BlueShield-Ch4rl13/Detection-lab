@@ -1,0 +1,36 @@
+title: Manipulacion de la base de datos TCC
+id: 3c2aab49-bcdd-5915-a33d-32919fc5e81c
+status: experimental
+description: |
+    TCC es el control de acceso a camara, microfono, disco completo y grabacion de
+    pantalla. Escribir directamente en TCC.db o resetear permisos con tccutil deja
+    al atacante conceder a su propio binario permisos que el usuario nunca aprobo.
+references:
+    - https://attack.mitre.org/techniques/T1548/006/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.defense-evasion
+    - attack.privilege-escalation
+    - attack.t1548.006
+logsource:
+    category: process_creation
+    product: macos
+detection:
+    selection_db:
+        CommandLine|contains:
+            - 'TCC.db'
+            - '/Library/Application Support/com.apple.TCC'
+    selection_sqlite:
+        Image|endswith:
+            - '/sqlite3'
+            - '/cp'
+            - '/mv'
+            - '/dd'
+    selection_tccutil:
+        Image|endswith: '/tccutil'
+        CommandLine|contains: 'reset'
+    condition: (selection_db and selection_sqlite) or selection_tccutil
+falsepositives:
+    - Depuracion de permisos por parte de soporte, que deberia ir con ticket
+level: high

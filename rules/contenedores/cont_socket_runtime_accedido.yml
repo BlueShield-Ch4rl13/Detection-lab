@@ -1,0 +1,43 @@
+title: Acceso al socket del runtime de contenedores
+id: 7d0e6088-9338-5a96-999a-8337650284ac
+status: experimental
+description: |
+    Quien puede hablar con /var/run/docker.sock o con el socket de containerd puede
+    crear un contenedor privilegiado y montar el disco del host. Es el escape de
+    contenedor mas comun y no requiere ningun exploit.
+references:
+    - https://attack.mitre.org/techniques/T1610/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.privilege-escalation
+    - attack.t1610
+    - attack.t1611
+logsource:
+    category: process_creation
+    product: linux
+detection:
+    selection_socket:
+        CommandLine|contains:
+            - '/var/run/docker.sock'
+            - '/run/docker.sock'
+            - '/run/containerd/containerd.sock'
+            - '/var/run/crio/crio.sock'
+    selection_cliente:
+        CommandLine|contains:
+            - 'curl'
+            - 'wget'
+            - 'nc '
+            - 'socat'
+            - 'docker run'
+            - 'ctr '
+            - 'crictl'
+    filtro_gestion:
+        Image|endswith:
+            - '/dockerd'
+            - '/containerd'
+            - '/kubelet'
+    condition: selection_socket and selection_cliente and not filtro_gestion
+falsepositives:
+    - Runners de CI que construyen imagenes montando el socket, practica desaconsejada pero habitual
+level: critical

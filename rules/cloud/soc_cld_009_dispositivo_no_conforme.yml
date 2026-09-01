@@ -1,0 +1,28 @@
+title: Dispositivo no conforme accediendo a un recurso corporativo
+id: f19d764c-d4f0-5a0b-a678-e9e17bc7843c
+status: experimental
+description: |
+    Acceso concedido desde un equipo que Intune marca como no conforme o no gestionado.
+    Es la traduccion directa a la nube del principio Zero Trust de que la postura del
+    dispositivo condiciona el acceso, y complementa la deteccion ZTA-DEV-003 del lado
+    del endpoint.
+references:
+    - https://csrc.nist.gov/pubs/sp/800/207/final
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.initial-access
+    - attack.t1078.004
+logsource:
+    product: azure
+    service: signinlogs
+detection:
+    selection:
+        ResultType: '0'
+    selection_dispositivo:
+        - DeviceDetail.isCompliant: false
+        - DeviceDetail.trustType: null
+    condition: selection and selection_dispositivo
+falsepositives:
+    - Dispositivos personales autorizados por politica BYOD, que deben distinguirse de los no gestionados
+level: medium

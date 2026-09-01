@@ -3,11 +3,11 @@ id: 9f7e0bd9-6dc3-507a-bc3d-ccd37de8defc
 status: experimental
 description: chmod +x sobre binarios soltados en directorios de escritura mundial.
 references:
-- https://attack.mitre.org/techniques/002
+- https://attack.mitre.org/techniques/T1222/002/
 author: C. Villalba
 date: 2026/07/16
 tags:
-- attack.defense_evasion
+- attack.defense-evasion
 - attack.t1222.002
 logsource:
   category: process_creation

@@ -1,0 +1,29 @@
+title: Tunelizacion o exfiltracion por DNS
+id: ec15f78d-b087-5e4d-9e01-b72d72fa253d
+status: experimental
+description: |
+    El DNS sale de casi cualquier red, lo que lo convierte en canal de reserva para C2 y
+    exfiltracion. Las senales son la longitud de la etiqueta, el uso de tipos TXT y NULL
+    y un numero de subdominios unicos desproporcionado para un mismo dominio padre.
+references:
+    - https://attack.mitre.org/techniques/T1071/004/
+    - https://attack.mitre.org/techniques/T1048/003/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.command-and-control
+    - attack.exfiltration
+    - attack.t1071.004
+logsource:
+    category: dns
+detection:
+    selection_tipo:
+        query_type:
+            - 'TXT'
+            - 'NULL'
+    selection_longitud:
+        query|re: '^[A-Za-z0-9+/=_-]{45,}\..*'
+    condition: 1 of selection_*
+falsepositives:
+    - Listas de reputacion y antispam que consultan por TXT, y algunos productos de seguridad
+level: high

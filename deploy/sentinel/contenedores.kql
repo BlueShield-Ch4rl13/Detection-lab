@@ -1,0 +1,70 @@
+// Generado por tools/build.py — no editar a mano
+// Dominio: contenedores  ·  pipeline: tools/pipelines/sentinel.yml + sentinel_asim
+
+// AKS: el evento de auditoria viaja dentro de log_s. Antepon esto
+// a cada consulta de este fichero si tu origen es AzureDiagnostics:
+//   AzureDiagnostics
+//   | where Category == 'kube-audit'
+//   | extend e = parse_json(log_s)
+//   | extend verb = tostring(e.verb), username = tostring(e.user.username),
+//            namespace = tostring(e.objectRef.namespace),
+//            resource = tostring(e.objectRef.resource),
+//            subresource = tostring(e.objectRef.subresource),
+//            apiGroup = tostring(e.objectRef.apiGroup)
+
+
+// ─────────────────────────────────────────────────────────
+// Escape de contenedor hacia los namespaces del host
+// Severidad: critical  ·  ATT&CK: T1611
+// Origen: rules/contenedores/cont_escape_a_namespaces_host.yml
+imProcessCreate
+| where (TargetProcessName endswith "/nsenter" and (TargetProcessCommandLine contains "-t 1" or TargetProcessCommandLine contains "--target 1" or TargetProcessCommandLine contains "--mount=/proc/1/ns/mnt")) or (TargetProcessName endswith "/chroot" and (TargetProcessCommandLine contains "/host" or TargetProcessCommandLine contains "/mnt/host" or TargetProcessCommandLine contains "/proc/1/root")) or (TargetProcessCommandLine contains "release_agent" or TargetProcessCommandLine contains "notify_on_release") or TargetProcessCommandLine contains "/proc/1/root"
+
+// ─────────────────────────────────────────────────────────
+// Acceso al socket del runtime de contenedores
+// Severidad: critical  ·  ATT&CK: T1610, T1611
+// Origen: rules/contenedores/cont_socket_runtime_accedido.yml
+imProcessCreate
+| where (TargetProcessCommandLine contains "/var/run/docker.sock" or TargetProcessCommandLine contains "/run/docker.sock" or TargetProcessCommandLine contains "/run/containerd/containerd.sock" or TargetProcessCommandLine contains "/var/run/crio/crio.sock") and (TargetProcessCommandLine contains "curl" or TargetProcessCommandLine contains "wget" or TargetProcessCommandLine contains "nc " or TargetProcessCommandLine contains "socat" or TargetProcessCommandLine contains "docker run" or TargetProcessCommandLine contains "ctr " or TargetProcessCommandLine contains "crictl") and (not((TargetProcessName endswith "/dockerd" or TargetProcessName endswith "/containerd" or TargetProcessName endswith "/kubelet")))
+
+// ─────────────────────────────────────────────────────────
+// Contenedor con capacidades de kernel peligrosas
+// Severidad: high  ·  ATT&CK: T1611
+// Origen: rules/contenedores/k8s_capacidades_peligrosas.yml
+AzureDiagnostics
+| where (verb in~ ("create", "update", "patch")) and resource =~ "pods" and (capabilities contains "SYS_ADMIN" or capabilities contains "SYS_PTRACE" or capabilities contains "SYS_MODULE" or capabilities contains "SYS_RAWIO" or capabilities contains "DAC_READ_SEARCH" or capabilities contains "ALL")
+
+// ─────────────────────────────────────────────────────────
+// Enlace a un rol con privilegios de administrador del cluster
+// Severidad: high  ·  ATT&CK: T1078.003
+// Origen: rules/contenedores/k8s_escalada_por_rolebinding.yml
+AzureDiagnostics
+| where ((verb in~ ("create", "update", "patch")) and apiGroup =~ "rbac.authorization.k8s.io" and (resource in~ ("clusterrolebindings", "rolebindings"))) and (not(username startswith "system:serviceaccount:kube-system:"))
+
+// ─────────────────────────────────────────────────────────
+// Ejecucion interactiva dentro de un pod
+// Severidad: medium  ·  ATT&CK: T1609
+// Origen: rules/contenedores/k8s_exec_en_pod.yml
+AzureDiagnostics
+| where (verb =~ "create" and resource =~ "pods" and (subresource in~ ("exec", "attach"))) and (not(username startswith "system:serviceaccount:kube-system:"))
+
+// ─────────────────────────────────────────────────────────
+// Lectura de secretos de Kubernetes
+// Severidad: medium  ·  ATT&CK: T1552.007
+// Origen: rules/contenedores/k8s_lectura_masiva_secretos.yml
+AzureDiagnostics
+| where ((verb in~ ("get", "list", "watch")) and resource =~ "secrets") and (not((username startswith "system:serviceaccount:kube-system:" or username startswith "system:kube-controller-manager" or username startswith "system:apiserver")))
+
+// ─────────────────────────────────────────────────────────
+// Pod que monta una ruta sensible del nodo
+// Severidad: critical  ·  ATT&CK: T1611
+// Origen: rules/contenedores/k8s_montaje_hostpath.yml
+AzureDiagnostics
+| where ((verb in~ ("create", "update", "patch")) and resource =~ "pods") and ((hostPath contains "/var/run/docker.sock" or hostPath contains "/var/run/containerd" or hostPath contains "/var/run/crio" or hostPath contains "/etc/kubernetes" or hostPath contains "/root" or hostPath contains "/proc") or hostPath =~ "/")
+
+// ─────────────────────────────────────────────────────────
+// Creacion de pod privilegiado
+// Severidad: high  ·  ATT&CK: T1610, T1611
+// Origen: rules/contenedores/k8s_pod_privilegiado.yml
+AzureDiagnostics
+| where ((verb in~ ("create", "update", "patch")) and resource =~ "pods" and privileged =~ "true") and (not((namespace in~ ("kube-system", "monitoring"))))

@@ -1,0 +1,38 @@
+title: Pod que monta una ruta sensible del nodo
+id: 766ec1dc-ed98-5480-abc2-0c34824f7d56
+status: experimental
+description: |
+    Un volumen hostPath expone el sistema de ficheros del nodo dentro del
+    contenedor. Montar la raiz, /etc, /var/run o el socket del runtime equivale a
+    dar control del nodo a quien controle el pod.
+references:
+    - https://attack.mitre.org/techniques/T1611/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.privilege-escalation
+    - attack.t1611
+logsource:
+    product: kubernetes
+    service: audit
+detection:
+    selection:
+        verb:
+            - 'create'
+            - 'update'
+            - 'patch'
+        resource: 'pods'
+    selection_rutas:
+        hostPath|contains:
+            - '/var/run/docker.sock'
+            - '/var/run/containerd'
+            - '/var/run/crio'
+            - '/etc/kubernetes'
+            - '/root'
+            - '/proc'
+    selection_raiz:
+        hostPath: '/'
+    condition: selection and (selection_rutas or selection_raiz)
+falsepositives:
+    - DaemonSets de observabilidad o de seguridad, que deben estar en una lista aprobada
+level: critical

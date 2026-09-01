@@ -3,7 +3,7 @@ id: 8097a5f5-4800-546d-a736-d3e5dae18db9
 status: experimental
 description: sc.exe create, usado para persistencia y movimiento lateral.
 references:
-- https://attack.mitre.org/techniques/003
+- https://attack.mitre.org/techniques/T1543/003/
 author: C. Villalba
 date: 2026/07/16
 tags:

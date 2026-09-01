@@ -1,0 +1,40 @@
+title: AppleScript ejecutando shell o descargando codigo
+id: 451d4f04-a5f2-508c-ae41-a1f9b5216882
+status: experimental
+description: |
+    osascript permite ejecutar shell desde AppleScript y es la via habitual por la
+    que un instalador malicioso de macOS pide credenciales al usuario o lanza la
+    segunda fase. Se buscan las combinaciones que no aparecen en automatizacion
+    legitima: do shell script, descargas y peticiones de contrasena de administrador.
+references:
+    - https://attack.mitre.org/techniques/T1059/002/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.execution
+    - attack.t1059.002
+logsource:
+    category: process_creation
+    product: macos
+detection:
+    selection_osascript:
+        Image|endswith: '/osascript'
+    selection_shell:
+        CommandLine|contains:
+            - 'do shell script'
+            - 'with administrator privileges'
+    selection_red:
+        CommandLine|contains:
+            - 'curl '
+            - 'wget '
+            - 'nscurl'
+            - 'base64 -d'
+            - 'python -c'
+    selection_display:
+        CommandLine|contains|all:
+            - 'display dialog'
+            - 'with hidden answer'
+    condition: selection_osascript and (selection_shell or selection_red or selection_display)
+falsepositives:
+    - Scripts de automatizacion internos, que deberian estar firmados y en rutas conocidas
+level: high

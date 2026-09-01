@@ -1,0 +1,32 @@
+title: Suplantacion de directivo en el nombre para mostrar
+id: e4883bfb-93b7-5cbb-9183-205ac29f5754
+status: experimental
+description: |
+    Fraude del CEO o BEC: el atacante escribe el nombre de un directivo en el campo
+    display name pero envia desde un dominio externo. Es la variante que mas dinero
+    mueve y la que menos firmas tecnicas deja, porque el correo no lleva adjunto ni URL.
+references:
+    - https://attack.mitre.org/techniques/T1534/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.initial-access
+    - attack.t1534
+logsource:
+    product: proofpoint
+    service: tap
+detection:
+    selection_nombre:
+        headerFrom|contains:
+            - 'Director General'
+            - 'Direccion Financiera'
+            - 'CEO'
+            - 'CFO'
+    selection_externo:
+        senderIsInternal: false
+    filter_dominio_propio:
+        sender|endswith: '@midominio.local'
+    condition: selection_nombre and selection_externo and not filter_dominio_propio
+falsepositives:
+    - Correo legitimo de directivos desde una cuenta personal, situacion que conviene prohibir por politica
+level: high

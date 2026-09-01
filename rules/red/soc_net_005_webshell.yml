@@ -1,0 +1,40 @@
+title: Interaccion con webshell
+id: 0cf72396-00b9-5ea5-8256-25a49ba58ad2
+status: experimental
+description: |
+    Peticiones a ficheros de script en el directorio publicado con parametros que
+    contienen comandos. Detecta el uso de la webshell despues de que se haya conseguido
+    colocar, que es cuando produce trafico observable.
+references:
+    - https://attack.mitre.org/techniques/T1505/003/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.persistence
+    - attack.t1505.003
+logsource:
+    category: webserver
+detection:
+    selection_script:
+        c-uri|contains:
+            - '.php'
+            - '.jsp'
+            - '.jspx'
+            - '.aspx'
+            - '.ashx'
+    selection_comando:
+        c-uri|contains:
+            - 'cmd='
+            - 'exec='
+            - 'shell='
+            - 'passthru('
+            - 'system('
+            - 'whoami'
+            - 'net user'
+            - 'powershell'
+            - '/bin/bash'
+            - 'eval('
+    condition: selection_script and selection_comando
+falsepositives:
+    - Aplicaciones que aceptan un parametro llamado cmd de forma legitima, poco habitual
+level: critical

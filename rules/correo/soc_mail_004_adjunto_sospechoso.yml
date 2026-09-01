@@ -1,0 +1,40 @@
+title: Adjunto con formato usado para entrega de malware
+id: b8df3c83-f6c3-55a1-89cb-9123ffd68050
+status: experimental
+description: |
+    Contenedores y formatos que se usan para saltarse la marca de zona y los controles
+    de macro: ISO, IMG, VHD, LNK dentro de ZIP, OneNote con adjunto incrustado y ficheros
+    con doble extension.
+references:
+    - https://attack.mitre.org/techniques/T1566/001/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.initial-access
+    - attack.t1566.001
+logsource:
+    product: proofpoint
+    service: tap
+detection:
+    selection_contenedor:
+        attachmentName|endswith:
+            - '.iso'
+            - '.img'
+            - '.vhd'
+            - '.vhdx'
+            - '.one'
+            - '.lnk'
+            - '.chm'
+            - '.hta'
+    selection_doble_extension:
+        attachmentName|re: '.*\.(pdf|doc|docx|xls|xlsx|jpg|png)\s*\.(exe|scr|js|vbs|bat|cmd|ps1)$'
+    selection_macro:
+        attachmentName|endswith:
+            - '.docm'
+            - '.xlsm'
+            - '.pptm'
+            - '.xlam'
+    condition: 1 of selection_*
+falsepositives:
+    - Imagenes ISO enviadas por el equipo de sistemas, que deberian ir por otro canal
+level: high

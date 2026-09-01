@@ -1,0 +1,213 @@
+// Generado por tools/build.py — no editar a mano
+// Dominio: windows  ·  pipeline: tools/pipelines/sentinel.yml + sentinel_asim
+
+// Las consultas sobre DeviceEvents (process_access, pipe_created,
+// create_remote_thread) necesitan expandir AdditionalFields:
+//   | extend af = parse_json(AdditionalFields)
+//   | extend PipeName = tostring(af.PipeName),
+//            GrantedAccess = tostring(af.DesiredAccess),
+//            CallTrace = tostring(af.CallTrace)
+
+
+// ─────────────────────────────────────────────────────────
+// Proceso del sistema con conexion saliente inusual
+// Severidad: medium  ·  ATT&CK: T1071.001
+// Origen: rules/windows/net_rare_process_external_conn.yml
+imNetworkSession
+| where ((SrcProcessName endswith "\\rundll32.exe" or SrcProcessName endswith "\\regsvr32.exe" or SrcProcessName endswith "\\mshta.exe") or (DstProcessName endswith "\\rundll32.exe" or DstProcessName endswith "\\regsvr32.exe" or DstProcessName endswith "\\mshta.exe")) and NetworkDirection =~ true
+
+// ─────────────────────────────────────────────────────────
+// Creacion de cuenta local
+// Severidad: medium  ·  ATT&CK: T1136.001
+// Origen: rules/windows/proc_net_user_add.yml
+imProcessCreate
+| where (TargetProcessCommandLine contains "net" and TargetProcessCommandLine contains "user") and TargetProcessCommandLine contains "/add"
+
+// ─────────────────────────────────────────────────────────
+// Documento de Office lanzando shell
+// Severidad: high  ·  ATT&CK: T1204.002, T1566.001
+// Origen: rules/windows/proc_office_spawning_shell.yml
+imProcessCreate
+| where ((ParentProcessName endswith "\\winword.exe" or ParentProcessName endswith "\\excel.exe" or ParentProcessName endswith "\\powerpnt.exe" or ParentProcessName endswith "\\outlook.exe") or (ActingProcessName endswith "\\winword.exe" or ActingProcessName endswith "\\excel.exe" or ActingProcessName endswith "\\powerpnt.exe" or ActingProcessName endswith "\\outlook.exe")) and (TargetProcessName endswith "\\cmd.exe" or TargetProcessName endswith "\\powershell.exe" or TargetProcessName endswith "\\wscript.exe" or TargetProcessName endswith "\\cscript.exe" or TargetProcessName endswith "\\mshta.exe")
+
+// ─────────────────────────────────────────────────────────
+// Creacion de servicio via sc.exe
+// Severidad: medium  ·  ATT&CK: T1543.003
+// Origen: rules/windows/proc_service_create_scexe.yml
+imProcessCreate
+| where TargetProcessName endswith "\\sc.exe" and TargetProcessCommandLine contains "create" and (TargetProcessCommandLine contains "binPath" or TargetProcessCommandLine contains "binpath=")
+
+// ─────────────────────────────────────────────────────────
+// Ejecucion via WMIC process call create
+// Severidad: medium  ·  ATT&CK: T1047
+// Origen: rules/windows/proc_wmic_process_call_create.yml
+imProcessCreate
+| where TargetProcessName endswith "\\wmic.exe" and (TargetProcessCommandLine contains "process" and TargetProcessCommandLine contains "call" and TargetProcessCommandLine contains "create")
+
+// ─────────────────────────────────────────────────────────
+// Kerberoasting - solicitud masiva de tickets de servicio con RC4
+// Severidad: high  ·  ATT&CK: T1558.003
+// Origen: rules/windows/soc_ad_001_kerberoasting.yml
+SecurityEvent
+| where (EventID == 4769 and TicketOptions =~ "0x40810000" and TicketEncryptionType =~ "0x17") and (not((ServiceName in~ ("krbtgt") or ServiceName endswith "$")))
+
+// ─────────────────────────────────────────────────────────
+// AS-REP Roasting - peticion sin preautenticacion Kerberos
+// Severidad: high  ·  ATT&CK: T1558.004
+// Origen: rules/windows/soc_ad_002_asrep_roasting.yml
+SecurityEvent
+| where (EventID == 4768 and PreAuthType == 0 and TicketEncryptionType =~ "0x17") and (not(TargetUserName endswith "$"))
+
+// ─────────────────────────────────────────────────────────
+// DCSync - replicacion de directorio desde un equipo que no es DC
+// Severidad: critical  ·  ATT&CK: T1003.006
+// Origen: rules/windows/soc_ad_003_dcsync.yml
+SecurityEvent
+| where (EventID == 4662 and (Properties contains "1131f6aa-9c07-11d1-f79f-00c04fc2dcd2" or Properties contains "1131f6ad-9c07-11d1-f79f-00c04fc2dcd2" or Properties contains "89e95b76-444d-4c62-991a-0facbeda640c")) and (not((SubjectUserName endswith "$" or (SubjectUserName in~ ("ANONYMOUS LOGON", "SYSTEM")))))
+
+// ─────────────────────────────────────────────────────────
+// Indicio de Golden Ticket - TGS de krbtgt con cifrado degradado
+// Severidad: critical  ·  ATT&CK: T1558.001
+// Origen: rules/windows/soc_ad_004_golden_ticket.yml
+SecurityEvent
+| where EventID == 4769 and ServiceName startswith "krbtgt" and TicketEncryptionType =~ "0x17"
+
+// ─────────────────────────────────────────────────────────
+// Herramienta de abuso de Kerberos ejecutada
+// Severidad: critical  ·  ATT&CK: T1003, T1558
+// Origen: rules/windows/soc_ad_005_herramientas_kerberos.yml
+imProcessCreate
+| where ((TargetProcessName endswith "\\Rubeus.exe" or TargetProcessName endswith "\\mimikatz.exe" or TargetProcessName endswith "\\kekeo.exe" or TargetProcessName endswith "\\GetUserSPNs.exe") or (TargetProcessFileOriginalName in~ ("Rubeus.exe", "mimikatz.exe"))) or (TargetProcessCommandLine contains "kerberoast" or TargetProcessCommandLine contains "asreproast" or TargetProcessCommandLine contains "lsadump::dcsync" or TargetProcessCommandLine contains "sekurlsa::logonpasswords" or TargetProcessCommandLine contains "sekurlsa::tickets" or TargetProcessCommandLine contains "kerberos::golden" or TargetProcessCommandLine contains "kerberos::ptt" or TargetProcessCommandLine contains "GetUserSPNs.py" or TargetProcessCommandLine contains "GetNPUsers.py" or TargetProcessCommandLine contains "secretsdump.py")
+
+// ─────────────────────────────────────────────────────────
+// Pass-the-Hash y Overpass-the-Hash
+// Severidad: high  ·  ATT&CK: T1550.002
+// Origen: rules/windows/soc_ad_006_pass_the_hash.yml
+SecurityEvent
+| where (EventID == 4624 and LogonType == 9 and LogonProcessName =~ "seclogo" and AuthenticationPackageName =~ "Negotiate") and (not(TargetUserName endswith "$"))
+
+// ─────────────────────────────────────────────────────────
+// Enumeracion de Active Directory - BloodHound y comandos de reconocimiento
+// Severidad: medium  ·  ATT&CK: T1069.002, T1087.002
+// Origen: rules/windows/soc_ad_007_enumeracion_dominio.yml
+imProcessCreate
+| where ((TargetProcessName endswith "\\SharpHound.exe" or TargetProcessName endswith "\\AzureHound.exe") or (TargetProcessCommandLine contains "Invoke-BloodHound" or TargetProcessCommandLine contains "SharpHound.ps1" or TargetProcessCommandLine contains "-CollectionMethod All")) or ((TargetProcessName endswith "\\net.exe" or TargetProcessName endswith "\\net1.exe") and (TargetProcessCommandLine contains "group \"domain admins\"" or TargetProcessCommandLine contains "group \"enterprise admins\"" or TargetProcessCommandLine contains "group /domain" or TargetProcessCommandLine contains "user /domain" or TargetProcessCommandLine contains "localgroup administrators")) or (TargetProcessName endswith "\\dsquery.exe" and (TargetProcessCommandLine contains "group" or TargetProcessCommandLine contains "user"))
+
+// ─────────────────────────────────────────────────────────
+// Ejecucion remota tipo PsExec
+// Severidad: high  ·  ATT&CK: T1569.002
+// Origen: rules/windows/soc_ad_008_psexec_remoto.yml
+Event
+| where (Source =~ "Service Control Manager" and EventID == 7045) and ((ServiceName contains "PSEXESVC" or ServiceName contains "PAExec" or ServiceName contains "csexec" or ServiceName contains "RemCom") or (RenderedDescription contains "\\PSEXESVC" or RenderedDescription contains "%SystemRoot%\\{" or RenderedDescription contains "cmd.exe /c echo" or RenderedDescription contains "\\ADMIN$\\"))
+
+// ─────────────────────────────────────────────────────────
+// Ejecucion remota por WMI o WinRM
+// Severidad: high  ·  ATT&CK: T1021.006, T1047
+// Origen: rules/windows/soc_ad_009_wmi_winrm_remoto.yml
+imProcessCreate
+| where ((ParentProcessName endswith "\\WmiPrvSE.exe" or ParentProcessName endswith "\\wsmprovhost.exe" or ParentProcessName endswith "\\winrshost.exe") or (ActingProcessName endswith "\\WmiPrvSE.exe" or ActingProcessName endswith "\\wsmprovhost.exe" or ActingProcessName endswith "\\winrshost.exe")) and (TargetProcessName endswith "\\cmd.exe" or TargetProcessName endswith "\\powershell.exe" or TargetProcessName endswith "\\pwsh.exe" or TargetProcessName endswith "\\wscript.exe" or TargetProcessName endswith "\\cscript.exe" or TargetProcessName endswith "\\rundll32.exe" or TargetProcessName endswith "\\mshta.exe")
+
+// ─────────────────────────────────────────────────────────
+// Modificacion sospechosa de directiva de grupo
+// Severidad: high  ·  ATT&CK: T1484.001
+// Origen: rules/windows/soc_ad_010_abuso_gpo.yml
+imProcessCreate
+| where ((TargetProcessName endswith "\\SharpGPOAbuse.exe" or TargetProcessName endswith "\\pyGPOAbuse.py") or (TargetProcessCommandLine contains "SharpGPOAbuse" or TargetProcessCommandLine contains "New-GPOImmediateTask" or TargetProcessCommandLine contains "--AddComputerTask" or TargetProcessCommandLine contains "--AddUserTask")) or ((TargetProcessCommandLine contains "\\SYSVOL\\" and TargetProcessCommandLine contains "\\Policies\\") and (TargetProcessCommandLine contains "ScheduledTasks.xml" or TargetProcessCommandLine contains "\\Scripts\\Startup" or TargetProcessCommandLine contains "GptTmpl.inf"))
+
+// ─────────────────────────────────────────────────────────
+// Cuenta de equipo creada por un usuario no administrador
+// Severidad: medium  ·  ATT&CK: T1136.002
+// Origen: rules/windows/soc_ad_011_cuenta_equipo_creada.yml
+SecurityEvent
+| where EventID == 4741 and (not(SubjectUserName endswith "$"))
+
+// ─────────────────────────────────────────────────────────
+// Abuso de servicios de certificados de Active Directory
+// Severidad: critical  ·  ATT&CK: T1649
+// Origen: rules/windows/soc_ad_012_abuso_adcs.yml
+imProcessCreate
+| where ((TargetProcessName endswith "\\Certify.exe" or TargetProcessName endswith "\\Certipy.exe") or (TargetProcessCommandLine contains "Certify.exe request" or TargetProcessCommandLine contains "certipy req" or TargetProcessCommandLine contains "certipy auth" or TargetProcessCommandLine contains "Rubeus.exe asktgt")) or (TargetProcessCommandLine contains "certreq" and TargetProcessCommandLine contains "san:")
+
+// ─────────────────────────────────────────────────────────
+// Volcado de memoria de LSASS
+// Severidad: critical  ·  ATT&CK: T1003.001
+// Origen: rules/windows/soc_edr_001_volcado_lsass.yml
+imProcessCreate
+| where (TargetProcessCommandLine contains "comsvcs.dll" and TargetProcessCommandLine contains "MiniDump") or (((TargetProcessName endswith "\\procdump.exe" or TargetProcessName endswith "\\procdump64.exe" or TargetProcessName endswith "\\dumpert.exe" or TargetProcessName endswith "\\nanodump.exe") or (TargetProcessFileOriginalName in~ ("procdump", "procdump64.exe"))) and TargetProcessCommandLine contains "lsass") or (TargetProcessCommandLine contains "rundll32" and TargetProcessCommandLine contains "dbghelp" and TargetProcessCommandLine contains "MiniDumpWriteDump")
+
+// ─────────────────────────────────────────────────────────
+// Acceso a memoria de LSASS con permisos de lectura
+// Severidad: high  ·  ATT&CK: T1003.001
+// Origen: rules/windows/soc_edr_002_acceso_lsass_sysmon.yml
+DeviceEvents
+| where ActionType =~ "OpenProcessApiCall" and ((FolderPath endswith "\\lsass.exe" and (GrantedAccess in~ ("0x1010", "0x1410", "0x1438", "0x143a", "0x1fffff"))) and (not((InitiatingProcessFolderPath startswith "C:\\Windows\\System32\\" or InitiatingProcessFolderPath startswith "C:\\Windows\\SysWOW64\\" or InitiatingProcessFolderPath startswith "C:\\Program Files\\Windows Defender\\"))))
+
+// ─────────────────────────────────────────────────────────
+// Destruccion de copias de seguridad y puntos de restauracion
+// Severidad: critical  ·  ATT&CK: T1490
+// Origen: rules/windows/soc_edr_003_borrado_copias_sombra.yml
+imProcessCreate
+| where (TargetProcessName endswith "\\vssadmin.exe" and (TargetProcessCommandLine contains "delete" and TargetProcessCommandLine contains "shadows")) or (TargetProcessName endswith "\\wmic.exe" and (TargetProcessCommandLine contains "shadowcopy" and TargetProcessCommandLine contains "delete")) or (TargetProcessName endswith "\\wbadmin.exe" and (TargetProcessCommandLine contains "delete" and TargetProcessCommandLine contains "catalog")) or (TargetProcessName endswith "\\bcdedit.exe" and (TargetProcessCommandLine contains "recoveryenabled no" or TargetProcessCommandLine contains "bootstatuspolicy ignoreallfailures")) or (TargetProcessCommandLine contains "Get-WmiObject Win32_Shadowcopy" or TargetProcessCommandLine contains "Remove-Item -Path C:\\Windows\\System32\\Recovery")
+
+// ─────────────────────────────────────────────────────────
+// Defensas de seguridad deshabilitadas
+// Severidad: high  ·  ATT&CK: T1070.001, T1562.001
+// Origen: rules/windows/soc_edr_004_defensas_deshabilitadas.yml
+imProcessCreate
+| where (TargetProcessCommandLine contains "Set-MpPreference -DisableRealtimeMonitoring $true" or TargetProcessCommandLine contains "Set-MpPreference -DisableBehaviorMonitoring $true" or TargetProcessCommandLine contains "Set-MpPreference -DisableIOAVProtection $true" or TargetProcessCommandLine contains "Add-MpPreference -ExclusionPath" or TargetProcessCommandLine contains "DisableAntiSpyware" or TargetProcessCommandLine contains "DisableAntiVirus") or (TargetProcessCommandLine contains "netsh advfirewall set allprofiles state off" or TargetProcessCommandLine contains "netsh firewall set opmode disable") or (TargetProcessCommandLine contains "sc stop WinDefend" or TargetProcessCommandLine contains "sc config WinDefend start= disabled" or TargetProcessCommandLine contains "sc stop Sense" or TargetProcessCommandLine contains "sc stop wazuh" or TargetProcessCommandLine contains "Stop-Service -Name Sense" or TargetProcessCommandLine contains "net stop \"Windows Defender") or (TargetProcessCommandLine contains "auditpol /clear" or (TargetProcessCommandLine contains "auditpol /set /category:" and TargetProcessCommandLine contains " /success:disable") or TargetProcessCommandLine contains "wevtutil cl " or TargetProcessCommandLine contains "wevtutil sl ")
+
+// ─────────────────────────────────────────────────────────
+// LOLBin usado para descargar y ejecutar
+// Severidad: high  ·  ATT&CK: T1105, T1140, T1197, T1218, T1218.005, T1218.010
+// Origen: rules/windows/soc_edr_005_lolbins_descarga.yml
+imProcessCreate
+| where (TargetProcessName endswith "\\certutil.exe" and (TargetProcessCommandLine contains "-urlcache" or TargetProcessCommandLine contains "-verifyctl" or TargetProcessCommandLine contains "decode")) or (TargetProcessName endswith "\\bitsadmin.exe" and (TargetProcessCommandLine contains "/transfer" or TargetProcessCommandLine contains "/create" or TargetProcessCommandLine contains "/addfile")) or (TargetProcessName endswith "\\mshta.exe" and (TargetProcessCommandLine contains "http" or TargetProcessCommandLine contains "javascript:" or TargetProcessCommandLine contains "vbscript:")) or (TargetProcessName endswith "\\regsvr32.exe" and (TargetProcessCommandLine contains "scrobj.dll" or TargetProcessCommandLine contains "/i:http")) or ((TargetProcessCommandLine contains "DownloadString(" or TargetProcessCommandLine contains "DownloadFile(" or TargetProcessCommandLine contains "Invoke-WebRequest" or TargetProcessCommandLine contains "Net.WebClient" or TargetProcessCommandLine contains "Start-BitsTransfer") and (TargetProcessCommandLine contains "http://" or TargetProcessCommandLine contains "https://"))
+
+// ─────────────────────────────────────────────────────────
+// PowerShell codificado u ofuscado
+// Severidad: high  ·  ATT&CK: T1027, T1059.001
+// Origen: rules/windows/soc_edr_006_powershell_ofuscado.yml
+imProcessCreate
+| where (TargetProcessName endswith "\\powershell.exe" or TargetProcessName endswith "\\pwsh.exe") and (TargetProcessCommandLine contains " -enc " or TargetProcessCommandLine contains " -EncodedCommand" or TargetProcessCommandLine contains " -e JAB" or TargetProcessCommandLine contains "FromBase64String" or TargetProcessCommandLine contains "[Convert]::FromBase64" or TargetProcessCommandLine contains "-nop -w hidden" or TargetProcessCommandLine contains "-NoProfile -WindowStyle Hidden" or TargetProcessCommandLine contains "IEX(New-Object" or TargetProcessCommandLine contains "iex (New-Object" or TargetProcessCommandLine contains "[Reflection.Assembly]::Load" or TargetProcessCommandLine contains "-ExecutionPolicy Bypass")
+
+// ─────────────────────────────────────────────────────────
+// Cifrado masivo de ficheros por ransomware
+// Severidad: critical  ·  ATT&CK: T1486
+// Origen: rules/windows/soc_edr_007_cifrado_masivo.yml
+imFileEvent
+| where (TargetFileName endswith ".locked" or TargetFileName endswith ".encrypted" or TargetFileName endswith ".crypt" or TargetFileName endswith ".lockbit" or TargetFileName endswith ".blackcat" or TargetFileName endswith ".royal" or TargetFileName endswith ".akira" or TargetFileName endswith ".basta" or TargetFileName endswith ".cactus" or TargetFileName endswith ".play") or (TargetFileName contains "readme_for_decrypt" or TargetFileName contains "how_to_decrypt" or TargetFileName contains "recover_your_files" or TargetFileName contains "restore-my-files" or TargetFileName contains "_readme.txt" or TargetFileName contains "HOW TO BACK FILES" or TargetFileName contains "RESTORE_FILES_INFO")
+
+// ─────────────────────────────────────────────────────────
+// Tarea programada sospechosa
+// Severidad: high  ·  ATT&CK: T1053.005
+// Origen: rules/windows/soc_edr_008_persistencia_tarea.yml
+imProcessCreate
+| where (TargetProcessName endswith "\\schtasks.exe" and TargetProcessCommandLine contains "/create") and ((TargetProcessCommandLine contains "powershell" or TargetProcessCommandLine contains "cmd.exe /c" or TargetProcessCommandLine contains "mshta" or TargetProcessCommandLine contains "rundll32" or TargetProcessCommandLine contains "wscript" or TargetProcessCommandLine contains "cscript" or TargetProcessCommandLine contains "regsvr32" or TargetProcessCommandLine contains "\\AppData\\" or TargetProcessCommandLine contains "\\Users\\Public\\" or TargetProcessCommandLine contains "\\Temp\\" or TargetProcessCommandLine contains "http://" or TargetProcessCommandLine contains "https://") or (TargetProcessCommandLine contains "/ru system" or TargetProcessCommandLine contains "/ru \"NT AUTHORITY\\SYSTEM\""))
+
+// ─────────────────────────────────────────────────────────
+// Persistencia por claves de arranque del registro
+// Severidad: high  ·  ATT&CK: T1547.001
+// Origen: rules/windows/soc_edr_009_persistencia_registro.yml
+imRegistry
+| where (RegistryKey contains "\\CurrentVersion\\Run" or RegistryKey contains "\\CurrentVersion\\RunOnce" or RegistryKey contains "\\Winlogon\\Shell" or RegistryKey contains "\\Winlogon\\Userinit" or RegistryKey contains "\\CurrentVersion\\Explorer\\User Shell Folders") and (RegistryValueData contains "powershell" or RegistryValueData contains "cmd.exe" or RegistryValueData contains "mshta" or RegistryValueData contains "rundll32" or RegistryValueData contains "wscript" or RegistryValueData contains "regsvr32" or RegistryValueData contains "\\AppData\\" or RegistryValueData contains "\\Users\\Public\\" or RegistryValueData contains "\\Temp\\" or RegistryValueData contains "\\ProgramData\\")
+
+// ─────────────────────────────────────────────────────────
+// Inyeccion de codigo en proceso remoto
+// Severidad: high  ·  ATT&CK: T1055
+// Origen: rules/windows/soc_edr_010_inyeccion_procesos.yml
+DeviceEvents
+| where ActionType =~ "CreateRemoteThreadApiCall" and ((FolderPath endswith "\\explorer.exe" or FolderPath endswith "\\svchost.exe" or FolderPath endswith "\\winlogon.exe" or FolderPath endswith "\\lsass.exe" or FolderPath endswith "\\rundll32.exe" or FolderPath endswith "\\dllhost.exe" or FolderPath endswith "\\notepad.exe" or FolderPath endswith "\\werfault.exe") and (not((InitiatingProcessFolderPath startswith "C:\\Windows\\System32\\" and (InitiatingProcessFolderPath endswith "\\csrss.exe" or InitiatingProcessFolderPath endswith "\\services.exe" or InitiatingProcessFolderPath endswith "\\wininit.exe")))))
+
+// ─────────────────────────────────────────────────────────
+// Named pipe caracteristico de framework de C2
+// Severidad: critical  ·  ATT&CK: T1071
+// Origen: rules/windows/soc_edr_011_pipe_c2.yml
+DeviceEvents
+| where ActionType =~ "NamedPipeEvent" and (PipeName startswith "\\msagent_" or PipeName startswith "\\postex_" or PipeName startswith "\\postex_ssh_" or PipeName startswith "\\status_" or PipeName startswith "\\mojo_" or PipeName startswith "\\wkssvc_" or PipeName startswith "\\ntsvcs_" or PipeName startswith "\\sliver-" or PipeName startswith "\\MSSE-")
+
+// ─────────────────────────────────────────────────────────
+// Ejecucion de binario desde una ruta de escritura de usuario
+// Severidad: medium  ·  ATT&CK: T1204.002
+// Origen: rules/windows/soc_edr_012_ejecucion_desde_temp.yml
+imProcessCreate
+| where ((TargetProcessName contains "\\AppData\\Local\\Temp\\" or TargetProcessName contains "\\Windows\\Temp\\" or TargetProcessName contains "\\Users\\Public\\" or TargetProcessName contains "\\$Recycle.Bin\\" or TargetProcessName contains "\\AppData\\Roaming\\") and (TargetProcessName endswith ".exe" or TargetProcessName endswith ".scr" or TargetProcessName endswith ".com" or TargetProcessName endswith ".pif")) and (not(((ParentProcessName endswith "\\msiexec.exe" or ParentProcessName endswith "\\setup.exe" or ParentProcessName endswith "\\TrustedInstaller.exe") or (ActingProcessName endswith "\\msiexec.exe" or ActingProcessName endswith "\\setup.exe" or ActingProcessName endswith "\\TrustedInstaller.exe"))))

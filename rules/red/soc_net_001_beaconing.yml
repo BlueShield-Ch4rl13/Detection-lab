@@ -1,0 +1,29 @@
+title: Patron de beaconing hacia un destino externo
+id: 8c852761-72ca-5d2e-80f2-27713e6f14cd
+status: experimental
+description: |
+    Un beacon de C2 se delata por la regularidad: intervalos casi constantes y tamano de
+    respuesta parecido, sostenido durante horas. La regla Sigma marca el flujo saliente
+    candidato; el calculo de desviacion tipica del intervalo lo hace la busqueda del
+    SIEM, porque Sigma no expresa agregacion temporal de ese tipo.
+references:
+    - https://attack.mitre.org/techniques/T1071/001/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.command-and-control
+    - attack.t1071.001
+logsource:
+    category: proxy
+detection:
+    selection:
+        c-uri|contains: '/'
+    filter_categorias:
+        cs-categories:
+            - 'Business'
+            - 'Search Engines'
+            - 'Software Updates'
+    condition: selection and not filter_categorias
+falsepositives:
+    - Telemetria de producto y comprobaciones periodicas de actualizacion, que tambien son regulares
+level: medium

@@ -1,0 +1,33 @@
+title: Kerberoasting - solicitud masiva de tickets de servicio con RC4
+id: 54b36280-b579-5b0d-af3a-3ff82ad085f2
+status: experimental
+description: |
+    Detecta solicitudes de ticket de servicio (TGS) cifradas con RC4 contra cuentas de
+    servicio. Un atacante pide el TGS de cuentas con SPN para crackear su contrasena
+    fuera de linea. El cifrado RC4 (0x17) es la senal: los clientes modernos negocian
+    AES, asi que un RC4 solicitado por un puesto de usuario es anomalo.
+references:
+    - https://attack.mitre.org/techniques/T1558/003/
+    - https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4769
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.credential-access
+    - attack.t1558.003
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID: 4769
+        TicketOptions: '0x40810000'
+        TicketEncryptionType: '0x17'
+    filter_maquinas:
+        ServiceName|endswith: '$'
+    filter_krbtgt:
+        ServiceName: 'krbtgt'
+    condition: selection and not 1 of filter_*
+falsepositives:
+    - Aplicaciones antiguas que solo soportan RC4
+    - Dominios con nivel funcional bajo o cuentas de servicio sin AES habilitado
+level: high

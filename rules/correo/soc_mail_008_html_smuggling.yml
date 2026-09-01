@@ -1,0 +1,36 @@
+title: HTML smuggling en adjunto
+id: 79ece427-9b7c-548f-a10e-679cd569fcae
+status: experimental
+description: |
+    El adjunto es un HTML aparentemente inofensivo que reconstruye el binario en el
+    navegador con JavaScript, de modo que el fichero nunca cruza el perimetro como
+    ejecutable. Detecta los patrones de construccion de blob y de descarga automatica.
+references:
+    - https://attack.mitre.org/techniques/T1027/006/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.defense-evasion
+    - attack.initial-access
+    - attack.t1027.006
+logsource:
+    product: proofpoint
+    service: tap
+detection:
+    selection_tipo:
+        attachmentName|endswith:
+            - '.html'
+            - '.htm'
+            - '.svg'
+    selection_patron:
+        attachmentContent|contains:
+            - 'msSaveOrOpenBlob'
+            - 'new Blob('
+            - 'application/octet-stream'
+            - 'download='
+            - 'atob('
+            - 'base64,'
+    condition: selection_tipo and selection_patron
+falsepositives:
+    - Boletines HTML complejos, que rara vez incluyen construccion de blob
+level: high

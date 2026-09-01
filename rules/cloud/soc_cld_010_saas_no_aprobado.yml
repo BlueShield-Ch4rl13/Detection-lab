@@ -1,0 +1,35 @@
+title: Subida de datos a un servicio SaaS no aprobado
+id: 8a846cef-b630-5bf6-b72b-345b927c6188
+status: experimental
+description: |
+    Shadow IT con dato dentro. Detecta la carga de ficheros hacia aplicaciones en la
+    nube que no estan en el catalogo aprobado, que es a la vez un riesgo de fuga y, si
+    hay datos personales, una posible transferencia internacional sin base juridica.
+references:
+    - https://attack.mitre.org/techniques/T1567/002/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.exfiltration
+    - attack.t1567.002
+logsource:
+    product: netskope
+    service: alerts
+detection:
+    selection:
+        activity:
+            - 'Upload'
+            - 'Share'
+            - 'Post'
+        app_category:
+            - 'Cloud Storage'
+            - 'File Sharing'
+            - 'Webmail'
+    selection_no_aprobada:
+        ccl:
+            - 'poor'
+            - 'low'
+    condition: selection and selection_no_aprobada
+falsepositives:
+    - Uso puntual autorizado de un servicio externo por peticion de un cliente
+level: medium

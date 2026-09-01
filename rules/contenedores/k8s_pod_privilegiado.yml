@@ -1,0 +1,37 @@
+title: Creacion de pod privilegiado
+id: 7b09c90e-e326-5a96-9a89-79a7fe78e3e7
+status: experimental
+description: |
+    Un contenedor con privileged true comparte los dispositivos y capacidades del
+    nodo. Desde ahi el salto al host es trivial: montar el disco del nodo, cargar
+    modulos o entrar en los namespaces del PID 1. Salvo agentes de infraestructura
+    conocidos, no deberia crearse ninguno.
+references:
+    - https://attack.mitre.org/techniques/T1610/
+    - https://kubernetes.io/docs/concepts/security/pod-security-standards/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.privilege-escalation
+    - attack.defense-evasion
+    - attack.t1610
+    - attack.t1611
+logsource:
+    product: kubernetes
+    service: audit
+detection:
+    selection:
+        verb:
+            - 'create'
+            - 'update'
+            - 'patch'
+        resource: 'pods'
+        privileged: 'true'
+    filtro_sistema:
+        namespace:
+            - 'kube-system'
+            - 'monitoring'
+    condition: selection and not filtro_sistema
+falsepositives:
+    - Agentes de red o de almacenamiento (CNI, CSI) que si necesitan privilegios; deben ir en su propio namespace
+level: high

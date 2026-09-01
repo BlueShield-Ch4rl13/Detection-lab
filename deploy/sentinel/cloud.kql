@@ -1,0 +1,68 @@
+// Generado por tools/build.py — no editar a mano
+// Dominio: cloud  ·  pipeline: tools/pipelines/sentinel.yml + sentinel_asim
+
+// SigninLogs: DeviceDetail es dynamic. Antepon:
+//   | extend DeviceIsCompliant = tostring(DeviceDetail.isCompliant),
+//            DeviceTrustType   = tostring(DeviceDetail.trustType)
+
+
+// ─────────────────────────────────────────────────────────
+// Consentimiento concedido a una aplicacion no verificada
+// Severidad: high  ·  ATT&CK: T1550.001
+// Origen: rules/cloud/soc_cld_001_consentimiento_oauth.yml
+AuditLogs
+| where (OperationName in~ ("Consent to application", "Add delegated permission grant", "Add app role assignment grant to user")) and (TargetResources contains "Mail.Read" or TargetResources contains "Mail.ReadWrite" or TargetResources contains "Mail.Send" or TargetResources contains "Files.ReadWrite.All" or TargetResources contains "Directory.ReadWrite.All" or TargetResources contains "User.ReadWrite.All" or TargetResources contains "offline_access")
+
+// ─────────────────────────────────────────────────────────
+// Metodo MFA registrado tras un inicio de sesion de riesgo
+// Severidad: medium  ·  ATT&CK: T1098.005
+// Origen: rules/cloud/soc_cld_002_metodo_mfa_registrado.yml
+AuditLogs
+| where OperationName in~ ("User registered security info", "Admin registered security info", "User registered all required security info", "User changed default security info")
+
+// ─────────────────────────────────────────────────────────
+// Alta en un rol privilegiado de Entra ID
+// Severidad: high  ·  ATT&CK: T1098.003
+// Origen: rules/cloud/soc_cld_005_rol_privilegiado.yml
+AuditLogs
+| where (OperationName in~ ("Add member to role", "Add eligible member to role", "Add member to role outside of PIM")) and (TargetResources contains "Global Administrator" or TargetResources contains "Privileged Role Administrator" or TargetResources contains "Security Administrator" or TargetResources contains "Exchange Administrator" or TargetResources contains "Application Administrator" or TargetResources contains "Cloud Application Administrator" or TargetResources contains "User Administrator")
+
+// ─────────────────────────────────────────────────────────
+// Politica de acceso condicional modificada o deshabilitada
+// Severidad: high  ·  ATT&CK: T1556.009
+// Origen: rules/cloud/soc_cld_006_acceso_condicional.yml
+AuditLogs
+| where OperationName in~ ("Update conditional access policy", "Delete conditional access policy", "Update policy", "Disable Strong Authentication")
+
+// ─────────────────────────────────────────────────────────
+// Credencial anadida a una aplicacion o service principal
+// Severidad: high  ·  ATT&CK: T1098.001
+// Origen: rules/cloud/soc_cld_007_credencial_service_principal.yml
+AuditLogs
+| where (OperationName in~ ("Add service principal credentials", "Update application - Certificates and secrets management", "Update application")) and (TargetResources contains "KeyDescription" or TargetResources contains "PasswordCredentials" or TargetResources contains "KeyCredentials")
+
+// ─────────────────────────────────────────────────────────
+// Inicio de sesion desde una red de anonimizacion
+// Severidad: high  ·  ATT&CK: T1090.003
+// Origen: rules/cloud/soc_cld_008_origen_anonimizado.yml
+SigninLogs
+| where ResultType =~ "0" and (RiskEventTypes_string contains "anonymizedIPAddress" or RiskEventTypes_string contains "maliciousIPAddress" or RiskEventTypes_string contains "unfamiliarFeatures" or RiskEventTypes_string contains "adminConfirmedUserCompromised")
+
+// ─────────────────────────────────────────────────────────
+// Dispositivo no conforme accediendo a un recurso corporativo
+// Severidad: medium  ·  ATT&CK: T1078.004
+// Origen: rules/cloud/soc_cld_009_dispositivo_no_conforme.yml
+SigninLogs
+| where ResultType =~ "0" and (DeviceIsCompliant =~ false or isnull(DeviceTrustType))
+
+// ─────────────────────────────────────────────────────────
+// Subida de datos a un servicio SaaS no aprobado
+// Severidad: medium  ·  ATT&CK: T1567.002
+// Origen: rules/cloud/soc_cld_010_saas_no_aprobado.yml
+NetskopeAlerts_CL
+| where ((activity_s in~ ("Upload", "Share", "Post")) and (app_category_s in~ ("Cloud Storage", "File Sharing", "Webmail"))) and (ccl_s in~ ("poor", "low"))
+
+// ── Sin conversion automatica a KQL ──
+//   soc_cld_003_password_spraying.yml: Backend does not support correlation rules.
+//   soc_cld_004_token_robado.yml: Backend does not support correlation rules.
+// Ver deploy/sentinel/correlaciones.kql

@@ -3,11 +3,11 @@ id: 8fd4716f-0df1-5142-8a42-2d80006a2218
 status: experimental
 description: Acceso al fichero de hashes de contrasenas (credential access).
 references:
-- https://attack.mitre.org/techniques/008
+- https://attack.mitre.org/techniques/T1003/008/
 author: C. Villalba
 date: 2026/07/16
 tags:
-- attack.credential_access
+- attack.credential-access
 - attack.t1003.008
 logsource:
   category: process_creation

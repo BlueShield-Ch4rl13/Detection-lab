@@ -1,0 +1,35 @@
+title: Gatekeeper deshabilitado o cuarentena eliminada
+id: ebc36b57-e804-575d-a354-1abd9e11abe7
+status: experimental
+description: |
+    Gatekeeper bloquea binarios sin firmar o sin notarizar. Desactivarlo por
+    completo, o quitar el atributo com.apple.quarantine a un fichero descargado,
+    es el paso previo habitual para ejecutar un binario que el sistema rechazaria.
+references:
+    - https://attack.mitre.org/techniques/T1553/001/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.defense-evasion
+    - attack.t1553.001
+    - attack.t1562.001
+logsource:
+    category: process_creation
+    product: macos
+detection:
+    selection_spctl:
+        Image|endswith: '/spctl'
+        CommandLine|contains:
+            - '--master-disable'
+            - '--global-disable'
+            - '--add'
+    selection_xattr:
+        Image|endswith: '/xattr'
+        CommandLine|contains: 'com.apple.quarantine'
+    selection_sip:
+        Image|endswith: '/csrutil'
+        CommandLine|contains: 'disable'
+    condition: 1 of selection_*
+falsepositives:
+    - Equipos de desarrollo con politica propia, que deberian estar en una UO aparte
+level: high

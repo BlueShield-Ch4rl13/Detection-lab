@@ -1,0 +1,29 @@
+title: Politica de acceso condicional modificada o deshabilitada
+id: b8b523ce-0a01-508a-be5d-7b83fe72c728
+status: stable
+description: |
+    El acceso condicional es el punto de aplicacion de politica de la arquitectura Zero
+    Trust en la nube. Deshabilitar una politica, o anadirse a su lista de exclusion, es
+    la forma limpia de saltarse el MFA sin dejar rastro de un fallo de autenticacion.
+references:
+    - https://attack.mitre.org/techniques/T1556/009/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.defense-evasion
+    - attack.persistence
+    - attack.t1556.009
+logsource:
+    product: azure
+    service: auditlogs
+detection:
+    selection:
+        properties.message:
+            - 'Update conditional access policy'
+            - 'Delete conditional access policy'
+            - 'Update policy'
+            - 'Disable Strong Authentication'
+    condition: selection
+falsepositives:
+    - Mantenimiento planificado de politicas, que debe pasar por gestion de cambios
+level: high

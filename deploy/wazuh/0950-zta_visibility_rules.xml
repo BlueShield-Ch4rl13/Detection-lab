@@ -1,0 +1,68 @@
+<!--
+  ZTA Detection Pack - Capacidad transversal: Visibility and Analytics
+  Marco: NIST SP 800-207 + CISA ZTMM 2.0
+  Rango de IDs: 100600-100699
+
+  CISA define Visibility and Analytics como capacidad transversal a los
+  cinco pilares. Sin telemetria fiable no hay verificacion continua, asi
+  que la perdida o manipulacion de la propia telemetria es un evento de
+  seguridad de primer orden en Zero Trust.
+-->
+<group name="zta,zta_visibility,">
+
+  <!-- ================================================================
+       ZTA-VIS-001 | Manipulacion de la recogida de telemetria
+       CISA: Visibility and Analytics | Advanced
+       La deteccion de "fuente silenciada" por ausencia de datos se hace
+       en Splunk (busqueda programada ZTA-VIS-001), porque Wazuh no puede
+       alertar sobre eventos que no llegan.
+       ================================================================ -->
+  <rule id="100600" level="12">
+    <if_group>syslog|audit</if_group>
+    <regex type="pcre2">(?i)(systemctl (stop|disable) (rsyslog|auditd|filebeat|wazuh-agent|splunk)|service (rsyslog|auditd) stop|auditctl -D|Set-Service.*(WinDefend|EventLog).*Stopped)</regex>
+    <description>ZTA-VIS-001: Servicio de telemetria detenido o deshabilitado en $(hostname). Perdida de visibilidad.</description>
+    <mitre>
+      <id>T1562.008</id>
+    </mitre>
+    <nist_800_53>AU.6,SI.4</nist_800_53>
+    <group>zta_visibility,zta_VIS-001,cisa_visibility_analytics,ztmm_advanced,</group>
+  </rule>
+
+  <rule id="100601" level="12">
+    <if_group>syscheck</if_group>
+    <field name="file" type="pcre2">(/etc/rsyslog\.conf|/etc/audit/rules\.d/|/etc/audit/auditd\.conf|/var/ossec/etc/ossec\.conf|/opt/splunkforwarder/etc/system/local/)</field>
+    <description>ZTA-VIS-001: Configuracion de recogida de logs modificada en $(hostname): $(file)</description>
+    <mitre>
+      <id>T1562.006</id>
+    </mitre>
+    <nist_800_53>AU.9,CM.3</nist_800_53>
+    <group>zta_visibility,zta_VIS-001,cisa_visibility_analytics,ztmm_advanced,</group>
+  </rule>
+
+  <!-- ================================================================
+       ZTA-VIS-002 | Borrado del registro de auditoria
+       CISA: Visibility and Analytics | Initial
+       ================================================================ -->
+  <rule id="100602" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID">^1102$|^104$</field>
+    <description>ZTA-VIS-002: Registro de auditoria borrado en $(hostname) por $(win.eventdata.subjectUserName).</description>
+    <mitre>
+      <id>T1070.001</id>
+    </mitre>
+    <nist_800_53>AU.9,AU.6</nist_800_53>
+    <group>zta_visibility,zta_VIS-002,cisa_visibility_analytics,ztmm_initial,</group>
+  </rule>
+
+  <rule id="100603" level="14">
+    <if_group>syslog|audit</if_group>
+    <regex type="pcre2">(?i)(>\s*/var/log/(auth\.log|secure|syslog)|rm\s+-[rf]*\s+/var/log/|truncate\s+-s\s*0\s+/var/log/|shred\s+.*/var/log/|journalctl\s+--vacuum-time=1s)</regex>
+    <description>ZTA-VIS-002: Borrado o truncado de ficheros de log en $(hostname). Posible anti-forense.</description>
+    <mitre>
+      <id>T1070.002</id>
+    </mitre>
+    <nist_800_53>AU.9,AU.6</nist_800_53>
+    <group>zta_visibility,zta_VIS-002,cisa_visibility_analytics,ztmm_initial,</group>
+  </rule>
+
+</group>

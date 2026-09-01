@@ -1,0 +1,26 @@
+# Generado por tools/build.py — no editar a mano
+# Dominio: contenedores  ·  ES|QL (Elastic)
+
+# Escape de contenedor hacia los namespaces del host  [critical]
+from * metadata _id, _index, _version | where ends_with(Image, "/nsenter") and (CommandLine like "*-t 1*" or CommandLine like "*--target 1*" or CommandLine like "*--mount=/proc/1/ns/mnt*") or ends_with(Image, "/chroot") and (CommandLine like "*/host*" or CommandLine like "*/mnt/host*" or CommandLine like "*/proc/1/root*") or CommandLine like "*release_agent*" or CommandLine like "*notify_on_release*" or CommandLine like "*/proc/1/root*"
+
+# Acceso al socket del runtime de contenedores  [critical]
+from * metadata _id, _index, _version | where (CommandLine like "*/var/run/docker.sock*" or CommandLine like "*/run/docker.sock*" or CommandLine like "*/run/containerd/containerd.sock*" or CommandLine like "*/var/run/crio/crio.sock*") and (CommandLine like "*curl*" or CommandLine like "*wget*" or CommandLine like "*nc *" or CommandLine like "*socat*" or CommandLine like "*docker run*" or CommandLine like "*ctr *" or CommandLine like "*crictl*") and not (ends_with(Image, "/dockerd") or ends_with(Image, "/containerd") or ends_with(Image, "/kubelet"))
+
+# Contenedor con capacidades de kernel peligrosas  [high]
+from * metadata _id, _index, _version | where (verb in ("create", "update", "patch")) and resource=="pods" and (capabilities like "*SYS_ADMIN*" or capabilities like "*SYS_PTRACE*" or capabilities like "*SYS_MODULE*" or capabilities like "*SYS_RAWIO*" or capabilities like "*DAC_READ_SEARCH*" or capabilities like "*ALL*")
+
+# Enlace a un rol con privilegios de administrador del cluster  [high]
+from * metadata _id, _index, _version | where (verb in ("create", "update", "patch")) and apiGroup=="rbac.authorization.k8s.io" and (resource in ("clusterrolebindings", "rolebindings")) and not starts_with(username, "system:serviceaccount:kube-system:")
+
+# Ejecucion interactiva dentro de un pod  [medium]
+from * metadata _id, _index, _version | where verb=="create" and resource=="pods" and (subresource in ("exec", "attach")) and not starts_with(username, "system:serviceaccount:kube-system:")
+
+# Lectura de secretos de Kubernetes  [medium]
+from * metadata _id, _index, _version | where (verb in ("get", "list", "watch")) and resource=="secrets" and not (starts_with(username, "system:serviceaccount:kube-system:") or starts_with(username, "system:kube-controller-manager") or starts_with(username, "system:apiserver"))
+
+# Pod que monta una ruta sensible del nodo  [critical]
+from * metadata _id, _index, _version | where (verb in ("create", "update", "patch")) and resource=="pods" and (hostPath like "*/var/run/docker.sock*" or hostPath like "*/var/run/containerd*" or hostPath like "*/var/run/crio*" or hostPath like "*/etc/kubernetes*" or hostPath like "*/root*" or hostPath like "*/proc*" or hostPath=="/")
+
+# Creacion de pod privilegiado  [high]
+from * metadata _id, _index, _version | where (verb in ("create", "update", "patch")) and resource=="pods" and privileged=="true" and not (namespace in ("kube-system", "monitoring"))

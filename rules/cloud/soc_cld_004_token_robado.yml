@@ -1,0 +1,55 @@
+title: Inicio de sesion correcto en Entra ID
+id: 2c7e95e6-4501-534f-9f9e-159eb7cfb365
+name: soc_cld_004_login_correcto
+status: experimental
+description: |
+    Regla base para la deteccion de reutilizacion de sesion. Aisla las autenticaciones
+    correctas para que la correlacion pueda contar desde cuantos sistemas autonomos
+    distintos se usa una misma sesion.
+references:
+    - https://attack.mitre.org/techniques/T1539/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.credential-access
+    - attack.t1539
+logsource:
+    product: azure
+    service: signinlogs
+detection:
+    selection:
+        ResultType: '0'
+    condition: selection
+falsepositives:
+    - Todas: es una regla base sin valor de alerta por si sola
+level: informational
+---
+title: Reutilizacion de sesion desde redes distintas
+id: 30a53297-0c05-5e6a-ba72-4d68737f7878
+status: experimental
+description: |
+    El robo de token de sesion mediante adversary-in-the-middle permite entrar sin
+    credenciales y sin volver a pasar el MFA. La senal es una misma correlacion de
+    sesion usada desde dos sistemas autonomos distintos en poco tiempo. Cubre lo que el
+    viaje imposible no ve cuando el atacante usa un proxy en el mismo pais.
+references:
+    - https://attack.mitre.org/techniques/T1539/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.credential-access
+    - attack.defense-evasion
+    - attack.t1539
+correlation:
+    type: value_count
+    rules:
+        - soc_cld_004_login_correcto
+    group-by:
+        - CorrelationId
+    timespan: 30m
+    condition:
+        gte: 2
+        field: AutonomousSystemNumber
+falsepositives:
+    - Cambio de red del usuario durante la sesion, por ejemplo de la oficina a la conexion movil
+level: high

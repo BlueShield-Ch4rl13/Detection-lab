@@ -1,0 +1,34 @@
+title: Creacion de usuario local u oculto en macOS
+id: c36ece79-7e24-5e5a-8da1-7b8b37b1cd92
+status: experimental
+description: |
+    Alta de una cuenta local con dscl o sysadminctl. El indicador de mayor valor es
+    IsHidden, que oculta la cuenta de la pantalla de inicio de sesion: no hay razon
+    administrativa habitual para crear una cuenta invisible.
+references:
+    - https://attack.mitre.org/techniques/T1136/001/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.persistence
+    - attack.t1136.001
+logsource:
+    category: process_creation
+    product: macos
+detection:
+    selection_dscl:
+        Image|endswith: '/dscl'
+        CommandLine|contains:
+            - '-create /Users/'
+            - '-append /Groups/admin'
+    selection_sysadminctl:
+        Image|endswith: '/sysadminctl'
+        CommandLine|contains: '-addUser'
+    selection_oculto:
+        CommandLine|contains:
+            - 'IsHidden'
+            - 'dscl . create /Users/'
+    condition: 1 of selection_*
+falsepositives:
+    - Aprovisionamiento por MDM, que deberia venir de un proceso de Jamf o similar
+level: high

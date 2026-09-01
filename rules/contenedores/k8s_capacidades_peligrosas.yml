@@ -1,0 +1,36 @@
+title: Contenedor con capacidades de kernel peligrosas
+id: 7ae90226-7659-5c85-89d4-05be5a0656f6
+status: experimental
+description: |
+    Anadir SYS_ADMIN, SYS_PTRACE, SYS_MODULE o NET_ADMIN a un contenedor le da
+    parte de lo que tendria en modo privilegiado sin marcar la bandera privileged,
+    que es justo lo que se busca al evadir una politica que solo mira esa bandera.
+references:
+    - https://attack.mitre.org/techniques/T1611/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.privilege-escalation
+    - attack.defense-evasion
+    - attack.t1611
+logsource:
+    product: kubernetes
+    service: audit
+detection:
+    selection:
+        verb:
+            - 'create'
+            - 'update'
+            - 'patch'
+        resource: 'pods'
+        capabilities|contains:
+            - 'SYS_ADMIN'
+            - 'SYS_PTRACE'
+            - 'SYS_MODULE'
+            - 'SYS_RAWIO'
+            - 'DAC_READ_SEARCH'
+            - 'ALL'
+    condition: selection
+falsepositives:
+    - Cargas de trabajo de red o de perfilado que documentan la capacidad que necesitan
+level: high

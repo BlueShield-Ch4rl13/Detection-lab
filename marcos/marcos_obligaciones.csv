@@ -1,0 +1,20 @@
+obligacion_id,categoria,obligacion,ens_ref,nis2_ref,iso_27001_ref,iso_22301_ref,dora_ref,rgpd_ref,plazo,autoridad_es,deteccion_relacionada
+OBL-NOT-01,Notificacion de incidentes,Alerta temprana tras conocer un incidente significativo,op.exp.7,Art. 23.4.a,A.5.25,8.4.3,Art. 19.4.a,,24 h,INCIBE-CERT / CCN-CERT,CMP-NOT-002
+OBL-NOT-02,Notificacion de incidentes,Notificacion de incidente con evaluacion inicial de gravedad e impacto,op.exp.9,Art. 23.4.b,A.5.26,8.4.3,Art. 19.4.b,Art. 33.1,72 h,INCIBE-CERT / CCN-CERT / AEPD,CMP-NOT-003
+OBL-NOT-03,Notificacion de incidentes,Notificacion inicial de incidente grave TIC en entidad financiera,op.exp.7,Art. 23.4.a,A.5.25,8.4.3,Art. 19 y RTS art. 5,,4 h desde clasificacion y max 24 h desde conocimiento,Banco de Espana / CNMV / DGSFP,CMP-NOT-004
+OBL-NOT-04,Notificacion de incidentes,Informe intermedio del incidente grave,op.exp.9,Art. 23.4.b,A.5.26,8.4.3,RTS art. 5,,72 h desde la notificacion inicial,Banco de Espana / CNMV / DGSFP,CMP-NOT-005
+OBL-NOT-05,Notificacion de incidentes,Informe final con causa raiz y medidas de mitigacion,op.exp.9,Art. 23.4.d,A.5.27,8.6,RTS art. 5,,1 mes,INCIBE-CERT / CCN-CERT / supervisor financiero,CMP-NOT-006
+OBL-NOT-06,Notificacion de incidentes,Comunicacion a los interesados si hay alto riesgo para sus derechos,mp.info.1,Art. 23.7,A.5.34,8.4.3,,Art. 34,sin dilacion indebida,AEPD,CMP-NOT-007
+OBL-CON-01,Continuidad,Copias de seguridad con periodicidad acorde al RPO definido,mp.info.9,Art. 21.2.c,A.8.13,8.3,Art. 12.1,Art. 32.1.c,segun RPO,-,CMP-CON-001
+OBL-CON-02,Continuidad,Pruebas periodicas de restauracion y del plan de continuidad,op.cont.3,Art. 21.2.c,A.5.30,8.5,"Art. 11.6, Art. 24",Art. 32.1.d,anual como minimo,-,CMP-CON-002
+OBL-CON-03,Continuidad,Recuperacion del servicio dentro del RTO comprometido,op.cont.2,Art. 21.2.c,A.5.29,8.4,Art. 11,Art. 32.1.c,segun RTO,-,CMP-CON-003
+OBL-CON-04,Continuidad,Copias protegidas frente a modificacion y separadas del entorno productivo,mp.info.9,Art. 21.2.c,A.8.13,8.3,Art. 12.3,Art. 32.1.b,permanente,-,CMP-CON-004
+OBL-LOG-01,Trazabilidad,Registro de la actividad de los usuarios con retencion suficiente,op.exp.8,Art. 21.2.b,A.8.15,9.1,Art. 12.1,Art. 32.1.d,segun categoria del sistema,-,CMP-LOG-001
+OBL-LOG-02,Trazabilidad,Proteccion de los registros frente a modificacion o borrado,op.exp.10,Art. 21.2.b,A.8.15,9.1,Art. 12.3,Art. 32.1.b,permanente,-,CMP-LOG-002
+OBL-LOG-03,Trazabilidad,Sincronizacion horaria de los sistemas para dar validez a la evidencia,mp.info.5,Art. 21.2.b,A.8.17,9.1,Art. 10.2,Art. 32.1.d,permanente,-,CMP-LOG-003
+OBL-RGP-01,Datos personales,Limitar y registrar el acceso a datos personales,mp.info.1,Art. 21.2.i,A.5.15,,Art. 9.4.c,"Art. 5.1.f, Art. 32.1.b",permanente,AEPD,CMP-RGP-001
+OBL-RGP-02,Datos personales,Controlar las transferencias internacionales de datos personales,mp.info.1,,A.5.14,,,Art. 44 a 49,previa a la transferencia,AEPD,CMP-RGP-002
+OBL-RGP-03,Datos personales,Cifrado o seudonimizacion de los datos personales,mp.info.3,Art. 21.2.h,A.8.24,,Art. 9.2,Art. 32.1.a,permanente,AEPD,CMP-RGP-003
+OBL-TER-01,Terceros,Control del acceso de proveedores a los sistemas,op.acc.5,Art. 21.2.d,A.5.19,8.2,"Art. 28, Art. 30",Art. 28,permanente,-,CMP-TER-001
+OBL-TER-02,Terceros,Registro de proveedores TIC y acuerdos contractuales exigibles,op.exp.1,Art. 21.2.d,A.5.20,8.2,"Art. 28.3, Art. 30",Art. 28.3,permanente,supervisor financiero,CMP-TER-002
+OBL-VUL-01,Vulnerabilidades,Remediacion de vulnerabilidades dentro del plazo definido,op.exp.4,Art. 21.2.e,A.8.8,,Art. 10,Art. 32.1.d,segun criticidad,-,CMP-VUL-001

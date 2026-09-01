@@ -1,0 +1,49 @@
+soc_id,titulo,dominio,nivel,fuente_log,mitre_id,tipo,implementacion,fichero_sigma,estado
+SOC-AD-001,Kerberoasting - solicitud masiva de tickets de servicio con RC4,ad_lateral,high,windows/security,T1558.003,deteccion,wazuh+splunk,sigma/ad_lateral/soc_ad_001_kerberoasting.yml,experimental
+SOC-AD-002,AS-REP Roasting - peticion sin preautenticacion Kerberos,ad_lateral,high,windows/security,T1558.004,deteccion,wazuh+splunk,sigma/ad_lateral/soc_ad_002_asrep_roasting.yml,experimental
+SOC-AD-003,DCSync - replicacion de directorio desde un equipo que no es DC,ad_lateral,critical,windows/security,T1003.006,deteccion,wazuh+splunk,sigma/ad_lateral/soc_ad_003_dcsync.yml,experimental
+SOC-AD-004,Indicio de Golden Ticket - TGS de krbtgt con cifrado degradado,ad_lateral,critical,windows/security,T1558.001,deteccion,wazuh+splunk,sigma/ad_lateral/soc_ad_004_golden_ticket.yml,experimental
+SOC-AD-005,Herramienta de abuso de Kerberos ejecutada,ad_lateral,critical,windows/process_creation,T1003|T1558,deteccion,wazuh+splunk,sigma/ad_lateral/soc_ad_005_herramientas_kerberos.yml,experimental
+SOC-AD-006,Pass-the-Hash y Overpass-the-Hash,ad_lateral,high,windows/security,T1550.002,deteccion,wazuh+splunk,sigma/ad_lateral/soc_ad_006_pass_the_hash.yml,experimental
+SOC-AD-007,Enumeracion de Active Directory - BloodHound y comandos de reconocimiento,ad_lateral,medium,windows/process_creation,T1069.002|T1087.002,deteccion,wazuh+splunk,sigma/ad_lateral/soc_ad_007_enumeracion_dominio.yml,experimental
+SOC-AD-008,Ejecucion remota tipo PsExec,ad_lateral,high,windows/system,T1569.002,deteccion,wazuh+splunk,sigma/ad_lateral/soc_ad_008_psexec_remoto.yml,experimental
+SOC-AD-009,Ejecucion remota por WMI o WinRM,ad_lateral,high,windows/process_creation,T1021.006|T1047,deteccion,wazuh+splunk,sigma/ad_lateral/soc_ad_009_wmi_winrm_remoto.yml,experimental
+SOC-AD-010,Modificacion sospechosa de directiva de grupo,ad_lateral,high,windows/process_creation,T1484.001,deteccion,wazuh+splunk,sigma/ad_lateral/soc_ad_010_abuso_gpo.yml,experimental
+SOC-AD-011,Cuenta de equipo creada por un usuario no administrador,ad_lateral,medium,windows/security,T1136.002,deteccion,wazuh+splunk,sigma/ad_lateral/soc_ad_011_cuenta_equipo_creada.yml,experimental
+SOC-AD-012,Abuso de servicios de certificados de Active Directory,ad_lateral,critical,windows/process_creation,T1649,deteccion,wazuh+splunk,sigma/ad_lateral/soc_ad_012_abuso_adcs.yml,experimental
+SOC-CLD-001,Consentimiento concedido a una aplicacion no verificada,cloud_identity,high,azure/auditlogs,T1550.001,deteccion,wazuh+splunk,sigma/cloud_identity/soc_cld_001_consentimiento_oauth.yml,stable
+SOC-CLD-002,Metodo MFA registrado tras un inicio de sesion de riesgo,cloud_identity,medium,azure/auditlogs,T1098.005,deteccion,wazuh+splunk,sigma/cloud_identity/soc_cld_002_metodo_mfa_registrado.yml,stable
+SOC-CLD-003,Password spraying contra Entra ID,cloud_identity,high,,T1110.003,correlacion,solo-splunk,sigma/cloud_identity/soc_cld_003_password_spraying.yml,stable
+SOC-CLD-004,Reutilizacion de sesion desde redes distintas,cloud_identity,high,,T1539,correlacion,solo-splunk,sigma/cloud_identity/soc_cld_004_token_robado.yml,experimental
+SOC-CLD-005,Alta en un rol privilegiado de Entra ID,cloud_identity,high,azure/auditlogs,T1098.003,deteccion,wazuh+splunk,sigma/cloud_identity/soc_cld_005_rol_privilegiado.yml,stable
+SOC-CLD-006,Politica de acceso condicional modificada o deshabilitada,cloud_identity,high,azure/auditlogs,T1556.009,deteccion,wazuh+splunk,sigma/cloud_identity/soc_cld_006_acceso_condicional.yml,stable
+SOC-CLD-007,Credencial anadida a una aplicacion o service principal,cloud_identity,high,azure/auditlogs,T1098.001,deteccion,wazuh+splunk,sigma/cloud_identity/soc_cld_007_credencial_service_principal.yml,stable
+SOC-CLD-008,Inicio de sesion desde una red de anonimizacion,cloud_identity,high,azure/signinlogs,T1090.003,deteccion,wazuh+splunk,sigma/cloud_identity/soc_cld_008_origen_anonimizado.yml,experimental
+SOC-CLD-009,Dispositivo no conforme accediendo a un recurso corporativo,cloud_identity,medium,azure/signinlogs,T1078.004,deteccion,solo-splunk,sigma/cloud_identity/soc_cld_009_dispositivo_no_conforme.yml,experimental
+SOC-CLD-010,Subida de datos a un servicio SaaS no aprobado,cloud_identity,medium,netskope/alerts,T1567.002,deteccion,wazuh+splunk,sigma/cloud_identity/soc_cld_010_saas_no_aprobado.yml,experimental
+SOC-MAIL-001,Correo desde un dominio recien registrado,email_phishing,medium,proofpoint/tap,T1566.002,deteccion,solo-splunk,sigma/email_phishing/soc_mail_001_dominio_reciente.yml,experimental
+SOC-MAIL-002,Suplantacion de directivo en el nombre para mostrar,email_phishing,high,proofpoint/tap,T1534,deteccion,wazuh+splunk,sigma/email_phishing/soc_mail_002_suplantacion_directivo.yml,experimental
+SOC-MAIL-003,Fallo de autenticacion de correo en el dominio propio,email_phishing,high,proofpoint/tap,T1566.002,deteccion,wazuh+splunk,sigma/email_phishing/soc_mail_003_fallo_dmarc.yml,experimental
+SOC-MAIL-004,Adjunto con formato usado para entrega de malware,email_phishing,high,proofpoint/tap,T1566.001,deteccion,wazuh+splunk,sigma/email_phishing/soc_mail_004_adjunto_sospechoso.yml,experimental
+SOC-MAIL-005,Usuario pulsa una URL de phishing bloqueada o permitida,email_phishing,high,proofpoint/tap,T1566.002,deteccion,wazuh+splunk,sigma/email_phishing/soc_mail_005_url_pulsada.yml,experimental
+SOC-MAIL-006,Regla de buzon con reenvio externo creada,email_phishing,high,m365/exchange,T1114.003|T1564.008,deteccion,wazuh+splunk,sigma/email_phishing/soc_mail_006_regla_buzon_externa.yml,stable
+SOC-MAIL-007,Envio masivo desde una cuenta interna comprometida,email_phishing,medium,,T1534,correlacion,solo-splunk,sigma/email_phishing/soc_mail_007_envio_masivo_interno.yml,experimental
+SOC-MAIL-008,HTML smuggling en adjunto,email_phishing,high,proofpoint/tap,T1027.006,deteccion,wazuh+splunk,sigma/email_phishing/soc_mail_008_html_smuggling.yml,experimental
+SOC-EDR-001,Volcado de memoria de LSASS,endpoint_ransomware,critical,windows/process_creation,T1003.001,deteccion,wazuh+splunk,sigma/endpoint_ransomware/soc_edr_001_volcado_lsass.yml,experimental
+SOC-EDR-002,Acceso a memoria de LSASS con permisos de lectura,endpoint_ransomware,high,windows/process_access,T1003.001,deteccion,wazuh+splunk,sigma/endpoint_ransomware/soc_edr_002_acceso_lsass_sysmon.yml,experimental
+SOC-EDR-003,Destruccion de copias de seguridad y puntos de restauracion,endpoint_ransomware,critical,windows/process_creation,T1490,deteccion,wazuh+splunk,sigma/endpoint_ransomware/soc_edr_003_borrado_copias_sombra.yml,stable
+SOC-EDR-004,Defensas de seguridad deshabilitadas,endpoint_ransomware,high,windows/process_creation,T1562.001,deteccion,wazuh+splunk,sigma/endpoint_ransomware/soc_edr_004_defensas_deshabilitadas.yml,experimental
+SOC-EDR-005,LOLBin usado para descargar y ejecutar,endpoint_ransomware,high,windows/process_creation,T1105|T1218,deteccion,wazuh+splunk,sigma/endpoint_ransomware/soc_edr_005_lolbins_descarga.yml,experimental
+SOC-EDR-006,PowerShell codificado u ofuscado,endpoint_ransomware,high,windows/process_creation,T1027|T1059.001,deteccion,wazuh+splunk,sigma/endpoint_ransomware/soc_edr_006_powershell_ofuscado.yml,experimental
+SOC-EDR-007,Cifrado masivo de ficheros por ransomware,endpoint_ransomware,critical,windows/file_event,T1486,deteccion,wazuh+splunk,sigma/endpoint_ransomware/soc_edr_007_cifrado_masivo.yml,experimental
+SOC-EDR-008,Tarea programada sospechosa,endpoint_ransomware,high,windows/process_creation,T1053.005,deteccion,wazuh+splunk,sigma/endpoint_ransomware/soc_edr_008_persistencia_tarea.yml,experimental
+SOC-EDR-009,Persistencia por claves de arranque del registro,endpoint_ransomware,high,windows/registry_event,T1547.001,deteccion,wazuh+splunk,sigma/endpoint_ransomware/soc_edr_009_persistencia_registro.yml,experimental
+SOC-EDR-010,Inyeccion de codigo en proceso remoto,endpoint_ransomware,high,windows/create_remote_thread,T1055,deteccion,wazuh+splunk,sigma/endpoint_ransomware/soc_edr_010_inyeccion_procesos.yml,experimental
+SOC-EDR-011,Named pipe caracteristico de framework de C2,endpoint_ransomware,critical,windows/pipe_created,T1071,deteccion,wazuh+splunk,sigma/endpoint_ransomware/soc_edr_011_pipe_c2.yml,experimental
+SOC-EDR-012,Ejecucion de binario desde una ruta de escritura de usuario,endpoint_ransomware,medium,windows/process_creation,T1204.002,deteccion,wazuh+splunk,sigma/endpoint_ransomware/soc_edr_012_ejecucion_desde_temp.yml,experimental
+SOC-NET-001,Patron de beaconing hacia un destino externo,network_c2,medium,proxy,T1071.001,deteccion,wazuh+splunk,sigma/network_c2/soc_net_001_beaconing.yml,experimental
+SOC-NET-002,Canal de mando sobre un servicio legitimo,network_c2,high,proxy,T1102,deteccion,wazuh+splunk,sigma/network_c2/soc_net_002_c2_servicio_legitimo.yml,experimental
+SOC-NET-003,Tunelizacion o exfiltracion por DNS,network_c2,high,dns,T1071.004,deteccion,wazuh+splunk,sigma/network_c2/soc_net_003_dns_tunel.yml,experimental
+SOC-NET-004,Explotacion de vulnerabilidad web contra un servicio publicado,network_c2,high,webserver,T1190,deteccion,wazuh+splunk,sigma/network_c2/soc_net_004_explotacion_web.yml,experimental
+SOC-NET-005,Interaccion con webshell,network_c2,critical,webserver,T1505.003,deteccion,wazuh+splunk,sigma/network_c2/soc_net_005_webshell.yml,experimental
+SOC-NET-006,Volumen de subida anomalo hacia el exterior,network_c2,medium,proxy,T1048,deteccion,wazuh+splunk,sigma/network_c2/soc_net_006_exfiltracion_volumen.yml,experimental

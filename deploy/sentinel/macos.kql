@@ -1,0 +1,58 @@
+// Generado por tools/build.py — no editar a mano
+// Dominio: macos  ·  pipeline: tools/pipelines/sentinel.yml + sentinel_asim
+
+// ─────────────────────────────────────────────────────────
+// Borrado de registros del sistema en macOS
+// Severidad: high  ·  ATT&CK: T1070.002, T1070.003
+// Origen: rules/macos/mac_borrado_de_registros.yml
+imProcessCreate
+| where (TargetProcessName endswith "/log" and TargetProcessCommandLine contains "erase") or ((TargetProcessCommandLine contains "/var/log/asl" or TargetProcessCommandLine contains "/private/var/log/" or TargetProcessCommandLine contains "/var/db/diagnostics" or TargetProcessCommandLine contains ".zsh_history" or TargetProcessCommandLine contains ".bash_history") and (TargetProcessName endswith "/rm" or TargetProcessName endswith "/shred" or TargetProcessName endswith "/srm")) or (TargetProcessCommandLine contains "unset HISTFILE" or TargetProcessCommandLine contains "HISTSIZE=0" or TargetProcessCommandLine contains "set +o history")
+
+// ─────────────────────────────────────────────────────────
+// Descarga y ejecucion directa en macOS
+// Severidad: high  ·  ATT&CK: T1059.004, T1105
+// Origen: rules/macos/mac_descarga_y_ejecucion.yml
+imProcessCreate
+| where (TargetProcessCommandLine contains "curl " or TargetProcessCommandLine contains "wget " or TargetProcessCommandLine contains "nscurl ") and (TargetProcessCommandLine contains "| bash" or TargetProcessCommandLine contains "| sh" or TargetProcessCommandLine contains "| zsh" or TargetProcessCommandLine contains "| python" or TargetProcessCommandLine contains "|bash" or TargetProcessCommandLine contains "|sh" or TargetProcessCommandLine contains "| osascript")
+
+// ─────────────────────────────────────────────────────────
+// Gatekeeper deshabilitado o cuarentena eliminada
+// Severidad: high  ·  ATT&CK: T1553.001, T1562.001
+// Origen: rules/macos/mac_gatekeeper_deshabilitado.yml
+imProcessCreate
+| where (TargetProcessName endswith "/spctl" and (TargetProcessCommandLine contains "--master-disable" or TargetProcessCommandLine contains "--global-disable" or TargetProcessCommandLine contains "--add")) or (TargetProcessName endswith "/xattr" and TargetProcessCommandLine contains "com.apple.quarantine") or (TargetProcessName endswith "/csrutil" and TargetProcessCommandLine contains "disable")
+
+// ─────────────────────────────────────────────────────────
+// AppleScript ejecutando shell o descargando codigo
+// Severidad: high  ·  ATT&CK: T1059.002
+// Origen: rules/macos/mac_osascript_sospechoso.yml
+imProcessCreate
+| where TargetProcessName endswith "/osascript" and ((TargetProcessCommandLine contains "do shell script" or TargetProcessCommandLine contains "with administrator privileges") or (TargetProcessCommandLine contains "curl " or TargetProcessCommandLine contains "wget " or TargetProcessCommandLine contains "nscurl" or TargetProcessCommandLine contains "base64 -d" or TargetProcessCommandLine contains "python -c") or (TargetProcessCommandLine contains "display dialog" and TargetProcessCommandLine contains "with hidden answer"))
+
+// ─────────────────────────────────────────────────────────
+// Persistencia por LaunchAgent o LaunchDaemon
+// Severidad: medium  ·  ATT&CK: T1543.001, T1543.004
+// Origen: rules/macos/mac_persistencia_launchagent.yml
+imFileEvent
+| where (TargetFileName contains "/Library/LaunchAgents/" or TargetFileName contains "/Library/LaunchDaemons/" or TargetFileName contains "/Library/StartupItems/") and TargetFileName endswith ".plist" and (not((TargetFilePath startswith "/usr/sbin/installer" or TargetFilePath startswith "/System/Library/PrivateFrameworks/PackageKit.framework/" or TargetFilePath startswith "/usr/libexec/xpcproxy")))
+
+// ─────────────────────────────────────────────────────────
+// Manipulacion de la base de datos TCC
+// Severidad: high  ·  ATT&CK: T1548.006
+// Origen: rules/macos/mac_tcc_manipulacion.yml
+imProcessCreate
+| where ((TargetProcessCommandLine contains "TCC.db" or TargetProcessCommandLine contains "/Library/Application Support/com.apple.TCC") and (TargetProcessName endswith "/sqlite3" or TargetProcessName endswith "/cp" or TargetProcessName endswith "/mv" or TargetProcessName endswith "/dd")) or (TargetProcessName endswith "/tccutil" and TargetProcessCommandLine contains "reset")
+
+// ─────────────────────────────────────────────────────────
+// Creacion de usuario local u oculto en macOS
+// Severidad: high  ·  ATT&CK: T1136.001
+// Origen: rules/macos/mac_usuario_oculto_creado.yml
+imProcessCreate
+| where (TargetProcessName endswith "/dscl" and (TargetProcessCommandLine contains "-create /Users/" or TargetProcessCommandLine contains "-append /Groups/admin")) or (TargetProcessName endswith "/sysadminctl" and TargetProcessCommandLine contains "-addUser") or (TargetProcessCommandLine contains "IsHidden" or TargetProcessCommandLine contains "dscl . create /Users/")
+
+// ─────────────────────────────────────────────────────────
+// Acceso o volcado del llavero de macOS
+// Severidad: critical  ·  ATT&CK: T1555.001
+// Origen: rules/macos/mac_volcado_llavero.yml
+imProcessCreate
+| where (TargetProcessName endswith "/security" and (TargetProcessCommandLine contains "dump-keychain" or TargetProcessCommandLine contains "find-generic-password" or TargetProcessCommandLine contains "find-internet-password" or TargetProcessCommandLine contains "unlock-keychain")) or ((TargetProcessCommandLine contains "login.keychain-db" or TargetProcessCommandLine contains "/Library/Keychains/") and (TargetProcessName endswith "/cat" or TargetProcessName endswith "/cp" or TargetProcessName endswith "/dd" or TargetProcessName endswith "/base64" or TargetProcessName endswith "/curl"))
