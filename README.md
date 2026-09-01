@@ -1,4 +1,4 @@
-# 🛡️ Detection-lab — detección como código, multi-SIEM
+# 🛡️ DetectionLab — detección como código, multi-SIEM
 
 ![Sigma](https://img.shields.io/badge/reglas-87%20Sigma-4FD6C4)
 ![ATT&CK](https://img.shields.io/badge/ATT%26CK-55%20t%C3%A9cnicas%20%C2%B7%2012%20t%C3%A1cticas-E0A34A)
