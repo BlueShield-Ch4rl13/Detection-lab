@@ -1,4 +1,6 @@
 cve,vendor,product,name,date_added,ransomware
+CVE-2026-82078,PaperCut,NG/MF,PaperCut NG/MF Unsafe Reflection Vulnerability,2026-08-31,Unknown
+CVE-2026-81578,PaperCut,NG/MF,PaperCut NG/MF Missing Authentication for Critical Function Vulnerability,2026-08-31,Unknown
 CVE-2023-49105,ownCloud,ownCloud,ownCloud Improper Authentication Vulnerability,2026-08-27,Unknown
 CVE-2026-53362,Linux,Kernel,Linux Kernel Unspecified Vulnerability,2026-08-27,Unknown
 CVE-2026-66384,JFrog,Artifactory,JFrog Artifactory Improper Limitation of a Pathname to a Restricted Directory Vulnerability,2026-08-27,Unknown
@@ -18,4 +20,3 @@ CVE-2026-33824,Microsoft,Internet Key Exchange (IKE) Service Extensions,Microsof
 CVE-2026-59310,Broadcom,VMware vCenter,Broadcom VMware vCenter Path Traversal Vulnerability,2026-08-18,Unknown
 CVE-2026-55040,Microsoft,SharePoint,Microsoft SharePoint Weak Authentication Vulnerability,2026-08-18,Unknown
 CVE-2026-65400,Apple,macOS,Apple macOS Improper Authentication Vulnerability,2026-08-18,Unknown
-CVE-2025-62593,Ray-Project,Ray,Ray-Project Ray Code Injection Vulnerability,2026-08-17,Unknown
