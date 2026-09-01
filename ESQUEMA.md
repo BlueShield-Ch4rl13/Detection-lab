@@ -104,7 +104,7 @@ bloqueada corta un servicio a clientes que no se enteran de por qué.
 marcada como automática. Es la línea que separa un SOC automatizado de uno que
 se pega un tiro en el pie, y conviene que la vigile un script y no la memoria.
 
-## Un detalle de YAML que muerde
+## Unos detalles de los ficheros YAML
 
 `reversible: no` sin comillas **no es la cadena "no": es el booleano `False`**.
 `si` sin comillas sí se queda como cadena. Esa asimetría hace que un enrutador
