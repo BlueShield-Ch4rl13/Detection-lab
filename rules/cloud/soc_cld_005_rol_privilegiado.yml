@@ -13,6 +13,10 @@ tags:
     - attack.persistence
     - attack.privilege-escalation
     - attack.t1098.003
+    - iso27001-2022.a-5-16
+    - iso27001-2022.a-5-18
+    - nist.ac-2
+    - nist.ac-6
 logsource:
     product: azure
     service: auditlogs

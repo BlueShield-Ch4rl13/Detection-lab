@@ -14,6 +14,9 @@ tags:
     - attack.persistence
     - attack.credential-access
     - attack.t1550.001
+    - iso27001-2022.a-8-5
+    - nist.ac-3
+    - nist.ia-2
 logsource:
     product: azure
     service: auditlogs

@@ -9,6 +9,10 @@ date: 2026/07/16
 tags:
 - attack.persistence
 - attack.t1098.004
+- iso27001-2022.a-5-16
+- iso27001-2022.a-5-18
+- nist.ac-2
+- nist.ac-6
 logsource:
   category: process_creation
   product: linux

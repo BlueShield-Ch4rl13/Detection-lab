@@ -12,6 +12,10 @@ date: 2026/08/27
 tags:
     - attack.exfiltration
     - attack.t1567.002
+    - iso27001-2022.a-8-12
+    - iso27001-2022.a-8-23
+    - nist.ac-4
+    - nist.sc-7
 logsource:
     product: netskope
     service: alerts

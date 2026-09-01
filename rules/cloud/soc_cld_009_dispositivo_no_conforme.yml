@@ -13,6 +13,10 @@ date: 2026/08/27
 tags:
     - attack.initial-access
     - attack.t1078.004
+    - iso27001-2022.a-5-15
+    - iso27001-2022.a-8-2
+    - nist.ac-2
+    - nist.ac-6
 logsource:
     product: azure
     service: signinlogs

@@ -13,6 +13,9 @@ tags:
     - attack.defense-evasion
     - attack.persistence
     - attack.t1556.009
+    - iso27001-2022.a-8-5
+    - nist.ac-2
+    - nist.ia-2
 logsource:
     product: azure
     service: auditlogs

@@ -13,6 +13,9 @@ tags:
     - attack.defense-evasion
     - attack.command-and-control
     - attack.t1090.003
+    - iso27001-2022.a-8-20
+    - iso27001-2022.a-8-22
+    - nist.sc-7
 logsource:
     product: azure
     service: signinlogs
