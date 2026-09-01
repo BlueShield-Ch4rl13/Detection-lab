@@ -13,6 +13,8 @@ tags:
     - attack.defense-evasion
     - attack.initial-access
     - attack.t1027.006
+    - iso27001-2022.a-8-7
+    - nist.si-3
 logsource:
     product: proofpoint
     service: tap

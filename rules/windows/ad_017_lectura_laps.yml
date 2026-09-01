@@ -1,0 +1,52 @@
+title: Lectura de contrasenas de administrador local gestionadas por LAPS
+id: 08b46422-a962-571d-8170-ebebb45e7ecb
+status: experimental
+description: |
+    La contrasena de LAPS es la ultima llave del administrador local y solo unas pocas
+    cuentas deberian poder leerla, de una en una y para un equipo concreto. Una consulta
+    LDAP que pide el atributo para todo el dominio, o una utilidad de volcado, entrega de
+    golpe el administrador local de todo el parque y con el, movimiento lateral inmediato.
+    El soporte legitimo usa la consola o el portal de autoservicio, que no dejan esta traza.
+references:
+    - https://attack.mitre.org/techniques/T1555/
+    - https://attack.mitre.org/techniques/T1087/002/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.credential-access
+    - attack.discovery
+    - attack.t1555
+    - attack.t1087.002
+    - iso27001-2022.a-5-16
+    - iso27001-2022.a-5-17
+    - iso27001-2022.a-8-5
+    - nist.ac-2
+    - nist.ia-5
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_atributo:
+        CommandLine|contains:
+            - 'ms-Mcs-AdmPwd'
+            - 'msLAPS-Password'
+            - 'msLAPS-EncryptedPassword'
+    selection_cmdlets:
+        CommandLine|contains:
+            - 'Get-AdmPwdPassword'
+            - 'Get-LapsADPassword'
+            - 'Get-LapsAADPassword'
+    selection_herramientas:
+        - Image|endswith:
+            - '\SharpLAPS.exe'
+            - '\LAPSDumper.exe'
+        - CommandLine|contains:
+            - 'SharpLAPS'
+            - 'lapsdumper'
+            - 'pyLAPS'
+            - '-M laps'
+            - '--laps'
+    condition: 1 of selection_*
+falsepositives:
+    - Script de inventario del equipo de puesto que audita la rotacion del atributo, que debe ejecutarse desde un host de administracion conocido y con una cuenta de servicio en lista de excepciones
+level: high

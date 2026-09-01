@@ -12,6 +12,9 @@ date: 2026-08-31
 tags:
     - attack.credential-access
     - attack.t1555.001
+    - iso27001-2022.a-5-17
+    - iso27001-2022.a-8-5
+    - nist.ia-5
 logsource:
     category: process_creation
     product: macos

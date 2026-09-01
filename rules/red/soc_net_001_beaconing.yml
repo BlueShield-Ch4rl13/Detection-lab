@@ -13,6 +13,10 @@ date: 2026/08/27
 tags:
     - attack.command-and-control
     - attack.t1071.001
+    - iso27001-2022.a-8-20
+    - iso27001-2022.a-8-23
+    - nist.sc-7
+    - nist.si-4
 logsource:
     category: proxy
 detection:

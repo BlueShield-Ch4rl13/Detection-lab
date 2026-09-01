@@ -1,0 +1,58 @@
+title: Acceso a bases de datos de gestores de contrasenas
+id: 404beb95-b0b8-5224-a7fd-7cf271361022
+status: experimental
+description: |
+    Una base de KeePass o el almacen local de 1Password o Bitwarden concentra en un unico
+    fichero las credenciales que el usuario considera mas sensibles, casi siempre las de
+    administracion. El atacante no necesita romper nada en el equipo: se lleva el fichero y
+    ataca la clave maestra fuera de la red, sin ruido y sin limite de intentos. El gestor
+    abre su base desde su propio proceso, nunca por copia ni por busqueda recursiva.
+references:
+    - https://attack.mitre.org/techniques/T1555/005/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.credential-access
+    - attack.t1555.005
+    - iso27001-2022.a-5-17
+    - iso27001-2022.a-8-5
+    - nist.ia-5
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_ficheros:
+        CommandLine|contains:
+            - '.kdbx'
+            - '.kdb'
+            - '.psafe3'
+            - '.opvault'
+            - 'KeePass.config.xml'
+            - '\Bitwarden\data.json'
+            - '\1Password\'
+            - '\KeePassXC\'
+    selection_acceso:
+        CommandLine|contains:
+            - 'copy '
+            - 'Copy-Item'
+            - 'xcopy'
+            - 'robocopy'
+            - 'Compress-Archive'
+            - 'Get-Content'
+            - 'Get-ChildItem'
+            - 'dir '
+            - '-Recurse'
+    selection_herramientas:
+        - Image|endswith:
+            - '\KeeThief.exe'
+            - '\KeeFarce.exe'
+            - '\LaZagne.exe'
+        - CommandLine|contains:
+            - 'KeeThief'
+            - 'KeeFarce'
+            - 'Get-KeePassDatabaseKey'
+            - 'lazagne'
+    condition: (selection_ficheros and selection_acceso) or selection_herramientas
+falsepositives:
+    - Copia de seguridad del perfil del usuario o sincronizacion de la base a una carpeta de red, que siempre la hace el mismo proceso de respaldo y no un interprete de comandos, por lo que se filtra por ruta del binario padre
+level: high

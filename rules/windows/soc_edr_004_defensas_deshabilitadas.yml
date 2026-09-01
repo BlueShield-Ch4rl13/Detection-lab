@@ -13,6 +13,12 @@ tags:
     - attack.defense-evasion
     - attack.t1562.001
     - attack.t1070.001
+    - iso27001-2022.a-8-15
+    - iso27001-2022.a-8-7
+    - nist.au-11
+    - nist.au-9
+    - nist.cm-7
+    - nist.si-3
 logsource:
     category: process_creation
     product: windows

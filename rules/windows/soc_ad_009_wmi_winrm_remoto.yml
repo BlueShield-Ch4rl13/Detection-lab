@@ -15,6 +15,11 @@ tags:
     - attack.execution
     - attack.t1047
     - attack.t1021.006
+    - iso27001-2022.a-6-7
+    - iso27001-2022.a-8-20
+    - nist.ac-17
+    - nist.cm-7
+    - nist.sc-7
 logsource:
     category: process_creation
     product: windows

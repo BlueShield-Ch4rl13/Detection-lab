@@ -16,6 +16,9 @@ tags:
     - attack.privilege-escalation
     - attack.t1543.001
     - attack.t1543.004
+    - iso27001-2022.a-8-9
+    - nist.cm-5
+    - nist.cm-6
 logsource:
     category: file_event
     product: macos

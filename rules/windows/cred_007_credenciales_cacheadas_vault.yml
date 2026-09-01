@@ -1,0 +1,61 @@
+title: Volcado de credenciales cacheadas y del Administrador de credenciales de Windows
+id: 11908a4b-0218-5368-8d81-0f5ce554c8dc
+status: experimental
+description: |
+    Windows conserva los ultimos inicios de sesion de dominio como hashes MSCache y las
+    credenciales guardadas del usuario en la boveda, que se descifra con DPAPI dentro de esa
+    misma sesion. Es a lo que recurre el atacante cuando no hay ninguna sesion privilegiada
+    viva que volcar de LSASS: le permite seguir moviendose aunque el administrador ya se
+    haya desconectado. Enumerar la boveda entera no es algo que haga un usuario normal.
+references:
+    - https://attack.mitre.org/techniques/T1003/005/
+    - https://attack.mitre.org/techniques/T1555/004/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.credential-access
+    - attack.t1003.005
+    - attack.t1555.004
+    - iso27001-2022.a-5-17
+    - iso27001-2022.a-8-5
+    - nist.ac-6
+    - nist.ia-5
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_cmdkey:
+        Image|endswith: '\cmdkey.exe'
+        CommandLine|contains:
+            - '/list'
+            - '/l '
+    selection_vaultcmd:
+        Image|endswith: '\vaultcmd.exe'
+        CommandLine|contains:
+            - '/list'
+            - '/listcreds'
+            - '/listschema'
+    selection_mimikatz:
+        CommandLine|contains:
+            - 'lsadump::cache'
+            - 'vault::cred'
+            - 'vault::list'
+            - 'sekurlsa::credman'
+    selection_registro:
+        CommandLine|contains:
+            - 'SECURITY\Cache'
+            - 'SECURITY\Policy\Secrets'
+    selection_herramientas:
+        - Image|endswith:
+            - '\CredentialsFileView.exe'
+            - '\VaultPasswordView.exe'
+            - '\netpass.exe'
+        - CommandLine|contains:
+            - 'Invoke-WCMDump'
+            - 'Get-VaultCredential'
+            - 'CredentialsFileView'
+            - 'VaultPasswordView'
+    condition: 1 of selection_*
+falsepositives:
+    - Diagnostico de soporte sobre un acceso fallido a un recurso de red, donde cmdkey /list se usa de forma puntual y siempre asociado a un ticket abierto en ese equipo
+level: high

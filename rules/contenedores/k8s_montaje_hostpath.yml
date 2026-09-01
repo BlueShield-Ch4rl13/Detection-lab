@@ -12,6 +12,9 @@ date: 2026-08-31
 tags:
     - attack.privilege-escalation
     - attack.t1611
+    - iso27001-2022.a-8-2
+    - nist.ac-6
+    - nist.sc-39
 logsource:
     product: kubernetes
     service: audit

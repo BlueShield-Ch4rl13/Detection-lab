@@ -13,6 +13,9 @@ tags:
     - attack.defense-evasion
     - attack.privilege-escalation
     - attack.t1484.001
+    - iso27001-2022.a-8-9
+    - nist.ac-6
+    - nist.cm-5
 logsource:
     category: process_creation
     product: windows

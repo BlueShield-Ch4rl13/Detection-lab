@@ -12,6 +12,9 @@ date: 2026/08/27
 tags:
     - attack.exfiltration
     - attack.t1048
+    - iso27001-2022.a-8-12
+    - nist.ac-4
+    - nist.sc-7
 logsource:
     category: proxy
 detection:

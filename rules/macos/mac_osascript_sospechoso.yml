@@ -13,6 +13,9 @@ date: 2026-08-31
 tags:
     - attack.execution
     - attack.t1059.002
+    - iso27001-2022.a-8-7
+    - nist.cm-7
+    - nist.si-3
 logsource:
     category: process_creation
     product: macos

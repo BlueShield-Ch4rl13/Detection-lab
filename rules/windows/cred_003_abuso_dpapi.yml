@@ -1,0 +1,55 @@
+title: Abuso de DPAPI - masterkeys y clave de respaldo del dominio
+id: 440e4a0c-5483-5e6a-aa57-e341c56268af
+status: experimental
+description: |
+    DPAPI cifra las credenciales guardadas de navegadores, RDP, Wi-Fi y del Administrador de
+    credenciales. Con la masterkey del usuario se abre su boveda; con la clave de respaldo
+    del dominio, que se extrae una sola vez de un DC, se abre la de cualquier usuario del
+    dominio y para siempre, porque esa clave no rota ni se puede revocar. Ninguna aplicacion
+    legitima la exporta, y las masterkeys las lee el propio LSASS, no una linea de comandos.
+references:
+    - https://attack.mitre.org/techniques/T1555/
+    - https://attack.mitre.org/techniques/T1003/004/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.credential-access
+    - attack.t1555
+    - attack.t1003.004
+    - iso27001-2022.a-5-17
+    - iso27001-2022.a-8-5
+    - nist.ac-6
+    - nist.ia-5
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_mimikatz:
+        CommandLine|contains:
+            - 'dpapi::masterkey'
+            - 'dpapi::cred'
+            - 'dpapi::blob'
+            - 'dpapi::chrome'
+            - 'dpapi::wifi'
+            - 'lsadump::backupkeys'
+            - 'sekurlsa::dpapi'
+    selection_herramientas:
+        - Image|endswith:
+            - '\SharpDPAPI.exe'
+            - '\DonPAPI.exe'
+        - CommandLine|contains:
+            - 'SharpDPAPI'
+            - 'DonPAPI'
+            - 'dpapi.py'
+            - 'Get-LsaBackupKey'
+            - 'backupkeys /export'
+    selection_rutas:
+        CommandLine|contains:
+            - '\AppData\Roaming\Microsoft\Protect\'
+            - '\AppData\Local\Microsoft\Credentials\'
+            - '\AppData\Roaming\Microsoft\Credentials\'
+            - '\Microsoft\Protect\S-1-5-18'
+    condition: 1 of selection_*
+falsepositives:
+    - Herramientas de migracion de perfil o de recuperacion de contrasenas del propio equipo de puesto, que deben ejecutarse con una cuenta de servicio conocida y desde una ruta firmada en lista de excepciones
+level: critical

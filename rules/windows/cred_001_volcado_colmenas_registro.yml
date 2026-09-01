@@ -1,0 +1,65 @@
+title: Volcado de las colmenas SAM, SYSTEM y SECURITY
+id: cc11096b-a05e-58b6-8523-384d00fb0dac
+status: experimental
+description: |
+    Con SAM y SYSTEM se obtienen los hashes de las cuentas locales sin tocar LSASS, y con
+    SECURITY salen los secretos LSA: contrasenas de cuentas de servicio en claro y la clave
+    que descifra las credenciales cacheadas. Es la via silenciosa cuando el EDR protege
+    lsass.exe, porque solo intervienen binarios firmados de Windows. Ninguna tarea de
+    administracion normal exporta esas tres colmenas concretas a un fichero.
+references:
+    - https://attack.mitre.org/techniques/T1003/002/
+    - https://attack.mitre.org/techniques/T1003/004/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.credential-access
+    - attack.t1003.002
+    - attack.t1003.004
+    - iso27001-2022.a-5-17
+    - iso27001-2022.a-8-5
+    - nist.ac-6
+    - nist.ia-5
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_reg_binario:
+        - Image|endswith: '\reg.exe'
+        - OriginalFileName: 'reg.exe'
+    selection_reg_accion:
+        CommandLine|contains:
+            - ' save '
+            - ' export '
+    selection_colmena:
+        CommandLine|contains:
+            - 'hklm\sam'
+            - 'hklm\security'
+            - 'hklm\system'
+            - '\config\SAM'
+            - '\config\SECURITY'
+            - '\config\SYSTEM'
+            - '\config\RegBack\'
+    selection_esentutl:
+        Image|endswith: '\esentutl.exe'
+        CommandLine|contains:
+            - '/y'
+            - '/vss'
+    selection_shadow:
+        CommandLine|contains|all:
+            - 'HarddiskVolumeShadowCopy'
+            - '\config\'
+    selection_herramientas:
+        - Image|endswith:
+            - '\pwdump.exe'
+            - '\pwdump7.exe'
+            - '\gsecdump.exe'
+            - '\samdump2.exe'
+        - CommandLine|contains:
+            - 'lsadump::sam'
+            - 'lsadump::secrets'
+            - 'Invoke-PowerDump'
+    condition: (selection_reg_binario and selection_reg_accion and selection_colmena) or (selection_esentutl and selection_colmena) or selection_shadow or selection_herramientas
+falsepositives:
+    - Exportacion de una rama del registro para diagnosticar una aplicacion, que apunta a HKLM\Software o a HKCU y no a las colmenas de seguridad, por lo que basta con revisar la rama de destino
+level: critical

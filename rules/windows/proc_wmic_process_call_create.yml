@@ -9,6 +9,9 @@ date: 2026/07/16
 tags:
 - attack.execution
 - attack.t1047
+- iso27001-2022.a-8-20
+- nist.ac-17
+- nist.cm-7
 logsource:
   category: process_creation
   product: windows

@@ -39,6 +39,8 @@ date: 2026/08/27
 tags:
     - attack.lateral-movement
     - attack.t1534
+    - iso27001-2022.a-6-3
+    - nist.si-8
 correlation:
     type: value_count
     rules:

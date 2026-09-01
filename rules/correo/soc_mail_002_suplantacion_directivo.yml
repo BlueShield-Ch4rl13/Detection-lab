@@ -12,6 +12,8 @@ date: 2026/08/27
 tags:
     - attack.initial-access
     - attack.t1534
+    - iso27001-2022.a-6-3
+    - nist.si-8
 logsource:
     product: proofpoint
     service: tap

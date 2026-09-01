@@ -13,6 +13,8 @@ tags:
     - attack.lateral-movement
     - attack.execution
     - attack.t1569.002
+    - iso27001-2022.a-8-9
+    - nist.cm-7
 logsource:
     product: windows
     service: system

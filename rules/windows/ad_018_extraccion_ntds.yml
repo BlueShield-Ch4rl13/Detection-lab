@@ -1,0 +1,54 @@
+title: Extraccion de la base de datos ntds.dit del controlador de dominio
+id: 893b0192-dee4-5f8b-baee-a9ee65e8d60d
+status: experimental
+description: |
+    ntds.dit guarda el hash de todas las cuentas del dominio, krbtgt incluida: quien se
+    lleva una copia se lleva el dominio entero y ya no necesita volver a entrar. Como el
+    servicio de directorio mantiene el fichero bloqueado, el atacante tiene que pasar por
+    ntdsutil, por una instantanea de volumen o por diskshadow para sacarlo en frio. Solo el
+    agente de copia de seguridad tiene motivo para tocar ese fichero, y siempre programado.
+references:
+    - https://attack.mitre.org/techniques/T1003/003/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.credential-access
+    - attack.t1003.003
+    - iso27001-2022.a-5-17
+    - iso27001-2022.a-8-5
+    - nist.ac-6
+    - nist.ia-5
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_ntdsutil:
+        Image|endswith: '\ntdsutil.exe'
+        CommandLine|contains:
+            - 'ifm'
+            - 'create full'
+            - 'snapshot'
+            - 'ac i ntds'
+    selection_vssadmin:
+        Image|endswith: '\vssadmin.exe'
+        CommandLine|contains|all:
+            - 'create'
+            - 'shadow'
+    selection_shadow_wmi:
+        CommandLine|contains|all:
+            - 'shadowcopy'
+            - 'create'
+    selection_diskshadow:
+        - Image|endswith: '\diskshadow.exe'
+        - CommandLine|contains: 'diskshadow /s'
+    selection_fichero:
+        CommandLine|contains: 'ntds.dit'
+    selection_herramientas:
+        - Image|endswith: '\NTDSDumpEx.exe'
+        - CommandLine|contains:
+            - 'NTDSDumpEx'
+            - 'Invoke-NinjaCopy'
+    condition: 1 of selection_*
+falsepositives:
+    - Copia de seguridad del estado del sistema en un DC, que crea instantaneas de forma programada y siempre desde el proceso del agente de respaldo, no desde un interprete de comandos
+level: critical

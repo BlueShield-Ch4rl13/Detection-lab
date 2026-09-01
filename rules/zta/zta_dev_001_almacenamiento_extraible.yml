@@ -17,6 +17,10 @@ tags:
     - attack.initial-access
     - attack.t1052.001
     - attack.t1091
+    - iso27001-2022.a-7-10
+    - iso27001-2022.a-8-12
+    - nist.ac-19
+    - nist.mp-7
 logsource:
     product: windows
     service: security

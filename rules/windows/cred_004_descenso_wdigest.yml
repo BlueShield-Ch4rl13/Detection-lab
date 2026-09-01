@@ -1,0 +1,45 @@
+title: Descenso de version a WDigest para cachear credenciales en claro
+id: 74fe15a7-3458-5317-9767-cca3e3939904
+status: experimental
+description: |
+    Desde Windows 8.1 WDigest ya no guarda la contrasena en claro en memoria, salvo que
+    UseLogonCredential valga 1. Escribir ese valor no roba nada por si solo: prepara el
+    terreno para que el siguiente inicio de sesion, idealmente el de un administrador, deje
+    la contrasena legible en LSASS, asi que la alerta llega antes que el volcado. Lo mismo
+    vale para apagar RunAsPPL o Credential Guard: ningun producto vigente lo necesita.
+references:
+    - https://attack.mitre.org/techniques/T1112/
+    - https://attack.mitre.org/techniques/T1003/001/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.credential-access
+    - attack.defense-evasion
+    - attack.t1112
+    - attack.t1003.001
+    - iso27001-2022.a-5-17
+    - iso27001-2022.a-8-5
+    - iso27001-2022.a-8-9
+    - nist.ac-6
+    - nist.cm-5
+    - nist.cm-6
+    - nist.ia-5
+logsource:
+    category: registry_event
+    product: windows
+detection:
+    selection_wdigest:
+        TargetObject|endswith: '\SecurityProviders\WDigest\UseLogonCredential'
+        Details|contains: '0x00000001'
+    selection_proteccion_lsa:
+        TargetObject|endswith:
+            - '\Control\Lsa\RunAsPPL'
+            - '\Control\Lsa\LsaCfgFlags'
+            - '\Control\Lsa\DisableRestrictedAdmin'
+        Details|contains: '0x00000000'
+    selection_tokenleak:
+        TargetObject|endswith: '\Control\Lsa\TokenLeakDetectDelaySecs'
+    condition: 1 of selection_*
+falsepositives:
+    - Aplicacion antigua que exige autenticacion digest y cuenta con una excepcion documentada, que debe acotarse a los servidores concretos que la publican y revisarse en cada renovacion
+level: high

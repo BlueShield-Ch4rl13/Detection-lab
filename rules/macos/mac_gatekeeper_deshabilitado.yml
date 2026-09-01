@@ -13,6 +13,12 @@ tags:
     - attack.defense-evasion
     - attack.t1553.001
     - attack.t1562.001
+    - iso27001-2022.a-8-7
+    - nist.au-9
+    - nist.cm-14
+    - nist.cm-7
+    - nist.si-3
+    - nist.si-7
 logsource:
     category: process_creation
     product: macos

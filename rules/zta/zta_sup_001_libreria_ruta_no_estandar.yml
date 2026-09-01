@@ -19,6 +19,9 @@ tags:
     - attack.defense-evasion
     - attack.t1574.001
     - attack.t1574.002
+    - iso27001-2022.a-8-9
+    - nist.cm-5
+    - nist.si-7
 logsource:
     category: image_load
     product: windows

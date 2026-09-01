@@ -1,0 +1,62 @@
+title: Acceso a los almacenes de credenciales del navegador
+id: 8661fc4c-c194-5b18-8992-957d866887cb
+status: experimental
+description: |
+    El navegador concentra en unos pocos ficheros conocidos las contrasenas guardadas, las
+    cookies de sesion y los tokens de acceso. Robar la cookie vale mas que robar la
+    contrasena, porque la sesion ya paso el segundo factor y se reutiliza tal cual desde
+    otro equipo. El propio navegador abre esos ficheros con su proceso y nunca por linea de
+    comandos, asi que copiarlos o comprimirlos desde una shell no tiene lectura legitima.
+references:
+    - https://attack.mitre.org/techniques/T1555/003/
+    - https://attack.mitre.org/techniques/T1539/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.credential-access
+    - attack.t1555.003
+    - attack.t1539
+    - iso27001-2022.a-5-17
+    - iso27001-2022.a-8-5
+    - nist.ia-2
+    - nist.ia-5
+    - nist.sc-23
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_ficheros:
+        CommandLine|contains:
+            - '\Login Data'
+            - '\User Data\Local State'
+            - 'key4.db'
+            - 'key3.db'
+            - 'logins.json'
+            - 'cert9.db'
+            - 'cookies.sqlite'
+            - 'signons.sqlite'
+    selection_acceso:
+        CommandLine|contains:
+            - 'copy '
+            - 'Copy-Item'
+            - 'xcopy'
+            - 'robocopy'
+            - 'Get-Content'
+            - 'Compress-Archive'
+            - 'esentutl'
+            - 'type '
+    selection_herramientas:
+        - Image|endswith:
+            - '\SharpChrome.exe'
+            - '\SharpWeb.exe'
+            - '\HackBrowserData.exe'
+            - '\WebBrowserPassView.exe'
+        - CommandLine|contains:
+            - 'SharpChrome'
+            - 'HackBrowserData'
+            - 'Invoke-SharpChrome'
+            - 'firepwd'
+    condition: (selection_ficheros and selection_acceso) or selection_herramientas
+falsepositives:
+    - Herramientas de migracion de perfil de usuario que copian la carpeta User Data completa durante una renovacion de equipo, que se distinguen por el proceso padre y deben ir a lista de excepciones por ruta del binario
+level: high

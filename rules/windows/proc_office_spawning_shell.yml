@@ -12,6 +12,12 @@ tags:
 - attack.t1204.002
 - attack.initial-access
 - attack.t1566.001
+- iso27001-2022.a-6-3
+- iso27001-2022.a-8-23
+- iso27001-2022.a-8-7
+- nist.at-2
+- nist.si-3
+- nist.si-8
 logsource:
   category: process_creation
   product: windows

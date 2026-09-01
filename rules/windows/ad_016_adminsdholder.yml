@@ -1,0 +1,46 @@
+title: Modificacion de AdminSDHolder o del descriptor de seguridad de un objeto de directorio
+id: 9c473f28-93ea-568b-a4f5-44110135c933
+status: experimental
+description: |
+    La ACL de AdminSDHolder se propaga cada hora a todos los grupos protegidos, asi que una
+    entrada anadida ahi devuelve el control sobre Domain Admins aunque el defensor limpie el
+    grupo una y otra vez. Lo mismo vale para el descriptor de seguridad del objeto raiz del
+    dominio, donde un WriteDacl basta para habilitar DCSync. Son objetos que en produccion
+    solo cambian al extender el esquema o al desplegar un producto de directorio.
+references:
+    - https://attack.mitre.org/techniques/T1098/
+    - https://attack.mitre.org/techniques/T1222/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1098
+    - attack.t1222
+    - iso27001-2022.a-5-16
+    - iso27001-2022.a-5-18
+    - iso27001-2022.a-8-3
+    - nist.ac-2
+    - nist.ac-3
+    - nist.ac-6
+logsource:
+    product: windows
+    service: security
+detection:
+    selection_adminsdholder:
+        EventID: 5136
+        ObjectDN|contains: 'CN=AdminSDHolder'
+    selection_descriptor:
+        EventID: 5136
+        AttributeLDAPDisplayName: 'nTSecurityDescriptor'
+    filter_equipos:
+        SubjectUserName|endswith: '$'
+    filter_sistema:
+        SubjectUserName:
+            - 'ANONYMOUS LOGON'
+            - 'SYSTEM'
+    condition: 1 of selection_* and not 1 of filter_*
+falsepositives:
+    - Despliegue de Exchange u otro producto que extiende el esquema y reescribe descriptores de seguridad en masa, que debe coincidir con una ventana de cambio aprobada
+    - Delegacion de permisos sobre una OU hecha por el equipo de directorio, motivo por el que selection_descriptor conviene acotarla a las OU que contienen cuentas privilegiadas
+level: critical

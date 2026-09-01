@@ -1,0 +1,61 @@
+title: Robo de ficheros de credenciales de nube y de SSH
+id: c79d5ef3-0b6d-5226-9b40-1a0cd438111b
+status: experimental
+description: |
+    Las claves de AWS, Azure, GCP, Kubernetes y SSH viven en ficheros de texto dentro del
+    perfil del usuario, casi nunca caducan y no pasan por el segundo factor. Un solo fichero
+    copiado convierte un puesto comprometido en acceso persistente a la infraestructura, y
+    ese acceso ya se ejerce fuera del alcance del EDR. Los clientes legitimos leen esos
+    ficheros desde su propio proceso, no con type, copy ni Compress-Archive.
+references:
+    - https://attack.mitre.org/techniques/T1552/001/
+    - https://attack.mitre.org/techniques/T1552/004/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.credential-access
+    - attack.t1552.001
+    - attack.t1552.004
+    - iso27001-2022.a-5-17
+    - nist.ia-5
+    - nist.sc-28
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_rutas:
+        CommandLine|contains:
+            - '\.aws\credentials'
+            - '\.aws\config'
+            - '\.azure\accessTokens.json'
+            - '\.azure\azureProfile.json'
+            - '\.kube\config'
+            - '\.docker\config.json'
+            - '\.ssh\config'
+            - 'id_rsa'
+            - 'id_ed25519'
+            - 'credentials.db'
+    selection_acceso:
+        CommandLine|contains:
+            - 'type '
+            - 'more '
+            - 'copy '
+            - 'xcopy'
+            - 'robocopy'
+            - 'Get-Content'
+            - 'Copy-Item'
+            - 'Compress-Archive'
+            - 'findstr'
+            - 'tar '
+    selection_busqueda:
+        CommandLine|contains|all:
+            - 'dir '
+            - '/s'
+        CommandLine|contains:
+            - 'id_rsa'
+            - '.pem'
+            - 'credentials'
+    condition: (selection_rutas and selection_acceso) or selection_busqueda
+falsepositives:
+    - Scripts de despliegue y agentes de integracion continua que copian el fichero de credenciales al espacio de trabajo, que se identifican por proceso padre y cuenta de servicio y deben ir a lista de excepciones por host
+level: high

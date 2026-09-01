@@ -1,0 +1,44 @@
+title: DCShadow - registro de un controlador de dominio falso
+id: af56165d-0e7e-5470-ae70-f1cff304abd7
+status: experimental
+description: |
+    DCShadow no lee el directorio, lo escribe: el atacante da de alta temporalmente un DC
+    falso y empuja cambios por el canal de replicacion, que casi ningun SOC audita. Es la
+    via para sembrar SID history o reescribir un descriptor de seguridad sin generar los
+    eventos de modificacion de objeto que se vigilan. La promocion legitima de un DC la
+    realiza la propia cuenta de equipo durante dcpromo, nunca una cuenta de usuario.
+references:
+    - https://attack.mitre.org/techniques/T1207/
+    - https://www.dcshadow.com/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.defense-evasion
+    - attack.persistence
+    - attack.t1207
+    - iso27001-2022.a-8-2
+    - nist.ac-6
+    - nist.cm-5
+logsource:
+    product: windows
+    service: security
+detection:
+    selection_spn:
+        EventID: 4742
+        ServicePrincipalNames|contains|all:
+            - 'GC/'
+            - 'E3514235-4B06-11D1-AB04-00C04FC2DCD2'
+    selection_replicacion:
+        EventID:
+            - 4928
+            - 4929
+    filter_equipos:
+        SubjectUserName|endswith: '$'
+    filter_sistema:
+        SubjectUserName:
+            - 'ANONYMOUS LOGON'
+            - 'SYSTEM'
+    condition: 1 of selection_* and not 1 of filter_*
+falsepositives:
+    - Promocion o degradacion planificada de un controlador de dominio, que debe coincidir con una ventana de cambio aprobada y con un alta o baja en el inventario de DC
+level: critical

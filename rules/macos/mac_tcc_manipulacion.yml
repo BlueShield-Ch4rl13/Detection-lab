@@ -13,6 +13,8 @@ tags:
     - attack.defense-evasion
     - attack.privilege-escalation
     - attack.t1548.006
+    - iso27001-2022.a-8-2
+    - nist.ac-6
 logsource:
     category: process_creation
     product: macos

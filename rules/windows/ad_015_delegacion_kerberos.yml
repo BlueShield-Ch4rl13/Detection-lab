@@ -1,0 +1,54 @@
+title: Abuso de delegacion Kerberos - constrained, unconstrained y RBCD
+id: 43e8419e-0986-5162-a5ef-2808128e015d
+status: experimental
+description: |
+    Quien controla la delegacion de una cuenta puede pedir tickets en nombre de cualquier
+    usuario, incluido un administrador de dominio, sin conocer su contrasena. La delegacion
+    basada en recursos es la peor de las tres porque se configura escribiendo un solo
+    atributo sobre el equipo destino, algo que puede hacer quien creo esa cuenta de equipo.
+    En un dominio maduro estos atributos se fijan al dar de alta el servicio y no se tocan.
+references:
+    - https://attack.mitre.org/techniques/T1098/
+    - https://attack.mitre.org/techniques/T1550/003/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.privilege-escalation
+    - attack.persistence
+    - attack.credential-access
+    - attack.t1098
+    - attack.t1550.003
+    - iso27001-2022.a-5-16
+    - iso27001-2022.a-5-18
+    - iso27001-2022.a-8-5
+    - nist.ac-2
+    - nist.ac-3
+    - nist.ac-6
+    - nist.ia-2
+logsource:
+    product: windows
+    service: security
+detection:
+    selection_rbcd:
+        EventID: 5136
+        AttributeLDAPDisplayName: 'msDS-AllowedToActOnBehalfOfOtherIdentity'
+    selection_constrained:
+        EventID:
+            - 4738
+            - 4742
+        AllowedToDelegateTo|contains: '/'
+    selection_unconstrained:
+        EventID:
+            - 4738
+            - 4742
+        UserAccountControl|contains:
+            - '%%2075'
+            - '%%2084'
+    filter_sistema:
+        SubjectUserName:
+            - 'ANONYMOUS LOGON'
+            - 'SYSTEM'
+    condition: 1 of selection_* and not filter_sistema
+falsepositives:
+    - Alta de un servicio que necesita delegacion, como un frontal web o un cluster de SQL Server, que debe quedar registrado con su cuenta y su SPN destino en el inventario de delegaciones
+level: critical

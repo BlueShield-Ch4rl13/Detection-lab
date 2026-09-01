@@ -15,6 +15,9 @@ tags:
     - attack.credential-access
     - attack.privilege-escalation
     - attack.t1649
+    - iso27001-2022.a-8-24
+    - nist.ia-5
+    - nist.sc-12
 logsource:
     category: process_creation
     product: windows

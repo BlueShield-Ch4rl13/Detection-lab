@@ -13,6 +13,11 @@ tags:
     - attack.privilege-escalation
     - attack.t1610
     - attack.t1611
+    - iso27001-2022.a-8-2
+    - iso27001-2022.a-8-9
+    - nist.ac-6
+    - nist.cm-7
+    - nist.sc-39
 logsource:
     category: process_creation
     product: linux

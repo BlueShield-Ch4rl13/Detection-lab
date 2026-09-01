@@ -13,6 +13,9 @@ tags:
     - attack.persistence
     - attack.privilege-escalation
     - attack.t1547.001
+    - iso27001-2022.a-8-9
+    - nist.cm-5
+    - nist.cm-6
 logsource:
     category: registry_event
     product: windows

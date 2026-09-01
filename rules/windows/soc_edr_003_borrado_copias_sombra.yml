@@ -13,6 +13,9 @@ date: 2026/08/27
 tags:
     - attack.impact
     - attack.t1490
+    - iso27001-2022.a-8-13
+    - nist.cp-10
+    - nist.cp-9
 logsource:
     category: process_creation
     product: windows

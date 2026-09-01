@@ -1,0 +1,55 @@
+title: Coercion de autenticacion y relay NTLM contra el controlador de dominio
+id: f9da33dd-eac7-5670-9bc1-fe7ff7bed9b2
+status: experimental
+description: |
+    PetitPotam, PrinterBug y DFSCoerce obligan a un servidor, normalmente un DC, a
+    autenticarse contra la maquina del atacante; ese NTLM se retransmite a AD CS o a LDAP y
+    sale un certificado o un DCSync sin haber robado ninguna contrasena. Lo caracteristico
+    es el enlace a las tuberias EFSRPC, spoolss o netdfs sobre IPC$, y despues un logon de
+    red NTLM de la cuenta de equipo del DC, que en un dominio sano habla siempre Kerberos.
+references:
+    - https://attack.mitre.org/techniques/T1187/
+    - https://attack.mitre.org/techniques/T1557/001/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.credential-access
+    - attack.collection
+    - attack.t1187
+    - attack.t1557.001
+    - iso27001-2022.a-8-24
+    - iso27001-2022.a-8-5
+    - nist.ia-2
+    - nist.sc-8
+logsource:
+    product: windows
+    service: security
+detection:
+    selection_tuberias:
+        EventID: 5145
+        ShareName|endswith: 'IPC$'
+        RelativeTargetName|contains:
+            - 'efsrpc'
+            - 'netdfs'
+            - 'spoolss'
+            - 'fssagentrpc'
+    selection_anonimo:
+        EventID: 5145
+        ShareName|endswith: 'IPC$'
+        RelativeTargetName|contains:
+            - 'lsarpc'
+            - 'samr'
+            - 'netlogon'
+            - 'lsass'
+        SubjectUserName: 'ANONYMOUS LOGON'
+    selection_relay_ntlm:
+        EventID: 4624
+        LogonType: 3
+        AuthenticationPackageName: 'NTLM'
+        TargetUserName|endswith: '$'
+    filter_anonimo_red:
+        TargetUserName: 'ANONYMOUS LOGON'
+    condition: 1 of selection_* and not filter_anonimo_red
+falsepositives:
+    - Servidores de impresion y agentes de copia antiguos que siguen negociando NTLM entre si, que se identifican con una linea base de dos semanas sobre selection_relay_ntlm y se pasan a lista de excepciones por cuenta de equipo y direccion de origen
+level: high

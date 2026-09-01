@@ -14,6 +14,9 @@ tags:
     - attack.persistence
     - attack.execution
     - attack.t1053.005
+    - iso27001-2022.a-8-9
+    - nist.cm-5
+    - nist.cm-7
 logsource:
     category: process_creation
     product: windows

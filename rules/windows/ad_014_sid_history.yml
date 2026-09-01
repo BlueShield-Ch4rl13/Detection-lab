@@ -1,0 +1,38 @@
+title: Inyeccion de SID history en una cuenta del dominio
+id: ae90efaf-7f20-5cb6-8465-984176acf7c5
+status: experimental
+description: |
+    Un SID de grupo privilegiado escrito en el atributo sIDHistory concede esa pertenencia
+    sin que la cuenta figure como miembro del grupo: la escalada no aparece en una revision
+    de miembros ni en el informe de permisos, y sobrevive al cambio de contrasena. Es una
+    puerta trasera silenciosa que solo se ve mirando el atributo. Fuera de una migracion de
+    dominio con ADMT en curso, sIDHistory no deberia cambiar jamas.
+references:
+    - https://attack.mitre.org/techniques/T1134/005/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.defense-evasion
+    - attack.t1134.005
+    - iso27001-2022.a-8-2
+    - nist.ac-3
+    - nist.ac-6
+logsource:
+    product: windows
+    service: security
+detection:
+    selection_evento:
+        EventID:
+            - 4765
+            - 4766
+    selection_atributo:
+        EventID:
+            - 4738
+            - 4742
+        SidHistory|contains: 'S-1-5-21'
+    condition: 1 of selection_*
+falsepositives:
+    - Migracion de cuentas entre dominios con ADMT, que debe acotarse al periodo del proyecto y a la lista de cuentas del lote en curso
+level: critical

@@ -13,6 +13,8 @@ tags:
     - attack.command-and-control
     - attack.exfiltration
     - attack.t1102
+    - iso27001-2022.a-8-23
+    - nist.sc-7
 logsource:
     category: proxy
 detection:

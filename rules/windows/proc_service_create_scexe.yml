@@ -9,6 +9,9 @@ date: 2026/07/16
 tags:
 - attack.persistence
 - attack.t1543.003
+- iso27001-2022.a-8-9
+- nist.cm-5
+- nist.cm-6
 logsource:
   category: process_creation
   product: windows

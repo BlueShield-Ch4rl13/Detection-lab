@@ -13,6 +13,9 @@ date: 2026/08/27
 tags:
     - attack.lateral-movement
     - attack.t1550.002
+    - iso27001-2022.a-8-5
+    - nist.ac-3
+    - nist.ia-2
 logsource:
     product: windows
     service: security

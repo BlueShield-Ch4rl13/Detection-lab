@@ -14,6 +14,11 @@ tags:
     - attack.initial-access
     - attack.persistence
     - attack.t1195.001
+    - iso27001-2022.a-5-19
+    - iso27001-2022.a-8-30
+    - nist.cm-14
+    - nist.sr-11
+    - nist.sr-3
 logsource:
     category: file_event
 detection:

@@ -16,6 +16,11 @@ tags:
     - attack.defense-evasion
     - attack.t1114.003
     - attack.t1564.008
+    - iso27001-2022.a-8-12
+    - iso27001-2022.a-8-15
+    - iso27001-2022.a-8-3
+    - nist.ac-3
+    - nist.au-9
 logsource:
     product: m365
     service: exchange

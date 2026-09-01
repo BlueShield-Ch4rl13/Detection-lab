@@ -13,6 +13,9 @@ tags:
     - attack.defense-evasion
     - attack.privilege-escalation
     - attack.t1055
+    - iso27001-2022.a-8-7
+    - nist.si-3
+    - nist.si-7
 logsource:
     category: create_remote_thread
     product: windows
