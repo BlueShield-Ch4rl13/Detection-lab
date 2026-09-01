@@ -192,7 +192,7 @@ action.notable.param.security_domain = threat
 action.notable.param.severity = {nivel}
 action.notable.param.drilldown_name = Ver eventos de la deteccion
 # MITRE ATT&CK: {tec}
-# Regla Sigma: {f.relative_to(RAIZ)}
+# Regla Sigma: {f.relative_to(RAIZ).as_posix()}
 # UUID: {doc.get('id', '-')}
 """)
     return "\n".join(partes)
@@ -247,7 +247,7 @@ def generar_kql(reglas, resultados, fallos) -> dict[str, str]:
                 f"// ─────────────────────────────────────────────────────────\n"
                 f"// {doc.get('title', f.stem)}\n"
                 f"// Severidad: {doc.get('level', 'medium')}  ·  ATT&CK: {tec}\n"
-                f"// Origen: {f.relative_to(RAIZ)}\n"
+                f"// Origen: {f.relative_to(RAIZ).as_posix()}\n"
                 f"{consulta}\n"
             )
         # los fallos de este dominio se declaran en el propio fichero
@@ -457,7 +457,7 @@ def main() -> int:
         if not args.check:
             carpeta.mkdir(parents=True, exist_ok=True)
             for nombre, contenido in escrituras.items():
-                (carpeta / nombre).write_text(contenido, encoding="utf-8")
+                (carpeta / nombre).write_text(contenido, encoding="utf-8", newline="\n")
 
         resumen[destino] = (len(resultados), fallos)
         estado = "" if args.check else f" -> {carpeta.relative_to(RAIZ)}/"
@@ -471,7 +471,7 @@ def main() -> int:
         mapa = RAIZ / "purple" / "atomic-map.md"
         mapa.parent.mkdir(parents=True, exist_ok=True)
         mapa.write_text(generar_atomic_map([(f, leer(f)) for f in ficheros]),
-                        encoding="utf-8")
+                        encoding="utf-8", newline="\n")
         print(f"\n{'purple/atomic-map.md':14} regenerado desde rules/")
 
     # Wazuh se delega al backend propio: pySigma no tiene uno oficial.
