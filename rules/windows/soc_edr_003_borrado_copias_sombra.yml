@@ -1,0 +1,47 @@
+title: Destruccion de copias de seguridad y puntos de restauracion
+id: 02750359-dfb4-57e1-864c-b80ef788407f
+status: stable
+description: |
+    Paso previo al cifrado en practicamente toda familia de ransomware: eliminar las
+    instantaneas de volumen, el catalogo de copias y la recuperacion de arranque para
+    que la victima no pueda recuperarse sin pagar. En un equipo de produccion esto no
+    tiene ningun uso legitimo fuera de una ventana de mantenimiento documentada.
+references:
+    - https://attack.mitre.org/techniques/T1490/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.impact
+    - attack.t1490
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_vssadmin:
+        Image|endswith: '\vssadmin.exe'
+        CommandLine|contains|all:
+            - 'delete'
+            - 'shadows'
+    selection_wmic:
+        Image|endswith: '\wmic.exe'
+        CommandLine|contains|all:
+            - 'shadowcopy'
+            - 'delete'
+    selection_wbadmin:
+        Image|endswith: '\wbadmin.exe'
+        CommandLine|contains|all:
+            - 'delete'
+            - 'catalog'
+    selection_bcdedit:
+        Image|endswith: '\bcdedit.exe'
+        CommandLine|contains:
+            - 'recoveryenabled no'
+            - 'bootstatuspolicy ignoreallfailures'
+    selection_powershell:
+        CommandLine|contains:
+            - 'Get-WmiObject Win32_Shadowcopy'
+            - 'Remove-Item -Path C:\Windows\System32\Recovery'
+    condition: 1 of selection_*
+falsepositives:
+    - Mantenimiento de disco planificado, que debe estar en ventana y aprobado
+level: critical

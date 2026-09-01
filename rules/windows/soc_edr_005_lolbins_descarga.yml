@@ -1,0 +1,63 @@
+title: LOLBin usado para descargar y ejecutar
+id: 2614c89b-16c3-5096-8ec8-dad99e3669f7
+status: experimental
+description: |
+    Binarios firmados por Microsoft usados para traer contenido de Internet y
+    ejecutarlo, evitando controles de aplicacion. Cubre certutil, bitsadmin, mshta,
+    regsvr32, curl y el cradle clasico de PowerShell.
+references:
+    - https://attack.mitre.org/techniques/T1105/
+    - https://lolbas-project.github.io/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.command-and-control
+    - attack.defense-evasion
+    - attack.t1105
+    - attack.t1218
+    - attack.t1140
+    - attack.t1197
+    - attack.t1218.010
+    - attack.t1218.005
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_certutil:
+        Image|endswith: '\certutil.exe'
+        CommandLine|contains:
+            - '-urlcache'
+            - '-verifyctl'
+            - 'decode'
+    selection_bitsadmin:
+        Image|endswith: '\bitsadmin.exe'
+        CommandLine|contains:
+            - '/transfer'
+            - '/create'
+            - '/addfile'
+    selection_mshta:
+        Image|endswith: '\mshta.exe'
+        CommandLine|contains:
+            - 'http'
+            - 'javascript:'
+            - 'vbscript:'
+    selection_regsvr32:
+        Image|endswith: '\regsvr32.exe'
+        CommandLine|contains:
+            - 'scrobj.dll'
+            - '/i:http'
+    selection_ps_metodo:
+        CommandLine|contains:
+            - 'DownloadString('
+            - 'DownloadFile('
+            - 'Invoke-WebRequest'
+            - 'Net.WebClient'
+            - 'Start-BitsTransfer'
+    selection_ps_url:
+        CommandLine|contains:
+            - 'http://'
+            - 'https://'
+    condition: selection_certutil or selection_bitsadmin or selection_mshta or selection_regsvr32 or (selection_ps_metodo and selection_ps_url)
+falsepositives:
+    - Scripts de despliegue y de instalacion internos, que conviene mover a un repositorio firmado
+level: high

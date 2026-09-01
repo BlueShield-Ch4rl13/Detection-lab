@@ -1,0 +1,44 @@
+title: Cifrado masivo de ficheros por ransomware
+id: 2423a95e-56a2-53e3-8db6-b6326db26eeb
+status: experimental
+description: |
+    Detecta la fase de impacto: la creacion o renombrado de un gran numero de ficheros
+    con extensiones de ransomware conocidas, o la aparicion de una nota de rescate.
+    Requiere agregacion por equipo, que es lo que aporta el bloque de correlacion del
+    SIEM sobre esta regla base.
+references:
+    - https://attack.mitre.org/techniques/T1486/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.impact
+    - attack.t1486
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_extension:
+        TargetFilename|endswith:
+            - '.locked'
+            - '.encrypted'
+            - '.crypt'
+            - '.lockbit'
+            - '.blackcat'
+            - '.royal'
+            - '.akira'
+            - '.basta'
+            - '.cactus'
+            - '.play'
+    selection_nota:
+        TargetFilename|contains:
+            - 'readme_for_decrypt'
+            - 'how_to_decrypt'
+            - 'recover_your_files'
+            - 'restore-my-files'
+            - '_readme.txt'
+            - 'HOW TO BACK FILES'
+            - 'RESTORE_FILES_INFO'
+    condition: 1 of selection_*
+falsepositives:
+    - Herramientas de cifrado legitimo que usan la extension .encrypted
+level: critical

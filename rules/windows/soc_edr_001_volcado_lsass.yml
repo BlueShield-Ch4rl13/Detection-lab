@@ -1,0 +1,43 @@
+title: Volcado de memoria de LSASS
+id: 84045599-ca95-50f1-86c8-66d8351fc0e8
+status: experimental
+description: |
+    LSASS guarda las credenciales de las sesiones activas. Su volcado es el paso previo
+    casi obligado al movimiento lateral. Detecta las tres vias habituales: herramientas
+    conocidas, el uso de comsvcs.dll MiniDump via rundll32, y el acceso al proceso con
+    permisos de lectura de memoria registrado por Sysmon.
+references:
+    - https://attack.mitre.org/techniques/T1003/001/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.credential-access
+    - attack.t1003.001
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_comsvcs:
+        CommandLine|contains|all:
+            - 'comsvcs.dll'
+            - 'MiniDump'
+    selection_herramientas:
+        - Image|endswith:
+            - '\procdump.exe'
+            - '\procdump64.exe'
+            - '\dumpert.exe'
+            - '\nanodump.exe'
+        - OriginalFileName:
+            - 'procdump'
+            - 'procdump64.exe'
+    selection_args_lsass:
+        CommandLine|contains: 'lsass'
+    selection_taskmgr:
+        CommandLine|contains|all:
+            - 'rundll32'
+            - 'dbghelp'
+            - 'MiniDumpWriteDump'
+    condition: selection_comsvcs or (selection_herramientas and selection_args_lsass) or selection_taskmgr
+falsepositives:
+    - Recogida de volcados por parte de soporte para diagnosticar cuelgues, que deberia ir acompanada de un ticket
+level: critical

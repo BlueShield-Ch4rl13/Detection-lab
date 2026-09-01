@@ -1,0 +1,35 @@
+title: DCSync - replicacion de directorio desde un equipo que no es DC
+id: c99d10d7-e44d-5516-b637-3ec1ccf42c9e
+status: experimental
+description: |
+    Detecta el uso de los permisos de replicacion de Active Directory para extraer
+    hashes de contrasena, la tecnica que usa mimikatz lsadump::dcsync. Se identifica por
+    el acceso a los GUID de extended right de replicacion en el evento 4662. Si el
+    solicitante no es una cuenta de equipo controlador de dominio, es un ataque.
+references:
+    - https://attack.mitre.org/techniques/T1003/006/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.credential-access
+    - attack.t1003.006
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID: 4662
+        Properties|contains:
+            - '1131f6aa-9c07-11d1-f79f-00c04fc2dcd2'
+            - '1131f6ad-9c07-11d1-f79f-00c04fc2dcd2'
+            - '89e95b76-444d-4c62-991a-0facbeda640c'
+    filter_equipos:
+        SubjectUserName|endswith: '$'
+    filter_sistema:
+        SubjectUserName:
+            - 'ANONYMOUS LOGON'
+            - 'SYSTEM'
+    condition: selection and not 1 of filter_*
+falsepositives:
+    - Herramientas de sincronizacion de directorio como Entra Connect, que deben estar en la lista de excepciones
+level: critical

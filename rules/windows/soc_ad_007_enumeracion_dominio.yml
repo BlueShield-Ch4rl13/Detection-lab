@@ -1,0 +1,47 @@
+title: Enumeracion de Active Directory - BloodHound y comandos de reconocimiento
+id: d73db06b-35ac-5211-9dc2-20ace855c116
+status: experimental
+description: |
+    Detecta el reconocimiento de dominio previo al movimiento lateral: ejecucion de
+    SharpHound o AzureHound, y las secuencias de comandos net y dsquery que un atacante
+    usa para mapear grupos privilegiados, equipos y relaciones de confianza.
+references:
+    - https://attack.mitre.org/techniques/T1087/002/
+    - https://attack.mitre.org/techniques/T1069/002/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.discovery
+    - attack.t1087.002
+    - attack.t1069.002
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_bloodhound:
+        - Image|endswith:
+            - '\SharpHound.exe'
+            - '\AzureHound.exe'
+        - CommandLine|contains:
+            - 'Invoke-BloodHound'
+            - 'SharpHound.ps1'
+            - '-CollectionMethod All'
+    selection_net:
+        Image|endswith:
+            - '\net.exe'
+            - '\net1.exe'
+        CommandLine|contains:
+            - 'group "domain admins"'
+            - 'group "enterprise admins"'
+            - 'group /domain'
+            - 'user /domain'
+            - 'localgroup administrators'
+    selection_dsquery:
+        Image|endswith: '\dsquery.exe'
+        CommandLine|contains:
+            - 'group'
+            - 'user'
+    condition: 1 of selection_*
+falsepositives:
+    - Scripts de inventario y auditoria del propio equipo de sistemas
+level: medium

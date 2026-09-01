@@ -1,0 +1,39 @@
+name: detection-lab - Sentinel (post)
+priority: 20
+# ---------------------------------------------------------------------------
+# Segunda mitad de un apano necesario, y conviene entender por que existe.
+#
+# El pipeline comunitario `sentinel_asim` lleva un paso llamado
+# `sentinel_asim_drop_eventid` que BORRA cualquier condicion sobre EventID.
+# Para las tablas ASIM tiene sentido: si la consulta va contra imProcessCreate,
+# el EventID 1 de Sysmon es redundante, la tabla ya implica el tipo de evento.
+#
+# Para SecurityEvent y Event NO lo tiene: ahi EventID es una columna real y a
+# menudo es LA condicion. Sin ella, una regla como "borrado del registro de
+# auditoria" (EventID 1102) se convierte en una consulta que devuelve todos los
+# eventos de seguridad del dominio, o directamente en una consulta vacia.
+#
+# Una consulta sintacticamente valida que casa con todo es peor que un error:
+# el error se ve, la consulta se despliega. Por eso:
+#
+#   tools/pipelines/sentinel.yml  (prioridad 5)  renombra EventID -> EventIDPreservado
+#   sentinel_asim                 (prioridad 10) no reconoce ese nombre y no lo borra
+#   este fichero                  (prioridad 20) lo devuelve a EventID
+#
+# tools/validate.py comprueba que ninguna consulta generada para SecurityEvent
+# o Event haya perdido su EventID por el camino.
+# ---------------------------------------------------------------------------
+
+transformations:
+  - id: restaurar_eventid
+    type: field_name_mapping
+    mapping:
+      EventIDPreservado: EventID
+    rule_cond_op: or
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: security
+      - type: logsource
+        product: windows
+        service: system

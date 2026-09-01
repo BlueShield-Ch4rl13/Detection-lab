@@ -1,0 +1,35 @@
+title: Named pipe caracteristico de framework de C2
+id: df529c1f-f89b-5dc9-bd86-97f23cf045d6
+status: experimental
+description: |
+    Cobalt Strike, Sliver y otros frameworks usan named pipes con patrones reconocibles
+    para la comunicacion entre el beacon y sus modulos. Detecta los nombres por defecto,
+    que siguen apareciendo en una parte importante de los despliegues reales.
+references:
+    - https://attack.mitre.org/techniques/T1071/
+    - https://attack.mitre.org/software/S0154/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.command-and-control
+    - attack.defense-evasion
+    - attack.t1071
+logsource:
+    category: pipe_created
+    product: windows
+detection:
+    selection:
+        PipeName|startswith:
+            - '\msagent_'
+            - '\postex_'
+            - '\postex_ssh_'
+            - '\status_'
+            - '\mojo_'
+            - '\wkssvc_'
+            - '\ntsvcs_'
+            - '\sliver-'
+            - '\MSSE-'
+    condition: selection
+falsepositives:
+    - Muy pocos, pero conviene revisar los pipes de software propio antes de dar la regla por buena
+level: critical

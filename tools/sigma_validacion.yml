@@ -1,0 +1,23 @@
+# Configuracion de validacion de sigma-cli para este paquete.
+#
+# Exclusiones y por que:
+#   attacktag / tlptag / cartag / stptag / cvetag / d3_fendtag / namespace_tag /
+#   detection_tag  -> descargan taxonomias externas en tiempo de validacion. En un
+#                     entorno sin salida a Internet o detras de proxy fallan con 403,
+#                     asi que la validacion de tags se hace aparte con validate.sh.
+#   number_as_string -> ResultType de Entra ID es una columna de tipo cadena en la
+#                     tabla SigninLogs de Sentinel, no un numero. Expresarlo como
+#                     cadena es lo correcto para ese origen.
+validators:
+  - all
+  - -attacktag
+  - -tlptag
+  - -tlpv1_tag
+  - -tlpv2_tag
+  - -cartag
+  - -stptag
+  - -cvetag
+  - -d3_fendtag
+  - -detection_tag
+  - -namespace_tag
+  - -number_as_string

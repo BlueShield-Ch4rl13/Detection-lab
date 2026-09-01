@@ -1,0 +1,39 @@
+title: Cuenta de servicio con inicio de sesion interactivo
+id: 6fb6acc5-8ef5-526a-a9b9-2988898935b1
+status: experimental
+description: |
+    Pilar de identidad. Una cuenta de servicio existe para que la use un proceso, no
+    una persona. Un inicio de sesion interactivo o por escritorio remoto con una de
+    ellas significa que alguien tiene su contrasena, y esas contrasenas casi nunca
+    caducan ni llevan MFA.
+references:
+    - https://attack.mitre.org/techniques/T1078/002/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1078.002
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID: 4624
+        LogonType:
+            - 2     # interactivo local
+            - 7     # desbloqueo de estacion
+            - 10    # escritorio remoto
+            - 11    # con credenciales en cache
+    selection_convencion:
+        TargetUserName|startswith:
+            - 'svc_'
+            - 'srv_'
+            - 'sa_'
+            - 'app_'
+    filtro_maquinas:
+        TargetUserName|endswith: '$'
+    condition: selection and selection_convencion and not filtro_maquinas
+falsepositives:
+    - Mantenimiento con la cuenta de servicio, practica desaconsejada que deberia dejar ticket
+level: high

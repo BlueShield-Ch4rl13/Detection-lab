@@ -1,0 +1,42 @@
+title: Persistencia por claves de arranque del registro
+id: 399fddea-b0d4-5580-9016-a906e2a5f1e2
+status: experimental
+description: |
+    Escritura en las claves Run, RunOnce, Winlogon y de servicios que se ejecutan al
+    iniciar sesion. Se filtra por rutas de escritura de usuario e interpretes, que es
+    donde se concentra el abuso.
+references:
+    - https://attack.mitre.org/techniques/T1547/001/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1547.001
+logsource:
+    category: registry_event
+    product: windows
+detection:
+    selection:
+        TargetObject|contains:
+            - '\CurrentVersion\Run'
+            - '\CurrentVersion\RunOnce'
+            - '\Winlogon\Shell'
+            - '\Winlogon\Userinit'
+            - '\CurrentVersion\Explorer\User Shell Folders'
+    selection_valor:
+        Details|contains:
+            - 'powershell'
+            - 'cmd.exe'
+            - 'mshta'
+            - 'rundll32'
+            - 'wscript'
+            - 'regsvr32'
+            - '\AppData\'
+            - '\Users\Public\'
+            - '\Temp\'
+            - '\ProgramData\'
+    condition: selection and selection_valor
+falsepositives:
+    - Software legitimo que arranca desde AppData, como algunos clientes de mensajeria y navegadores
+level: high

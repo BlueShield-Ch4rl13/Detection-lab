@@ -1,0 +1,53 @@
+title: Instalacion de paquete desde un repositorio no aprobado
+id: 5dd0df5c-e15a-59df-9bff-b236a7a0d6b0
+status: experimental
+description: |
+    Pilar de cadena de suministro software. Instalar directamente desde un indice
+    publico o desde una URL salta el repositorio interno, y con el se saltan el
+    escaneo de vulnerabilidades, la firma y el inventario. Es tambien la via por la
+    que entra un paquete con nombre confundible (typosquatting).
+references:
+    - https://attack.mitre.org/techniques/T1195/001/
+    - https://www.cisa.gov/zero-trust-maturity-model
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.initial-access
+    - attack.t1195.001
+    - attack.t1195.002
+logsource:
+    category: process_creation
+    product: linux
+detection:
+    selection_gestor:
+        Image|endswith:
+            - '/pip'
+            - '/pip3'
+            - '/npm'
+            - '/yarn'
+            - '/gem'
+            - '/go'
+            - '/cargo'
+            - '/composer'
+    selection_url_directa:
+        CommandLine|contains:
+            - 'install git+'
+            - 'install http://'
+            - 'install https://'
+            - '--index-url'
+            - '--extra-index-url'
+            - '--registry'
+            - 'install github.com/'
+    selection_curl_a_gestor:
+        CommandLine|contains|all:
+            - 'curl'
+            - 'install'
+    filtro_interno:
+        CommandLine|contains:
+            - 'repo.midominio.local'
+            - 'nexus.midominio.local'
+            - 'artifactory.midominio.local'
+    condition: selection_gestor and (selection_url_directa or selection_curl_a_gestor) and not filtro_interno
+falsepositives:
+    - Equipos de desarrollo con permiso explicito, que deberian estar en su propia unidad organizativa
+level: medium

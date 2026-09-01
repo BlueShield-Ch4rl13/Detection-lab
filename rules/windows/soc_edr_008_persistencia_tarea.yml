@@ -1,0 +1,45 @@
+title: Tarea programada sospechosa
+id: 099c1cf5-2990-5ab5-ba59-7ebbb0aaf70b
+status: experimental
+description: |
+    Detecta el alta de tareas programadas cuyo comando apunta a un interprete, a una
+    ruta de escritura de usuario o a una descarga. Es una de las formas de persistencia
+    mas usadas porque sobrevive al reinicio y pasa desapercibida entre las tareas del
+    sistema.
+references:
+    - https://attack.mitre.org/techniques/T1053/005/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.persistence
+    - attack.execution
+    - attack.t1053.005
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_schtasks:
+        Image|endswith: '\schtasks.exe'
+        CommandLine|contains: '/create'
+    selection_sospechoso:
+        CommandLine|contains:
+            - 'powershell'
+            - 'cmd.exe /c'
+            - 'mshta'
+            - 'rundll32'
+            - 'wscript'
+            - 'cscript'
+            - 'regsvr32'
+            - '\AppData\'
+            - '\Users\Public\'
+            - '\Temp\'
+            - 'http://'
+            - 'https://'
+    selection_sistema:
+        CommandLine|contains:
+            - '/ru system'
+            - '/ru "NT AUTHORITY\SYSTEM"'
+    condition: selection_schtasks and (selection_sospechoso or selection_sistema)
+falsepositives:
+    - Instaladores de software que crean tareas de actualizacion, que conviene inventariar por editor
+level: high

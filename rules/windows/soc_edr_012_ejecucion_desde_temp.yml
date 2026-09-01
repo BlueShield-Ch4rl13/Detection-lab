@@ -1,0 +1,40 @@
+title: Ejecucion de binario desde una ruta de escritura de usuario
+id: 53189db7-b253-5519-ab36-0d8698ea9110
+status: experimental
+description: |
+    Un ejecutable lanzado desde Temp, AppData, la papelera o un directorio publico es
+    una senal de bajo nivel pero de alta cobertura: es el patron de casi toda entrega
+    inicial, desde el adjunto de correo hasta el instalador troyanizado. Pensada para
+    correlar, no para alertar sola.
+references:
+    - https://attack.mitre.org/techniques/T1204/002/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.execution
+    - attack.t1204.002
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|contains:
+            - '\AppData\Local\Temp\'
+            - '\Windows\Temp\'
+            - '\Users\Public\'
+            - '\$Recycle.Bin\'
+            - '\AppData\Roaming\'
+        Image|endswith:
+            - '.exe'
+            - '.scr'
+            - '.com'
+            - '.pif'
+    filter_instaladores:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+            - '\TrustedInstaller.exe'
+    condition: selection and not filter_instaladores
+falsepositives:
+    - Instaladores que se descomprimen en Temp antes de ejecutarse, que es el motivo de tratar esta regla como senal de correlacion
+level: medium

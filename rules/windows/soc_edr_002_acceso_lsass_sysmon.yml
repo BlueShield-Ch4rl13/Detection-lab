@@ -1,0 +1,36 @@
+title: Acceso a memoria de LSASS con permisos de lectura
+id: 9b92970e-32f3-52ad-8234-2649fd2a6d8b
+status: experimental
+description: |
+    Complemento de la deteccion por linea de comandos. Sysmon registra en el evento 10
+    todo acceso a un proceso; un GrantedAccess de 0x1010, 0x1410 o 0x1438 sobre lsass.exe
+    corresponde a los permisos que necesita un volcado de memoria. Detecta tambien las
+    implementaciones propias que no usan herramientas conocidas.
+references:
+    - https://attack.mitre.org/techniques/T1003/001/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.credential-access
+    - attack.t1003.001
+logsource:
+    category: process_access
+    product: windows
+detection:
+    selection:
+        TargetImage|endswith: '\lsass.exe'
+        GrantedAccess:
+            - '0x1010'
+            - '0x1410'
+            - '0x1438'
+            - '0x143a'
+            - '0x1fffff'
+    filter_sistema:
+        SourceImage|startswith:
+            - 'C:\Windows\System32\'
+            - 'C:\Windows\SysWOW64\'
+            - 'C:\Program Files\Windows Defender\'
+    condition: selection and not filter_sistema
+falsepositives:
+    - Agentes de EDR y de inventario que inspeccionan procesos, que deben ir a la lista de excepciones por ruta firmada
+level: high

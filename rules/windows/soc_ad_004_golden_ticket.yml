@@ -1,0 +1,27 @@
+title: Indicio de Golden Ticket - TGS de krbtgt con cifrado degradado
+id: da924d29-69e6-5216-aa30-7765e1e2ebb7
+status: experimental
+description: |
+    Un Golden Ticket es un TGT forjado con el hash de krbtgt. Mimikatz lo genera por
+    defecto con RC4, asi que una peticion de servicio que involucra a krbtgt con
+    cifrado 0x17 desde un equipo que no es DC es sospechosa. Complementar siempre con
+    revision del ticket lifetime, que en los tickets forjados suele ser de 10 anos.
+references:
+    - https://attack.mitre.org/techniques/T1558/001/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.credential-access
+    - attack.t1558.001
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID: 4769
+        ServiceName|startswith: 'krbtgt'
+        TicketEncryptionType: '0x17'
+    condition: selection
+falsepositives:
+    - Entornos con nivel funcional de dominio anterior a 2008
+level: critical

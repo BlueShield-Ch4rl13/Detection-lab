@@ -1,0 +1,50 @@
+title: Defensas de seguridad deshabilitadas
+id: 36eabb0c-817b-5472-83fe-29bf4b6c4fa0
+status: experimental
+description: |
+    Detecta la desactivacion de Microsoft Defender, del cortafuegos local, de la
+    auditoria del sistema o de agentes de seguridad. Cubre las tres vias: cmdlets de
+    PowerShell, modificacion de registro y parada de servicio.
+references:
+    - https://attack.mitre.org/techniques/T1562/001/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.defense-evasion
+    - attack.t1562.001
+    - attack.t1070.001
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_defender:
+        CommandLine|contains:
+            - 'Set-MpPreference -DisableRealtimeMonitoring $true'
+            - 'Set-MpPreference -DisableBehaviorMonitoring $true'
+            - 'Set-MpPreference -DisableIOAVProtection $true'
+            - 'Add-MpPreference -ExclusionPath'
+            - 'DisableAntiSpyware'
+            - 'DisableAntiVirus'
+    selection_firewall:
+        CommandLine|contains:
+            - 'netsh advfirewall set allprofiles state off'
+            - 'netsh firewall set opmode disable'
+    selection_servicios:
+        CommandLine|contains:
+            - 'sc stop WinDefend'
+            - 'sc config WinDefend start= disabled'
+            - 'sc stop Sense'
+            - 'sc stop wazuh'
+            - 'Stop-Service -Name Sense'
+            - 'net stop "Windows Defender'
+    selection_auditoria:
+        CommandLine|contains:
+            - 'auditpol /clear'
+            - 'auditpol /set /category:* /success:disable'
+            - 'wevtutil cl '
+            - 'wevtutil sl '
+    condition: 1 of selection_*
+falsepositives:
+    - Instalacion de otro producto antivirus, que desactiva Defender de forma legitima
+    - Exclusiones anadidas por el equipo de sistemas, que deben pasar por gestion de cambios
+level: high

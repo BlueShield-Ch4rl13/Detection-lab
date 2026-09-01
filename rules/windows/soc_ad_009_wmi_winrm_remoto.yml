@@ -1,0 +1,38 @@
+title: Ejecucion remota por WMI o WinRM
+id: d100a784-f138-5e0b-a961-f39fcf91a366
+status: experimental
+description: |
+    Detecta procesos hijos de WmiPrvSE.exe o de wsmprovhost.exe, que son los procesos
+    servidores de WMI y WinRM. Un interprete de comandos naciendo de ellos significa que
+    alguien esta ejecutando codigo en el equipo desde la red.
+references:
+    - https://attack.mitre.org/techniques/T1047/
+    - https://attack.mitre.org/techniques/T1021/006/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.lateral-movement
+    - attack.execution
+    - attack.t1047
+    - attack.t1021.006
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        ParentImage|endswith:
+            - '\WmiPrvSE.exe'
+            - '\wsmprovhost.exe'
+            - '\winrshost.exe'
+        Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\rundll32.exe'
+            - '\mshta.exe'
+    condition: selection
+falsepositives:
+    - Herramientas de gestion como SCCM o Ansible sobre WinRM, que deben inventariarse
+level: high

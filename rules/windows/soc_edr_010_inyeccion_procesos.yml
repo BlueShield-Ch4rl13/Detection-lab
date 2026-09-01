@@ -1,0 +1,39 @@
+title: Inyeccion de codigo en proceso remoto
+id: 21ae1a6a-2bbf-5c18-a201-da9a767e785a
+status: experimental
+description: |
+    Detecta la creacion de hilos remotos hacia procesos de confianza, tecnica que usan
+    los cargadores de malware y los frameworks de C2 para ejecutar en un proceso
+    legitimo y evadir el control de aplicaciones.
+references:
+    - https://attack.mitre.org/techniques/T1055/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.defense-evasion
+    - attack.privilege-escalation
+    - attack.t1055
+logsource:
+    category: create_remote_thread
+    product: windows
+detection:
+    selection:
+        TargetImage|endswith:
+            - '\explorer.exe'
+            - '\svchost.exe'
+            - '\winlogon.exe'
+            - '\lsass.exe'
+            - '\rundll32.exe'
+            - '\dllhost.exe'
+            - '\notepad.exe'
+            - '\werfault.exe'
+    filter_sistema:
+        SourceImage|startswith: 'C:\Windows\System32\'
+        SourceImage|endswith:
+            - '\csrss.exe'
+            - '\services.exe'
+            - '\wininit.exe'
+    condition: selection and not filter_sistema
+falsepositives:
+    - Depuradores y herramientas de perfilado, poco habituales en un puesto de usuario
+level: high

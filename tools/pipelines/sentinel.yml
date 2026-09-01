@@ -1,0 +1,390 @@
+name: detection-lab - Microsoft Sentinel
+priority: 5
+# ---------------------------------------------------------------------------
+# Rellena los huecos que deja el pipeline comunitario `sentinel_asim`.
+#
+# sentinel_asim ya resuelve, y aqui NO se tocan:
+#   process_creation  -> imProcessCreate      network_connection -> imNetworkSession
+#   file_event        -> imFileEvent          registry_event     -> imRegistry
+#   proxy / webserver -> imWebSession         dns                -> imDns
+#
+# Este pipeline anade las fuentes que ASIM no esquematiza. Se encadena delante:
+#   sigma convert -t kusto -p tools/pipelines/sentinel.yml -p sentinel_asim <regla>
+#
+# TABLAS QUE HAY QUE AJUSTAR AL DESPLIEGUE
+# ---------------------------------------
+# Las tres de abajo dependen de como este conectado cada producto. Cambia el
+# valor de `val` y nada mas; el resto del pipeline no se toca.
+#
+#   Proofpoint TAP   ProofpointTAPMessagesBlocked_CL   (conector nativo)
+#                    CommonSecurityLog                 (si llega por CEF)
+#   Netskope         NetskopeAlerts_CL                 (conector nativo)
+#                    CommonSecurityLog                 (si llega por CEF)
+#   Kubernetes       AzureDiagnostics                  (AKS, Category kube-audit)
+#
+# Aviso sobre AKS: con AzureDiagnostics el evento de auditoria viaja entero
+# dentro de la columna `log_s` como JSON. Las consultas generadas asumen
+# columnas ya expandidas, asi que hay que anteponer en la regla de analitica:
+#
+#   AzureDiagnostics
+#   | where Category == "kube-audit"
+#   | extend e = parse_json(log_s)
+#   | extend verb = tostring(e.verb),
+#            username = tostring(e.user.username),
+#            namespace = tostring(e.objectRef.namespace),
+#            resource = tostring(e.objectRef.resource),
+#            subresource = tostring(e.objectRef.subresource),
+#            apiGroup = tostring(e.objectRef.apiGroup),
+#            privileged = tostring(e.responseObject.spec.containers[0].securityContext.privileged),
+#            capabilities = tostring(e.requestObject.spec.containers[0].securityContext.capabilities.add),
+#            hostPath = tostring(e.requestObject.spec.volumes[0].hostPath.path)
+#
+# Con una tabla propia alimentada por Fluent Bit las columnas ya vienen planas y
+# no hace falta el extend.
+# ---------------------------------------------------------------------------
+
+transformations:
+
+  # ── Registro de seguridad de Windows ────────────────────────────────────
+  # SecurityEvent conserva los nombres nativos del canal Security, asi que solo
+  # hace falta fijar la tabla.
+  - id: tabla_securityevent
+    type: set_state
+    key: query_table
+    val: SecurityEvent
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: security
+
+  # sentinel_asim borra toda condicion sobre EventID (paso
+  # sentinel_asim_drop_eventid). En SecurityEvent y Event, EventID es una
+  # columna real y a menudo la condicion principal, asi que se esconde tras un
+  # nombre que ese paso no reconoce y se restaura despues.
+  # Ver tools/pipelines/sentinel-post.yml.
+  - id: preservar_eventid_security
+    type: field_name_mapping
+    mapping:
+      EventID: EventIDPreservado
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: security
+
+  # ── Registro de sistema de Windows ──────────────────────────────────────
+  - id: tabla_event
+    type: set_state
+    key: query_table
+    val: Event
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: system
+
+  - id: campos_event
+    type: field_name_mapping
+    mapping:
+      Provider_Name: Source
+      ImagePath: RenderedDescription
+      EventID: EventIDPreservado
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: system
+
+  # ── Telemetria de endpoint sin esquema ASIM ─────────────────────────────
+  # process_access, pipe_created y create_remote_thread no tienen esquema ASIM.
+  # En Defender XDR viven en DeviceEvents, distinguidas por ActionType.
+  #
+  # PipeName, GrantedAccess y CallTrace NO son columnas: viajan dentro de la
+  # columna dynamic AdditionalFields. Se mapean a nombres planos y la regla de
+  # analitica los crea antes del where:
+  #
+  #   DeviceEvents
+  #   | extend af = parse_json(AdditionalFields)
+  #   | extend PipeName      = tostring(af.PipeName),
+  #            GrantedAccess = tostring(af.DesiredAccess),
+  #            CallTrace     = tostring(af.CallTrace)
+  #
+  # Sin ese extend la consulta es sintacticamente valida pero no casa nunca,
+  # que es el peor fallo posible en una deteccion.
+  - id: tabla_deviceevents
+    type: set_state
+    key: query_table
+    val: DeviceEvents
+    rule_cond_op: or
+    rule_conditions:
+      - type: logsource
+        category: process_access
+      - type: logsource
+        category: pipe_created
+      - type: logsource
+        category: create_remote_thread
+
+  - id: accion_process_access
+    type: add_condition
+    conditions:
+      ActionType: OpenProcessApiCall
+    rule_conditions:
+      - type: logsource
+        category: process_access
+
+  - id: accion_pipe_created
+    type: add_condition
+    conditions:
+      ActionType: NamedPipeEvent
+    rule_conditions:
+      - type: logsource
+        category: pipe_created
+
+  - id: accion_create_remote_thread
+    type: add_condition
+    conditions:
+      ActionType: CreateRemoteThreadApiCall
+    rule_conditions:
+      - type: logsource
+        category: create_remote_thread
+
+  - id: campos_deviceevents
+    type: field_name_mapping
+    mapping:
+      SourceImage: InitiatingProcessFolderPath
+      TargetImage: FolderPath
+      SourceProcessId: InitiatingProcessId
+      TargetProcessId: ProcessId
+      Image: InitiatingProcessFolderPath
+      CommandLine: InitiatingProcessCommandLine
+      User: InitiatingProcessAccountName
+    rule_cond_op: or
+    rule_conditions:
+      - type: logsource
+        category: process_access
+      - type: logsource
+        category: pipe_created
+      - type: logsource
+        category: create_remote_thread
+
+  # ── Entra ID: inicios de sesion ─────────────────────────────────────────
+  # DeviceDetail es una columna dynamic y el backend entrecomilla cualquier
+  # nombre de campo con punto, lo que rompe el acceso al subcampo. Se mapea a
+  # nombres planos; la regla de analitica los crea antes del where:
+  #   SigninLogs
+  #   | extend DeviceIsCompliant = tostring(DeviceDetail.isCompliant),
+  #            DeviceTrustType   = tostring(DeviceDetail.trustType)
+  - id: tabla_signinlogs
+    type: set_state
+    key: query_table
+    val: SigninLogs
+    rule_conditions:
+      - type: logsource
+        product: azure
+        service: signinlogs
+
+  - id: campos_signinlogs
+    type: field_name_mapping
+    mapping:
+      RiskEventTypes: RiskEventTypes_string
+      DeviceDetail.isCompliant: DeviceIsCompliant
+      DeviceDetail.trustType: DeviceTrustType
+      Location: Location
+      IPAddress: IPAddress
+      UserPrincipalName: UserPrincipalName
+      AppDisplayName: AppDisplayName
+      ConditionalAccessStatus: ConditionalAccessStatus
+    rule_conditions:
+      - type: logsource
+        product: azure
+        service: signinlogs
+
+  # ── Entra ID: registro de auditoria ─────────────────────────────────────
+  # En SigmaHQ el mensaje de la operacion se llama properties.message; en la
+  # tabla AuditLogs de Sentinel es OperationName.
+  #
+  # TargetResources e InitiatedBy son columnas dynamic. KQL convierte a texto de
+  # forma implicita en `contains`, asi que la consulta generada funciona tal cual.
+  # Si se quiere busqueda exacta sobre un campo interno hay que expandirlo antes:
+  #   | mv-expand TargetResources | extend rol = tostring(TargetResources.displayName)
+  - id: tabla_auditlogs
+    type: set_state
+    key: query_table
+    val: AuditLogs
+    rule_conditions:
+      - type: logsource
+        product: azure
+        service: auditlogs
+
+  - id: campos_auditlogs
+    type: field_name_mapping
+    mapping:
+      properties.message: OperationName
+      TargetResources: TargetResources
+      InitiatedBy: InitiatedBy
+      Category: Category
+      Result: Result
+    rule_conditions:
+      - type: logsource
+        product: azure
+        service: auditlogs
+
+  # ── Exchange Online / actividad de M365 ─────────────────────────────────
+  - id: tabla_officeactivity
+    type: set_state
+    key: query_table
+    val: OfficeActivity
+    rule_conditions:
+      - type: logsource
+        product: m365
+        service: exchange
+
+  - id: campos_officeactivity
+    type: field_name_mapping
+    mapping:
+      Operation: Operation
+      Parameters: Parameters
+      UserId: UserId
+      ClientIP: ClientIP
+    rule_conditions:
+      - type: logsource
+        product: m365
+        service: exchange
+
+  # ── Proofpoint TAP  (AJUSTAR la tabla al conector) ──────────────────────
+  - id: tabla_proofpoint
+    type: set_state
+    key: query_table
+    val: ProofpointTAPMessagesBlocked_CL
+    rule_conditions:
+      - type: logsource
+        product: proofpoint
+        service: tap
+
+  - id: campos_proofpoint
+    type: field_name_mapping
+    mapping:
+      sender: sender_s
+      senderDomain: senderDomain_s
+      senderDomainAge: senderDomainAge_d
+      senderIsInternal: senderIsInternal_b
+      headerFrom: headerFrom_s
+      recipient: recipient_s
+      subject: subject_s
+      attachmentName: attachmentName_s
+      attachmentContent: attachmentContent_s
+      threatStatus: threatStatus_s
+      eventType: eventType_s
+      spfResult: spfResult_s
+      dkimResult: dkimResult_s
+      dmarcResult: dmarcResult_s
+      url: url_s
+      clickTime: clickTime_t
+    rule_conditions:
+      - type: logsource
+        product: proofpoint
+        service: tap
+
+  # ── Netskope  (AJUSTAR la tabla al conector) ────────────────────────────
+  - id: tabla_netskope
+    type: set_state
+    key: query_table
+    val: NetskopeAlerts_CL
+    rule_conditions:
+      - type: logsource
+        product: netskope
+        service: alerts
+
+  - id: campos_netskope
+    type: field_name_mapping
+    mapping:
+      activity: activity_s
+      app: app_s
+      app_category: app_category_s
+      ccl: ccl_s
+      user: user_s
+      numbytes: numbytes_d
+    rule_conditions:
+      - type: logsource
+        product: netskope
+        service: alerts
+
+  # ── Kubernetes  (AJUSTAR la tabla; ver el aviso de AKS arriba) ──────────
+  - id: tabla_kubernetes
+    type: set_state
+    key: query_table
+    val: AzureDiagnostics
+    rule_conditions:
+      - type: logsource
+        product: kubernetes
+        service: audit
+
+  # ── Correcciones sobre el esquema ASIM ──────────────────────────────────
+  # Dos campos que sentinel_asim no resuelve bien contra el esquema real:
+  #
+  #  - OriginalFileName lo mapea a TargetProcessFilename, columna que no
+  #    existe en imProcessCreate. La correcta es TargetProcessFileOriginalName.
+  #    Este pipeline corre antes (prioridad 5), asi que el campo ya llega
+  #    renombrado y sentinel_asim lo deja pasar.
+  #  - cs-categories (categoria de URL del proxy) no esta mapeado.
+  - id: asim_originalfilename
+    type: field_name_mapping
+    mapping:
+      OriginalFileName: TargetProcessFileOriginalName
+    rule_conditions:
+      - type: logsource
+        category: process_creation
+
+  - id: asim_categoria_url
+    type: field_name_mapping
+    mapping:
+      cs-categories: UrlCategory
+      cs-method: HttpRequestMethod
+      c-uri: Url
+    rule_cond_op: or
+    rule_conditions:
+      - type: logsource
+        category: proxy
+      - type: logsource
+        category: webserver
+
+  # ── DNS ─────────────────────────────────────────────────────────────────
+  # sentinel_asim no cubre la categoria dns; se fija imDns a mano.
+  - id: tabla_dns
+    type: set_state
+    key: query_table
+    val: imDns
+    rule_conditions:
+      - type: logsource
+        category: dns
+
+  - id: campos_dns
+    type: field_name_mapping
+    mapping:
+      query: DnsQuery
+      query_type: DnsQueryTypeName
+      answer: DnsResponseName
+    rule_conditions:
+      - type: logsource
+        category: dns
+
+  # ── Carga de librerias (image_load) ─────────────────────────────────────
+  # ASIM no esquematiza image_load. En Defender XDR es DeviceImageLoadEvents.
+  - id: tabla_imageload
+    type: set_state
+    key: query_table
+    val: DeviceImageLoadEvents
+    rule_conditions:
+      - type: logsource
+        category: image_load
+
+  - id: campos_imageload
+    type: field_name_mapping
+    mapping:
+      ImageLoaded: FolderPath
+      Image: InitiatingProcessFolderPath
+      CommandLine: InitiatingProcessCommandLine
+      Signed: IsSigned
+      SignatureStatus: SignatureStatus
+      Hashes: SHA256
+    rule_conditions:
+      - type: logsource
+        category: image_load
+

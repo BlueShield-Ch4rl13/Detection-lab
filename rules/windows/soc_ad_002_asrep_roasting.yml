@@ -1,0 +1,29 @@
+title: AS-REP Roasting - peticion sin preautenticacion Kerberos
+id: 05ce8c8f-92c0-5450-9da3-3d957a21566f
+status: experimental
+description: |
+    Detecta peticiones de autenticacion Kerberos (AS-REQ) sobre cuentas que tienen
+    deshabilitada la preautenticacion. El atacante recibe material cifrado con la
+    contrasena del usuario y lo craquea sin tocar el dominio. Se apoya en el evento
+    4768 con PreAuthType 0.
+references:
+    - https://attack.mitre.org/techniques/T1558/004/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.credential-access
+    - attack.t1558.004
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID: 4768
+        PreAuthType: 0
+        TicketEncryptionType: '0x17'
+    filter:
+        TargetUserName|endswith: '$'
+    condition: selection and not filter
+falsepositives:
+    - Cuentas de servicio antiguas con la preautenticacion deshabilitada de forma legitima
+level: high

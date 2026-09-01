@@ -1,0 +1,28 @@
+title: Cuenta de equipo creada por un usuario no administrador
+id: 6d07e08b-7e4c-5a6f-8d27-3717e0ea2338
+status: experimental
+description: |
+    Por defecto cualquier usuario del dominio puede dar de alta hasta diez equipos
+    (MachineAccountQuota). Esa cuota es el punto de partida de ataques como noPac,
+    sAMAccountName spoofing y la escalada por delegacion basada en recursos. El alta de
+    una cuenta de equipo por un usuario que no es del equipo de sistemas merece revision.
+references:
+    - https://attack.mitre.org/techniques/T1136/002/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1136.002
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID: 4741
+    filter_equipos:
+        SubjectUserName|endswith: '$'
+    condition: selection and not filter_equipos
+falsepositives:
+    - Altas de equipo realizadas por el equipo de sistemas, que deben ir a una lista de excepciones por cuenta
+level: medium

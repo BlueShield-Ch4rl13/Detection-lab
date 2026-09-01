@@ -1,0 +1,48 @@
+title: Carga de libreria desde una ruta no estandar
+id: e82ffea5-13cf-5426-80a7-c5e7f25c2e1c
+status: experimental
+description: |
+    Pilar de cadena de suministro software. Un proceso del sistema cargando una DLL
+    desde una ruta escribible por el usuario es secuestro de orden de busqueda o
+    sideloading: el binario es legitimo y esta firmado, la libreria no. Es la tecnica
+    que mas veces sobrevive a un antivirus, porque lo que se ejecuta esta en la lista
+    blanca.
+references:
+    - https://attack.mitre.org/techniques/T1574/001/
+    - https://attack.mitre.org/techniques/T1574/002/
+    - https://csrc.nist.gov/pubs/sp/800/207/final
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.defense-evasion
+    - attack.t1574.001
+    - attack.t1574.002
+logsource:
+    category: image_load
+    product: windows
+detection:
+    selection_ruta:
+        ImageLoaded|contains:
+            - '\AppData\Local\Temp\'
+            - '\AppData\Roaming\'
+            - '\Users\Public\'
+            - '\ProgramData\'
+            - '\Windows\Temp\'
+            - '\$Recycle.Bin\'
+    selection_dll:
+        ImageLoaded|endswith: '.dll'
+    filtro_firmado:
+        Signed: 'true'
+        SignatureStatus: 'Valid'
+    filtro_instaladores:
+        Image|endswith:
+            - '\msiexec.exe'
+            - '\TrustedInstaller.exe'
+            - '\setup.exe'
+    condition: selection_ruta and selection_dll and not 1 of filtro_*
+falsepositives:
+    - Instaladores que descomprimen en Temp antes de registrar, normalmente acompanados de un evento de msiexec
+    - Software portable ejecutado desde el perfil del usuario
+level: high

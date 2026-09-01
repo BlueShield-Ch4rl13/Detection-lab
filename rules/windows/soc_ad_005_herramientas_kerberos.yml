@@ -1,0 +1,45 @@
+title: Herramienta de abuso de Kerberos ejecutada
+id: 8326ba13-ff5b-50a8-a31b-acdc642cb6b6
+status: experimental
+description: |
+    Deteccion por linea de comandos de las utilidades habituales de abuso de Kerberos:
+    Rubeus, mimikatz, kekeo e impacket. Complementa las detecciones basadas en eventos
+    de seguridad, que se pueden evadir con implementaciones propias, y cubre el caso en
+    que el binario se ha renombrado gracias a OriginalFileName.
+references:
+    - https://attack.mitre.org/techniques/T1558/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.credential-access
+    - attack.t1558
+    - attack.t1003
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_nombre:
+        - Image|endswith:
+            - '\Rubeus.exe'
+            - '\mimikatz.exe'
+            - '\kekeo.exe'
+            - '\GetUserSPNs.exe'
+        - OriginalFileName:
+            - 'Rubeus.exe'
+            - 'mimikatz.exe'
+    selection_args:
+        CommandLine|contains:
+            - 'kerberoast'
+            - 'asreproast'
+            - 'lsadump::dcsync'
+            - 'sekurlsa::logonpasswords'
+            - 'sekurlsa::tickets'
+            - 'kerberos::golden'
+            - 'kerberos::ptt'
+            - 'GetUserSPNs.py'
+            - 'GetNPUsers.py'
+            - 'secretsdump.py'
+    condition: 1 of selection_*
+falsepositives:
+    - Ejercicios de red team autorizados, que deben estar documentados y acotados en el tiempo
+level: critical

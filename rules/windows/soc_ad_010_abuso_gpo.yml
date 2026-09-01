@@ -1,0 +1,40 @@
+title: Modificacion sospechosa de directiva de grupo
+id: b79d32d8-b72a-5ae0-ad98-f6e745e568db
+status: experimental
+description: |
+    Un atacante con control sobre una GPO puede ejecutar codigo en todos los equipos que
+    la aplican. Detecta la ejecucion de herramientas de abuso de GPO y la modificacion
+    de los ficheros de scripts y tareas programadas dentro de SYSVOL.
+references:
+    - https://attack.mitre.org/techniques/T1484/001/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.defense-evasion
+    - attack.privilege-escalation
+    - attack.t1484.001
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_herramienta:
+        - Image|endswith:
+            - '\SharpGPOAbuse.exe'
+            - '\pyGPOAbuse.py'
+        - CommandLine|contains:
+            - 'SharpGPOAbuse'
+            - 'New-GPOImmediateTask'
+            - '--AddComputerTask'
+            - '--AddUserTask'
+    selection_sysvol:
+        CommandLine|contains|all:
+            - '\SYSVOL\'
+            - '\Policies\'
+        CommandLine|contains:
+            - 'ScheduledTasks.xml'
+            - '\Scripts\Startup'
+            - 'GptTmpl.inf'
+    condition: 1 of selection_*
+falsepositives:
+    - Administracion legitima de GPO, que deberia hacerse desde la consola y no por linea de comandos
+level: high

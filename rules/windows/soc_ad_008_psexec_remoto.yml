@@ -1,0 +1,37 @@
+title: Ejecucion remota tipo PsExec
+id: 115a874a-4941-5c4c-89fc-5c02eb47b43a
+status: experimental
+description: |
+    Detecta la instalacion del servicio que crean PsExec y sus clones (paexec, csexec,
+    remcom, impacket smbexec) para ejecutar codigo en un equipo remoto. Se apoya en el
+    evento 7045 del log de sistema, que registra el alta del servicio.
+references:
+    - https://attack.mitre.org/techniques/T1569/002/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.lateral-movement
+    - attack.execution
+    - attack.t1569.002
+logsource:
+    product: windows
+    service: system
+detection:
+    selection:
+        Provider_Name: 'Service Control Manager'
+        EventID: 7045
+    selection_nombre:
+        - ServiceName|contains:
+            - 'PSEXESVC'
+            - 'PAExec'
+            - 'csexec'
+            - 'RemCom'
+        - ImagePath|contains:
+            - '\PSEXESVC'
+            - '%SystemRoot%\{'
+            - 'cmd.exe /c echo'
+            - '\ADMIN$\'
+    condition: selection and selection_nombre
+falsepositives:
+    - Uso administrativo de PsExec por parte del equipo de sistemas, que conviene restringir a equipos bastion
+level: high

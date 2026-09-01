@@ -1,0 +1,149 @@
+# =====================================================================
+# Pipeline de pySigma para el paquete SOC
+#
+# El backend de Splunk exige un pipeline que le diga a que indice y
+# sourcetype corresponde cada logsource de Sigma. Los pipelines oficiales
+# (sysmon, splunk_windows) solo cubren Windows; este anade el resto:
+# Entra ID, Microsoft 365, Proofpoint, Netskope, proxy, DNS y servidor web.
+#
+# Es el fichero que hay que tocar para adaptar la conversion a otro
+# entorno: cambiando aqui los indices, las 48 reglas se regeneran solas.
+#
+# Uso:
+#   sigma convert -t splunk -p sysmon -p splunk_windows \
+#                 -p tools/pipelines/splunk.yml rules/
+#
+# Cada indice de aqui es el unico sitio donde cambiarlo: las reglas Sigma no
+# llevan indices escritos a mano.
+# =====================================================================
+name: detection-lab - indices y sourcetypes
+priority: 20
+
+transformations:
+
+  # --- Entra ID -------------------------------------------------------
+  - id: entra_signin
+    type: add_condition
+    conditions:
+      index: idp
+      sourcetype: 'azure:aad:signin'
+    rule_conditions:
+      - type: logsource
+        product: azure
+        service: signinlogs
+
+  - id: entra_audit
+    type: add_condition
+    conditions:
+      index: idp
+      sourcetype: 'azure:aad:audit'
+    rule_conditions:
+      - type: logsource
+        product: azure
+        service: auditlogs
+
+  # --- Microsoft 365 --------------------------------------------------
+  - id: m365_exchange
+    type: add_condition
+    conditions:
+      index: m365
+      sourcetype: 'o365:management:activity'
+    rule_conditions:
+      - type: logsource
+        product: m365
+        service: exchange
+
+  # --- Correo: Proofpoint ---------------------------------------------
+  - id: proofpoint_tap
+    type: add_condition
+    conditions:
+      index: email
+      sourcetype: 'proofpoint:tap'
+    rule_conditions:
+      - type: logsource
+        product: proofpoint
+        service: tap
+
+  # --- CASB: Netskope -------------------------------------------------
+  - id: netskope_alertas
+    type: add_condition
+    conditions:
+      index: casb
+      sourcetype: 'netskope:alerts'
+    rule_conditions:
+      - type: logsource
+        product: netskope
+        service: alerts
+
+  # --- Red -------------------------------------------------------------
+  - id: proxy
+    type: add_condition
+    conditions:
+      index: proxy
+    rule_conditions:
+      - type: logsource
+        category: proxy
+
+  - id: dns
+    type: add_condition
+    conditions:
+      index: network
+      sourcetype: 'suricata:eve'
+      event_type: dns
+    rule_conditions:
+      - type: logsource
+        category: dns
+
+  - id: webserver
+    type: add_condition
+    conditions:
+      index: web
+    rule_conditions:
+      - type: logsource
+        category: webserver
+
+  # --- Endpoint Linux -------------------------------------------------
+  - id: linux_proceso
+    type: add_condition
+    conditions:
+      index: endpoint
+      sourcetype: 'linux:audit'
+    rule_conditions:
+      - type: logsource
+        category: process_creation
+        product: linux
+
+  # --- Endpoint macOS -------------------------------------------------
+  # ESF (Endpoint Security Framework) reenviado por el agente. Si la
+  # telemetria llega por osquery, cambia el sourcetype a 'osquery:results'.
+  - id: macos_proceso
+    type: add_condition
+    conditions:
+      index: endpoint
+      sourcetype: 'macos:esf'
+    rule_conditions:
+      - type: logsource
+        category: process_creation
+        product: macos
+
+  - id: macos_fichero
+    type: add_condition
+    conditions:
+      index: endpoint
+      sourcetype: 'macos:esf'
+    rule_conditions:
+      - type: logsource
+        category: file_event
+        product: macos
+
+  # --- Kubernetes -----------------------------------------------------
+  - id: k8s_auditoria
+    type: add_condition
+    conditions:
+      index: k8s
+      sourcetype: 'kube:apiserver:audit'
+    rule_conditions:
+      - type: logsource
+        product: kubernetes
+        service: audit
+

@@ -1,0 +1,34 @@
+title: Montaje de almacenamiento extraible
+id: 7cbc6380-a117-572b-830c-b754c0f78f4a
+status: experimental
+description: |
+    Pilar de dispositivos y de datos. Un USB conectado a un equipo con acceso a
+    recursos corporativos es a la vez via de entrada de codigo y via de salida de
+    datos. En un entorno Zero Trust maduro el almacenamiento extraible esta
+    bloqueado por politica; verlo montado significa que la politica no se aplica en
+    ese equipo.
+references:
+    - https://attack.mitre.org/techniques/T1052/001/
+    - https://attack.mitre.org/techniques/T1091/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.exfiltration
+    - attack.initial-access
+    - attack.t1052.001
+    - attack.t1091
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID: 6416
+    selection_clase:
+        ClassName|contains:
+            - 'DiskDrive'
+            - 'USB'
+            - 'WPD'
+    condition: selection and selection_clase
+falsepositives:
+    - Soportes cifrados y aprobados, que deberian identificarse por numero de serie en una lista
+level: medium

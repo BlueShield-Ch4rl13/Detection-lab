@@ -1,0 +1,38 @@
+title: Protocolo en claro hacia un recurso que exige cifrado
+id: 047df04a-271b-59d0-af0b-69f1039cf53a
+status: experimental
+description: |
+    Pilar de redes. El cifrado extremo a extremo es uno de los siete principios de
+    NIST SP 800-207: la red interna no se considera de confianza, asi que el trafico
+    interno tambien va cifrado. Telnet, FTP, LDAP simple o HTTP hacia un servicio de
+    negocio son a la vez una desviacion de la arquitectura y una oportunidad de
+    captura de credenciales.
+references:
+    - https://csrc.nist.gov/pubs/sp/800/207/final
+    - https://attack.mitre.org/techniques/T1040/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.credential-access
+    - attack.collection
+    - attack.t1040
+logsource:
+    category: network_connection
+detection:
+    selection_puertos:
+        DestinationPort:
+            - 21     # FTP
+            - 23     # Telnet
+            - 69     # TFTP
+            - 110    # POP3 sin cifrar
+            - 143    # IMAP sin cifrar
+            - 389    # LDAP simple
+            - 512    # rexec
+            - 513    # rlogin
+            - 514    # rsh
+    selection_inicio:
+        Initiated: 'true'
+    condition: selection_puertos and selection_inicio
+falsepositives:
+    - Equipamiento heredado sin alternativa cifrada, que debe estar inventariado y segmentado
+level: medium

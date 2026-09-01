@@ -52,34 +52,48 @@ llegando a Wazuh — que es justo lo que consumen las reglas.
 
 Las reglas viven en **Sigma** (formato portable). Dos formas de usarlas en Wazuh:
 
-**A) Hunting en el indexer (rápido):** usa las consultas ya convertidas a Lucene
-   en `deploy/windows-wazuh-lucene.txt` y `deploy/linux-wazuh-lucene.txt`
-   directamente en Discover de Wazuh/OpenSearch.
-
-**B) Reglas nativas de Wazuh (alerta):** traduce las de mayor valor a reglas XML
-   de Wazuh en la serie **100xxx** (para no chocar con tus 110xxx de
-   Infra-SocAnalyst). Ejemplo para "PowerShell codificado":
-
-```xml
-<group name="sysmon,sigma,detection_lab,">
-  <rule id="100201" level="12">
-    <if_group>sysmon_event1</if_group>
-    <field name="win.eventdata.image">powershell\.exe$</field>
-    <field name="win.eventdata.commandLine">-enc|-EncodedCommand</field>
-    <description>Detection-lab: PowerShell con comando codificado (T1059.001)</description>
-    <mitre><id>T1059.001</id></mitre>
-  </rule>
-</group>
-```
-
-Regenera todas las conversiones cuando cambies reglas:
+**A) Reglas nativas de Wazuh — es lo que alerta.** `tools/sigma_to_wazuh.py`
+   convierte las 87 reglas Sigma en 139 reglas XML. Las genera en la serie
+   **101xxx**, que no choca ni con las 100xxx de marco de este repositorio ni
+   con las 110xxx de Infra-SocAnalyst.
 
 ```bash
-sigma convert -t lucene  -p sysmon rules/windows/ > deploy/windows-wazuh-lucene.txt
-sigma convert -t splunk  -p sysmon rules/windows/ > deploy/windows-splunk.txt
-sigma convert -t esql    -p sysmon rules/windows/ > deploy/windows-esql.txt
-sigma convert -t lucene  --without-pipeline rules/linux/ > deploy/linux-wazuh-lucene.txt
+python tools/build.py                     # regenera los cuatro SIEM
+
+sudo cp deploy/wazuh/0970-detection_lab_sigma.xml /var/ossec/etc/rules/
+sudo cp deploy/wazuh/09[0-6]*.xml                 /var/ossec/etc/rules/   # marco (opcional)
+sudo /var/ossec/bin/wazuh-logtest -t              # comprueba la sintaxis antes de reiniciar
+sudo systemctl restart wazuh-manager
 ```
+
+   Por que hay mas reglas XML que reglas Sigma: Wazuh combina con **AND** todas
+   las condiciones de una regla, no tiene OR dentro de una. Una condicion Sigma
+   como `1 of selection_*` se pasa a forma normal disyuntiva (aplicando De
+   Morgan a las negaciones) y se emite **una regla por cada termino**. Por eso
+   las descripciones acaban en `[1/5]`, `[2/5]`…: son partes de la misma
+   deteccion.
+
+**B) Hunting en el indexador — es lo que busca hacia atras.** Las consultas
+   Lucene de `deploy/elastic/*-lucene.txt` van directamente al Discover de
+   Wazuh/OpenSearch. **No alertan**: sirven para cazar sobre lo ya indexado
+   cuando llega un IOC nuevo o hay que revisar una ventana pasada. Una consulta
+   Lucene no es una deteccion desplegada, y es un error frecuente confundirlas.
+
+### Lo que no se convierte, y hay que saberlo
+
+Cinco reglas no tienen equivalente en Wazuh, y `tools/build.py` lo dice cada vez
+que se ejecuta en lugar de generar algo que parezca equivalente:
+
+| Regla | Motivo |
+|---|---|
+| Password spraying contra Entra ID | Correlacion `value_count`: Wazuh cuenta disparos de regla con `<frequency>`, no valores distintos de un campo |
+| Reutilizacion de sesion desde redes distintas | Igual |
+| Envio masivo desde una cuenta interna | Igual |
+| Dispositivo no conforme | Compara contra `null` (campo ausente), que Wazuh no puede comprobar sobre un campo decodificado |
+| Correo desde un dominio recien registrado | Usa el modificador `|lt` (comparacion numerica), que Wazuh no expresa |
+
+Las tres correlaciones si estan disponibles en Splunk, y en Sentinel como KQL
+escrito a mano en `deploy/sentinel/correlaciones.kql`.
 
 ## Paso 3 — Emular con Atomic Red Team
 

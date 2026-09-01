@@ -1,0 +1,48 @@
+title: Modificacion de un fichero de dependencias o lockfile
+id: 933f7737-80c7-5bdb-8ce2-e857119ac34d
+status: experimental
+description: |
+    Pilar de cadena de suministro software. El lockfile es lo que garantiza que lo que
+    se compila hoy es lo mismo que se auditó ayer. Modificarlo fuera de un commit
+    revisado, sobre todo en un servidor de compilacion, es la forma limpia de
+    introducir una dependencia maliciosa sin tocar el codigo fuente.
+references:
+    - https://attack.mitre.org/techniques/T1195/001/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.initial-access
+    - attack.persistence
+    - attack.t1195.001
+logsource:
+    category: file_event
+detection:
+    selection_ficheros:
+        TargetFilename|endswith:
+            - '/package-lock.json'
+            - '/yarn.lock'
+            - '/pnpm-lock.yaml'
+            - '/poetry.lock'
+            - '/Pipfile.lock'
+            - '/requirements.txt'
+            - '/go.sum'
+            - '/Cargo.lock'
+            - '/composer.lock'
+            - '/Gemfile.lock'
+    filtro_herramientas:
+        Image|endswith:
+            - '/git'
+            - '/npm'
+            - '/yarn'
+            - '/pnpm'
+            - '/poetry'
+            - '/pip'
+            - '/pip3'
+            - '/go'
+            - '/cargo'
+            - '/composer'
+            - '/bundle'
+    condition: selection_ficheros and not filtro_herramientas
+falsepositives:
+    - Edicion manual por una persona desarrolladora en su propio equipo
+level: medium

@@ -1,0 +1,32 @@
+title: Borrado o reduccion del registro de auditoria
+id: 15af3283-6349-580f-980f-519cc737d589
+status: experimental
+description: |
+    Capacidad transversal de visibilidad y analitica del modelo CISA. Sin registro no
+    hay deteccion, y por eso su manipulacion es uno de los primeros movimientos tras
+    conseguir privilegios. Cubre el borrado del canal, la desactivacion de categorias
+    de auditoria y la reduccion del tamano de retencion, que es la version silenciosa
+    del borrado.
+references:
+    - https://attack.mitre.org/techniques/T1070/001/
+    - https://www.cisa.gov/zero-trust-maturity-model
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.defense-evasion
+    - attack.t1070.001
+    - attack.t1562.002
+logsource:
+    product: windows
+    service: security
+detection:
+    selection_borrado:
+        EventID:
+            - 1102   # registro de auditoria borrado
+            - 1100   # servicio de registro de eventos detenido
+    selection_politica:
+        EventID: 4719   # cambio en la politica de auditoria del sistema
+    condition: 1 of selection_*
+falsepositives:
+    - Apagado ordenado del equipo, que genera 1100 de forma legitima y se distingue por ir seguido del arranque
+level: critical

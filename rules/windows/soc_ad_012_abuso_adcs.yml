@@ -1,0 +1,38 @@
+title: Abuso de servicios de certificados de Active Directory
+id: 6197f868-992a-5ff7-a3bb-9fd7b94eaf75
+status: experimental
+description: |
+    Los ataques ESC1 a ESC8 sobre AD CS permiten obtener un certificado que autentica
+    como cualquier usuario, incluido un administrador de dominio. Detecta la ejecucion
+    de las herramientas de abuso y la solicitud de certificados con un SAN que no
+    corresponde al solicitante.
+references:
+    - https://attack.mitre.org/techniques/T1649/
+    - https://posts.specterops.io/certified-pre-owned-d95910965cd2
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.credential-access
+    - attack.privilege-escalation
+    - attack.t1649
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_herramienta:
+        - Image|endswith:
+            - '\Certify.exe'
+            - '\Certipy.exe'
+        - CommandLine|contains:
+            - 'Certify.exe request'
+            - 'certipy req'
+            - 'certipy auth'
+            - 'Rubeus.exe asktgt'
+    selection_san:
+        CommandLine|contains|all:
+            - 'certreq'
+            - 'san:'
+    condition: 1 of selection_*
+falsepositives:
+    - Emision legitima de certificados, que normalmente se hace desde la consola de la CA y no por linea de comandos
+level: critical

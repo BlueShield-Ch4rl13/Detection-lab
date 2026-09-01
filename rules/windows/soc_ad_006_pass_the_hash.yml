@@ -1,0 +1,30 @@
+title: Pass-the-Hash y Overpass-the-Hash
+id: 01c2fb48-329b-5375-b16a-812b91423779
+status: experimental
+description: |
+    El logon de tipo 9 (NewCredentials) generado por el proceso seclogo con paquete
+    Negotiate es la firma clasica de "runas /netonly" usado por mimikatz sekurlsa::pth.
+    Tambien se cubre el logon de red con NTLM desde una cuenta privilegiada, que en un
+    dominio con Kerberos disponible no deberia producirse.
+references:
+    - https://attack.mitre.org/techniques/T1550/002/
+author: SOC Detection Pack
+date: 2026/08/27
+tags:
+    - attack.lateral-movement
+    - attack.t1550.002
+logsource:
+    product: windows
+    service: security
+detection:
+    selection_pth:
+        EventID: 4624
+        LogonType: 9
+        LogonProcessName: 'seclogo'
+        AuthenticationPackageName: 'Negotiate'
+    filter_cuentas:
+        TargetUserName|endswith: '$'
+    condition: selection_pth and not filter_cuentas
+falsepositives:
+    - Uso legitimo de runas /netonly por parte de administradores, que conviene inventariar
+level: high
