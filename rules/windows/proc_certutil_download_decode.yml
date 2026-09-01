@@ -7,9 +7,9 @@ references:
 author: C. Villalba
 date: 2026/07/16
 tags:
-- attack.command_and_control
+- attack.command-and-control
 - attack.t1105
-- attack.defense_evasion
+- attack.defense-evasion
 - attack.t1140
 logsource:
   category: process_creation
