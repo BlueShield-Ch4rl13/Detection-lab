@@ -18,9 +18,9 @@
     },
     {
       "techniqueID": "T1003.001",
-      "score": 2,
+      "score": 4,
       "color": "",
-      "comment": "2 regla(s): Volcado de memoria de LSASS; Acceso a memoria de LSASS con permisos de lectura",
+      "comment": "4 regla(s): Volcado de LSASS via comsvcs MiniDump; Indicadores de Mimikatz en linea de comandos; Volcado de memoria de LSASS; Acceso a memoria de LSASS con permisos de lectura",
       "enabled": true
     },
     {
@@ -95,9 +95,9 @@
     },
     {
       "techniqueID": "T1053.005",
-      "score": 1,
+      "score": 2,
       "color": "",
-      "comment": "1 regla(s): Tarea programada sospechosa",
+      "comment": "2 regla(s): Creacion de tarea programada via schtasks; Tarea programada sospechosa",
       "enabled": true
     },
     {
@@ -109,9 +109,9 @@
     },
     {
       "techniqueID": "T1059.001",
-      "score": 1,
+      "score": 3,
       "color": "",
-      "comment": "1 regla(s): PowerShell codificado u ofuscado",
+      "comment": "3 regla(s): Cradle de descarga en PowerShell; PowerShell con comando codificado; PowerShell codificado u ofuscado",
       "enabled": true
     },
     {
@@ -137,9 +137,9 @@
     },
     {
       "techniqueID": "T1070.001",
-      "score": 2,
+      "score": 3,
       "color": "",
-      "comment": "2 regla(s): Defensas de seguridad deshabilitadas; Borrado o reduccion del registro de auditoria",
+      "comment": "3 regla(s): Borrado de registros de eventos; Defensas de seguridad deshabilitadas; Borrado o reduccion del registro de auditoria",
       "enabled": true
     },
     {
@@ -256,9 +256,9 @@
     },
     {
       "techniqueID": "T1105",
-      "score": 3,
+      "score": 5,
       "color": "",
-      "comment": "3 regla(s): Descarga tuberia a shell (curl|bash); Descarga y ejecucion directa en macOS; LOLBin usado para descargar y ejecutar",
+      "comment": "5 regla(s): Descarga tuberia a shell (curl|bash); Descarga y ejecucion directa en macOS; Certutil usado para descargar o decodificar; Cradle de descarga en PowerShell; y 1 mas",
       "enabled": true
     },
     {
@@ -291,9 +291,9 @@
     },
     {
       "techniqueID": "T1140",
-      "score": 2,
+      "score": 3,
       "color": "",
-      "comment": "2 regla(s): Ejecucion de payload codificado en base64; LOLBin usado para descargar y ejecutar",
+      "comment": "3 regla(s): Ejecucion de payload codificado en base64; Certutil usado para descargar o decodificar; LOLBin usado para descargar y ejecutar",
       "enabled": true
     },
     {
@@ -319,9 +319,9 @@
     },
     {
       "techniqueID": "T1197",
-      "score": 1,
+      "score": 2,
       "color": "",
-      "comment": "1 regla(s): LOLBin usado para descargar y ejecutar",
+      "comment": "2 regla(s): Descarga con BITSAdmin; LOLBin usado para descargar y ejecutar",
       "enabled": true
     },
     {
@@ -340,16 +340,16 @@
     },
     {
       "techniqueID": "T1218.005",
-      "score": 1,
+      "score": 2,
       "color": "",
-      "comment": "1 regla(s): LOLBin usado para descargar y ejecutar",
+      "comment": "2 regla(s): Ejecucion sospechosa de mshta; LOLBin usado para descargar y ejecutar",
       "enabled": true
     },
     {
       "techniqueID": "T1218.010",
-      "score": 1,
+      "score": 2,
       "color": "",
-      "comment": "1 regla(s): LOLBin usado para descargar y ejecutar",
+      "comment": "2 regla(s): Regsvr32 ejecutando scriptlet remoto (Squiblydoo); LOLBin usado para descargar y ejecutar",
       "enabled": true
     },
     {
@@ -375,9 +375,9 @@
     },
     {
       "techniqueID": "T1490",
-      "score": 1,
+      "score": 2,
       "color": "",
-      "comment": "1 regla(s): Destruccion de copias de seguridad y puntos de restauracion",
+      "comment": "2 regla(s): Borrado de instantaneas (anti-recuperacion); Destruccion de copias de seguridad y puntos de restauracion",
       "enabled": true
     },
     {
@@ -424,9 +424,9 @@
     },
     {
       "techniqueID": "T1547.001",
-      "score": 1,
+      "score": 2,
       "color": "",
-      "comment": "1 regla(s): Persistencia por claves de arranque del registro",
+      "comment": "2 regla(s): Persistencia por clave Run (registro); Persistencia por claves de arranque del registro",
       "enabled": true
     },
     {
@@ -515,9 +515,9 @@
     },
     {
       "techniqueID": "T1562.001",
-      "score": 2,
+      "score": 3,
       "color": "",
-      "comment": "2 regla(s): Gatekeeper deshabilitado o cuarentena eliminada; Defensas de seguridad deshabilitadas",
+      "comment": "3 regla(s): Gatekeeper deshabilitado o cuarentena eliminada; Manipulacion de Windows Defender; Defensas de seguridad deshabilitadas",
       "enabled": true
     },
     {
