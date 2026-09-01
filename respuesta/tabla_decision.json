@@ -1,0 +1,864 @@
+{
+  "ad": {
+    "nombre": "Active Directory y movimiento lateral en dominio",
+    "enriquecimiento": [
+      "cti_local",
+      "inventario",
+      "directorio",
+      "historico_siem",
+      "calendario_cambios"
+    ],
+    "evidencia": [
+      "Tickets de servicio pedidos por la cuenta, con tipo de cifrado y nombre de servicio",
+      "Peticiones de replicacion de directorio y quien las hizo",
+      "Modificacion del objeto de directorio con valor anterior y nuevo",
+      "Donde se uso despues el material de autenticacion",
+      "Descriptor de seguridad y atributos sensibles del objeto antes de tocar nada",
+      "Tickets Kerberos en cache en el equipo de origen"
+    ],
+    "cierre_automatico": [],
+    "contencion": [
+      {
+        "accion": "Aislar el endpoint de origen en la red, dejando solo la comunicacion con el manager",
+        "radio": "equipo",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Matar el proceso de la herramienta por su ProcessGuid",
+        "radio": "proceso",
+        "aprobacion": "no",
+        "reversible": "no"
+      },
+      {
+        "accion": "Congelar el estado del objeto de directorio tocado en el caso",
+        "radio": "objeto",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Aislar el controlador de dominio",
+        "radio": "equipo",
+        "aprobacion": "si",
+        "reversible": "si"
+      }
+    ],
+    "requiere_persona": [
+      "Rotar krbtgt",
+      "Revertir el descriptor de seguridad, retirar sIDHistory o quitar la delegacion",
+      "Revocar los certificados emitidos por la CA",
+      "Deshabilitar la cuenta de equipo o de usuario implicada",
+      "Declarar el dominio comprometido"
+    ],
+    "escalado": {
+      "a": "L3",
+      "plazo_min": 10,
+      "a_guardia_si": "El objeto tocado es krbtgt, la CA o ntds.dit, o el origen es un controlador de dominio"
+    }
+  },
+  "cloud": {
+    "nombre": "Identidad y plano de control en la nube",
+    "enriquecimiento": [
+      "identidad_nube",
+      "cti_local",
+      "geo_asn",
+      "inventario_aplicaciones",
+      "historico_siem"
+    ],
+    "evidencia": [
+      "Sesiones vivas y tokens de refresco de la identidad, con hora de emision",
+      "Permisos concretos concedidos en el consentimiento, no el nombre de la aplicacion",
+      "Cambios en el inquilino hechos por esa identidad en las 24 h siguientes",
+      "Cadena completa del inicio de sesion",
+      "Que ha leido la aplicacion o el service principal desde la concesion",
+      "Reglas de buzon y reenvios creados por esa identidad"
+    ],
+    "cierre_automatico": [
+      "Password spraying (soc_cld_003) cuyos fallos se concentran en una sola\ncuenta y proceden de una unica IP que el inventario resuelve a un\ndispositivo corporativo gestionado, con codigo de error de credencial\ncacheada o expirada.\n",
+      "Subida a SaaS no aprobado (soc_cld_010) cuando el servicio de destino\nfigura en el catalogo de aplicaciones con aprobacion vigente y contrato\nde tratamiento, y el volumen queda por debajo del umbral de la regla de\nexfiltracion.\n"
+    ],
+    "contencion": [
+      {
+        "accion": "Revocar las sesiones y los tokens de refresco de la identidad",
+        "radio": "equipo",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Marcar la identidad como en riesgo para forzar reautenticacion con MFA en el siguiente acceso",
+        "radio": "equipo",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Anotar en el caso los permisos concedidos y dejar preparada su retirada",
+        "radio": "objeto",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Retirar el consentimiento de la aplicacion o anular la credencial anadida al service principal",
+        "radio": "cuenta",
+        "aprobacion": "si",
+        "reversible": "si"
+      }
+    ],
+    "requiere_persona": [
+      "Deshabilitar la cuenta",
+      "Restablecer la contrasena",
+      "Revertir la politica de acceso condicional modificada",
+      "Retirar el rol privilegiado asignado",
+      "Declarar el inquilino comprometido"
+    ],
+    "escalado": {
+      "a": "L2",
+      "plazo_min": 15,
+      "a_L3_si": "Hay alta en un rol de administracion global, modificacion de acceso condicional o consentimiento con permisos de aplicacion"
+    }
+  },
+  "contenedores": {
+    "nombre": "Kubernetes y runtime de contenedores",
+    "enriquecimiento": [
+      "k8s_api",
+      "inventario",
+      "cti_local",
+      "registro_imagenes",
+      "directorio"
+    ],
+    "evidencia": [
+      "Manifiesto del pod y de su propietario, antes de que se reprograme",
+      "Registros del contenedor mientras el pod aun existe",
+      "Todas las peticiones del mismo sujeto al API server en 1 h",
+      "Procesos y llamadas al sistema vistos desde el nodo",
+      "Permisos efectivos del ServiceAccount implicado",
+      "Digest de la imagen en ejecucion, no su etiqueta"
+    ],
+    "cierre_automatico": [
+      "Lectura de secretos (k8s_lectura_masiva_secretos) cuyo sujeto es un\nServiceAccount de la lista de operadores aprobados, con la peticion\nllegando desde la IP del pod de ese operador, el user-agent del\ncontrolador y los secretos leidos dentro del conjunto que ese operador\nya reconcilia habitualmente.\n"
+    ],
+    "contencion": [
+      {
+        "accion": "Acordonar el nodo donde corre el pod",
+        "radio": "objeto",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Aplicar una NetworkPolicy de denegacion de salida sobre las etiquetas del pod",
+        "radio": "objeto",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Retirar el RoleBinding o ClusterRoleBinding creado en la escalada, guardando su manifiesto",
+        "radio": "equipo",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Escalar el workload a cero replicas",
+        "radio": "objeto",
+        "aprobacion": "si",
+        "reversible": "si"
+      }
+    ],
+    "requiere_persona": [
+      "Rotar los secretos que se hayan leido",
+      "Reconstruir o retirar la imagen del registro",
+      "Declarar el nodo o el cluster comprometido",
+      "Revisar el resto de workloads con la misma configuracion insegura"
+    ],
+    "escalado": {
+      "a": "L2",
+      "plazo_min": 15,
+      "a_L3_si": "Hay escape a los namespaces del host, acceso al socket del runtime o montaje de hostPath sobre una ruta sensible"
+    }
+  },
+  "correo": {
+    "nombre": "Phishing y abuso del canal de correo",
+    "enriquecimiento": [
+      "pasarela_correo",
+      "cti_local",
+      "directorio",
+      "historico_siem",
+      "inventario_dominios"
+    ],
+    "evidencia": [
+      "Lista completa de destinatarios del mismo mensaje o campana",
+      "Registro de clics del proveedor, con hora y usuario",
+      "Estado de entrega por destinatario: entregado, en cuarentena o retirado",
+      "Cabeceras completas con resultados de SPF, DKIM y DMARC",
+      "Comportamiento del adjunto detonado en la caja de arena",
+      "Autenticaciones del usuario que pulso en los 60 minutos siguientes",
+      "Reglas de buzon y reenvios creados en ese buzon en las 24 h siguientes"
+    ],
+    "cierre_automatico": [
+      "Mensaje bloqueado o puesto en cuarentena por la pasarela antes de la\nentrega, con cero destinatarios en estado entregado y sin ninguna\nentrada en el registro de clics para las URL que contiene.\n",
+      "Envio masivo interno (soc_mail_007) desde un buzon de la lista de\nemisores autorizados - comunicacion interna, recursos humanos,\nsistemas - dentro de una ventana de campana registrada.\n"
+    ],
+    "contencion": [
+      {
+        "accion": "Retirar el mensaje de todos los buzones que lo recibieron mediante borrado reversible",
+        "radio": "equipo",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Deshabilitar la regla de reenvio externa creada, guardando antes su definicion completa",
+        "radio": "objeto",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Anadir la URL concreta a la lista de bloqueo del reescritor de enlaces del proveedor",
+        "radio": "equipo",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Bloquear el dominio o la IP remitente en la pasarela de correo",
+        "radio": "organizacion",
+        "aprobacion": "si",
+        "reversible": "si"
+      }
+    ],
+    "requiere_persona": [
+      "Contactar con el usuario que pulso",
+      "Restablecer la credencial del usuario",
+      "Avisar al resto de la organizacion de la campana",
+      "Denunciar el dominio o pedir su retirada"
+    ],
+    "escalado": {
+      "a": "L2",
+      "plazo_min": 20,
+      "a_L3_si": "Hay clic confirmado con autenticacion posterior desde IP nueva, o se creo una regla de reenvio externa en el buzon del que pulso"
+    }
+  },
+  "credenciales": {
+    "nombre": "Volcado y robo de credenciales",
+    "enriquecimiento": [
+      "cti_local",
+      "inventario",
+      "directorio",
+      "historico_siem"
+    ],
+    "evidencia": [
+      "Arbol de procesos completo del proceso que accedio",
+      "Conexiones de red del proceso en los 10 minutos previos y posteriores",
+      "Hash del binario y su primera aparicion en el parque",
+      "Sesiones abiertas en el equipo en el momento del evento"
+    ],
+    "cierre_automatico": [],
+    "contencion": [
+      {
+        "accion": "Aislar el endpoint en la red, dejando solo la comunicacion con el manager",
+        "radio": "equipo",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Marcar las credenciales del usuario y del equipo para rotacion",
+        "radio": "objeto",
+        "aprobacion": "no",
+        "reversible": "si"
+      }
+    ],
+    "requiere_persona": [
+      "Rotar la contrasena de la cuenta afectada",
+      "Rotar krbtgt",
+      "Deshabilitar la cuenta",
+      "Reinstalar el equipo"
+    ],
+    "escalado": {
+      "a": "L2",
+      "plazo_min": 15,
+      "a_L3_si": "El equipo es un controlador de dominio o la cuenta es administrativa"
+    }
+  },
+  "cumplimiento": {
+    "nombre": "Cumplimiento y obligaciones regulatorias",
+    "enriquecimiento": [
+      "registro_incidentes",
+      "inventario",
+      "calendario_obligaciones",
+      "itsm"
+    ],
+    "evidencia": [
+      "Momento exacto en que empezo a correr el plazo",
+      "Estado de la obligacion y quien es el responsable",
+      "Registro de la ultima ejecucion correcta del control"
+    ],
+    "cierre_automatico": [
+      "Fallo de copia de seguridad seguido, en la misma ventana de RPO, de una\nejecucion correcta del mismo trabajo sobre el mismo activo. El control se\ncumplio; el primer intento fallido es ruido operativo.\n",
+      "Desviacion de reloj en una fuente que vuelve a sincronizar sola en menos\nde 15 minutos y no tiene eventos de seguridad en esa ventana.\n"
+    ],
+    "contencion": [
+      {
+        "accion": "Fijar retencion extendida sobre los registros del periodo afectado",
+        "radio": "objeto",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Abrir o actualizar la tarea de obligacion con su plazo y responsable",
+        "radio": "objeto",
+        "aprobacion": "no",
+        "reversible": "si"
+      }
+    ],
+    "requiere_persona": [
+      "Decidir si el incidente es notificable",
+      "Redactar y enviar la notificacion a la autoridad",
+      "Aceptar una desviacion como riesgo asumido",
+      "Restaurar desde copia de seguridad"
+    ],
+    "escalado": {
+      "a": "L2",
+      "plazo_min": 60,
+      "a_L3_si": "Quedan menos de 24 h de un plazo de NIS2, DORA o RGPD"
+    }
+  },
+  "endpoint": {
+    "nombre": "Ejecucion y persistencia en el puesto Windows",
+    "enriquecimiento": [
+      "cti_local",
+      "inventario",
+      "directorio",
+      "historico_siem",
+      "catalogo_software"
+    ],
+    "evidencia": [
+      "Arbol de procesos completo, tres niveles hacia arriba",
+      "Conexiones de red del proceso en los 10 minutos previos y posteriores",
+      "Ficheros escritos por el proceso, para separar descarga de ejecucion",
+      "Hash del binario y su primera aparicion y difusion en el parque",
+      "Persistencia declarada en el equipo en el momento del evento",
+      "Sesiones abiertas y quien las abrio"
+    ],
+    "cierre_automatico": [
+      "Ejecucion desde ruta de usuario o creacion de servicio (soc_edr_012,\nproc_service_create_scexe) cuyo proceso padre es el agente de\ndistribucion de software del parque, con binario firmado por un\nfabricante del catalogo, dentro de una ventana de despliegue publicada\nen el ITSM y con la misma senal presente en al menos otros cinco\nequipos del mismo grupo en esa ventana.\n",
+      "Conexion saliente inusual de un proceso del sistema\n(net_rare_process_external_conn) cuando el proceso esta firmado, reside\nen System32, el destino figura en la lista de puntos de actualizacion\naprobados y el par proceso-destino coincide con el de la linea base del\ngrupo de equipos.\n"
+    ],
+    "contencion": [
+      {
+        "accion": "Aislar el endpoint en la red, dejando solo la comunicacion con el manager",
+        "radio": "equipo",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Matar el proceso por su ProcessGuid",
+        "radio": "proceso",
+        "aprobacion": "no",
+        "reversible": "no"
+      },
+      {
+        "accion": "Poner el fichero en cuarentena moviendolo a la ruta de custodia, conservando hash y ruta original",
+        "radio": "objeto",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Deshabilitar la tarea programada o el valor Run creado, exportando antes su definicion",
+        "radio": "objeto",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Bloquear la ejecucion del hash en todo el parque mediante politica de control de aplicaciones",
+        "radio": "organizacion",
+        "aprobacion": "si",
+        "reversible": "si"
+      }
+    ],
+    "requiere_persona": [
+      "Reinstalar el equipo",
+      "Restaurar desde copia tras un cifrado",
+      "Activar el plan de continuidad",
+      "Deshabilitar la cuenta local creada o el usuario implicado"
+    ],
+    "escalado": {
+      "a": "L2",
+      "plazo_min": 20,
+      "a_L3_si": "Hay borrado de copias sombra, cifrado masivo o named pipe de framework de C2",
+      "a_guardia_si": "El cifrado esta en marcha o el equipo afectado es un servidor de ficheros"
+    }
+  },
+  "exfiltracion": {
+    "nombre": "Salida de informacion",
+    "enriquecimiento": [
+      "cti_local",
+      "inventario",
+      "directorio",
+      "historico_siem",
+      "catalogo_servicios"
+    ],
+    "evidencia": [
+      "Lista de ficheros tocados con ruta, tamano y hora, que es la base del calculo de alcance",
+      "Volumen enviado y recibido por separado, con destino resuelto",
+      "Manifiesto del archivo creado, no su contenido",
+      "Origen real de los datos, para saber que sistema hay que declarar",
+      "Estado y fecha de creacion de las reglas de reenvio del buzon",
+      "Retencion extendida sobre los indices que cubren la ventana del hecho"
+    ],
+    "cierre_automatico": [],
+    "contencion": [
+      {
+        "accion": "Fijar retencion extendida sobre los indices, el registro del proxy y el del correo que cubren la ventana",
+        "radio": "objeto",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Aislar el endpoint en la red, dejando solo la comunicacion con el manager",
+        "radio": "equipo",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Deshabilitar la regla de reenvio automatico creada, guardando antes su definicion completa",
+        "radio": "objeto",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Bloquear el destino de la subida en el proxy corporativo",
+        "radio": "organizacion",
+        "aprobacion": "si",
+        "reversible": "si"
+      }
+    ],
+    "requiere_persona": [
+      "Calificar el hecho como brecha de datos personales",
+      "Notificar a la autoridad o a los interesados",
+      "Entrevistar al usuario o implicar a recursos humanos",
+      "Avisar al cliente cuyos datos han salido",
+      "Deshabilitar la cuenta del usuario"
+    ],
+    "escalado": {
+      "a": "L2",
+      "plazo_min": 15,
+      "a_L3_si": "El activo de origen maneja datos personales o clasificados, o el volumen se desvia de la linea base",
+      "ademas_avisar_a": [
+        "dpd",
+        "asesoria_juridica"
+      ],
+      "nota_plazo": "El plazo de escalado no es el plazo regulatorio. Las 24 h de NIS2 y las\n72 h del RGPD empiezan a contar cuando la organizacion conoce el hecho, es\ndecir con esta alerta, no cuando el caso se asigna.\n"
+    }
+  },
+  "inteligencia": {
+    "nombre": "Coincidencias con la inteligencia de amenazas",
+    "enriquecimiento": [
+      "cti_local",
+      "resolucion_dns",
+      "historico_siem",
+      "inventario"
+    ],
+    "evidencia": [
+      "Proceso que origino la conexion o escribio el fichero",
+      "Antiguedad del indicador en la lista y su puntuacion",
+      "Cuantos equipos distintos del parque han tocado el indicador"
+    ],
+    "cierre_automatico": [
+      "Coincidencia unica de IP o dominio, de nivel medio o bajo, cuyo PTR y ASN\ncorresponden a un proveedor de CDN o de nube publica reconocido, con mas\nde diez equipos del parque hablando con ese mismo destino en 24 h y\nninguno de ellos con otra alerta abierta.\n",
+      "Coincidencia de dominio contra un indicador de mas de 25 dias que ya no\nfigura en el feed de la ultima sincronizacion.\n"
+    ],
+    "contencion": [
+      {
+        "accion": "Bloquear el destino en el proxy de salida solo para el equipo afectado",
+        "radio": "equipo",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Poner en cuarentena el fichero cuyo hash coincidio",
+        "radio": "objeto",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Aislar el endpoint en la red, dejando solo la comunicacion con el manager",
+        "radio": "equipo",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Bloquear el destino en el cortafuegos perimetral para toda la organizacion",
+        "radio": "organizacion",
+        "aprobacion": "si",
+        "reversible": "si"
+      }
+    ],
+    "requiere_persona": [
+      "Retirar un indicador de la lista por falso positivo repetido",
+      "Bloquear en el perimetro o en el DNS corporativo",
+      "Declarar comprometido un equipo por una sola coincidencia de reputacion"
+    ],
+    "escalado": {
+      "a": "L2",
+      "plazo_min": 30,
+      "a_L3_si": "La coincidencia es de hash o el equipo acumula tres indicadores distintos"
+    }
+  },
+  "linux": {
+    "nombre": "Endpoint y servidor Linux",
+    "enriquecimiento": [
+      "cti_local",
+      "inventario",
+      "gestion_accesos",
+      "historico_siem",
+      "calendario_cambios"
+    ],
+    "evidencia": [
+      "Sesion que ejecuto el comando y por donde entro",
+      "Arbol de procesos con el padre real y la hora de arranque",
+      "Conexiones abiertas por el proceso y su contraparte en el cortafuegos",
+      "Contenido de la persistencia creada, con marca de tiempo",
+      "Hash del binario y a que paquete pertenece",
+      "Historial de la shell antes de que se borre"
+    ],
+    "cierre_automatico": [
+      "Ejecucion o chmod +x sobre un fichero en /tmp, /var/tmp o /dev/shm\n(lin_chmod_tmp_exec) cuyo proceso padre es el gestor de paquetes o el\nagente de configuracion del parque, dentro de una ventana de\nmantenimiento abierta en el ITSM, y con el mismo evento presente en al\nmenos otros dos equipos del mismo grupo en esa ventana.\n"
+    ],
+    "contencion": [
+      {
+        "accion": "Aislar el servidor en la red, dejando solo la comunicacion con el manager",
+        "radio": "equipo",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Matar el proceso por PID y hora de arranque",
+        "radio": "proceso",
+        "aprobacion": "no",
+        "reversible": "no"
+      },
+      {
+        "accion": "Congelar el fichero de persistencia copiandolo al almacen de evidencia y fijando retencion",
+        "radio": "objeto",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Retirar la clave publica anadida a authorized_keys, guardando antes el fichero completo",
+        "radio": "cuenta",
+        "aprobacion": "si",
+        "reversible": "si"
+      }
+    ],
+    "requiere_persona": [
+      "Revertir /etc/ld.so.preload",
+      "Sacar el servidor de balanceo",
+      "Rotar las credenciales de servicio del equipo",
+      "Eliminar la cuenta local creada",
+      "Reconstruir el servidor"
+    ],
+    "escalado": {
+      "a": "L2",
+      "plazo_min": 20,
+      "a_L3_si": "Hay modificacion de ld.so.preload, shell inversa establecida o lectura de /etc/shadow en un servidor de produccion"
+    }
+  },
+  "macos": {
+    "nombre": "Endpoint macOS",
+    "enriquecimiento": [
+      "cti_local",
+      "mdm",
+      "inventario",
+      "directorio",
+      "historico_siem",
+      "catalogo_software"
+    ],
+    "evidencia": [
+      "Firma, notarizacion y Team ID del binario",
+      "Procedencia del fichero segun el atributo de cuarentena",
+      "Persistencia declarada y su contenido",
+      "Concesiones TCC vigentes, en copia y solo lectura",
+      "Arbol de procesos y actividad en la ventana, desde el registro unificado",
+      "Usuarios locales incluidos los ocultos por UniqueID bajo 500"
+    ],
+    "cierre_automatico": [
+      "Descarga y ejecucion desde /tmp, /var/folders o la cache del gestor\n(mac_descarga_y_ejecucion) cuyo proceso padre es el agente de gestion\ndel parque o el gestor de paquetes registrado del equipo, firmado con\nun Team ID del catalogo, dentro de la ventana de mantenimiento\npublicada en el ITSM.\n"
+    ],
+    "contencion": [
+      {
+        "accion": "Aislar el equipo en la red, dejando solo la comunicacion con el manager",
+        "radio": "equipo",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Matar el proceso por PID y hora de arranque",
+        "radio": "proceso",
+        "aprobacion": "no",
+        "reversible": "no"
+      },
+      {
+        "accion": "Poner el binario en cuarentena moviendolo al almacen de custodia, conservando hash y atributos extendidos",
+        "radio": "objeto",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Descargar y retirar el elemento de persistencia (launchctl bootout mas mover el plist)",
+        "radio": "objeto",
+        "aprobacion": "si",
+        "reversible": "si"
+      }
+    ],
+    "requiere_persona": [
+      "Rotar las credenciales guardadas en el llavero afectado",
+      "Restablecer la base de datos TCC",
+      "Reinstalar el equipo",
+      "Eliminar el usuario local oculto creado"
+    ],
+    "escalado": {
+      "a": "L2",
+      "plazo_min": 30,
+      "a_L3_si": "Se volco el llavero, se deshabilito SIP o el equipo guarda claves de firma"
+    }
+  },
+  "red": {
+    "nombre": "Trafico, mando y control",
+    "enriquecimiento": [
+      "cti_local",
+      "resolucion_dns",
+      "proxy",
+      "inventario",
+      "historico_siem"
+    ],
+    "evidencia": [
+      "Serie temporal de las conexiones al destino, con intervalos y desviacion tipica",
+      "Volumen enviado y recibido, por separado",
+      "Proceso que abrio la conexion en el equipo",
+      "Resolucion DNS previa y quien la pidio",
+      "Para tunel DNS, longitud y entropia de las etiquetas y numero de subdominios distintos en 1 h",
+      "SNI y emisor del certificado presentado por el destino"
+    ],
+    "cierre_automatico": [
+      "Coincidencia unica de reputacion - un solo indicador, en una sola\nlista - contra una IP cuyo PTR y ASN corresponden a un proveedor de CDN\no de nube publica reconocido, cuando mas de diez equipos del parque han\nhablado con ese mismo destino en las ultimas 24 h y ninguno de ellos\ntiene otra alerta abierta.\n",
+      "Beaconing (soc_net_001) hacia un destino que el proxy clasifica en la\ncategoria de actualizacion de software, abierto por un proceso firmado\nque es el cliente de actualizacion de ese mismo fabricante, y con el\nmismo patron presente en el resto de equipos del grupo.\n"
+    ],
+    "contencion": [
+      {
+        "accion": "Bloquear el destino en el proxy de salida solo para el equipo afectado",
+        "radio": "equipo",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Aislar el endpoint en la red, dejando solo la comunicacion con el manager",
+        "radio": "equipo",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Matar el proceso que sostiene la conexion por su ProcessGuid",
+        "radio": "proceso",
+        "aprobacion": "no",
+        "reversible": "no"
+      },
+      {
+        "accion": "Bloquear el destino en el cortafuegos perimetral para toda la organizacion",
+        "radio": "organizacion",
+        "aprobacion": "si",
+        "reversible": "si"
+      }
+    ],
+    "requiere_persona": [
+      "Bloquear el destino en el perimetro o en el DNS corporativo",
+      "Aislar un segmento de red completo",
+      "Contactar con el proveedor de alojamiento o pedir la retirada del dominio",
+      "Decidir que un beacon confirmado obliga a reconstruir el equipo"
+    ],
+    "escalado": {
+      "a": "L2",
+      "plazo_min": 30,
+      "a_L3_si": "Hay interaccion con webshell, o beaconing sostenido cuyo proceso no esta firmado ni conocido en el parque",
+      "nota_plazo": "El plazo es mas largo que en otras familias a proposito: el volumen de\ncoincidencias de reputacion no justifica acortar el turno de nadie. Lo que\nsi acorta el plazo no es la gravedad del indicador, es la repeticion en el\nmismo equipo.\n"
+    }
+  },
+  "web": {
+    "nombre": "Ataques contra aplicaciones web",
+    "enriquecimiento": [
+      "cti_local",
+      "inventario",
+      "cti_local",
+      "lookup",
+      "waf",
+      "historico_siem"
+    ],
+    "evidencia": [
+      "La peticion completa con cabeceras y cuerpo, no solo la URI",
+      "Las veinte peticiones anteriores y posteriores de la misma c-ip con su codigo y su tamano",
+      "Procesos hijo del proceso del servidor web en los 10 minutos siguientes",
+      "Ficheros creados bajo la raiz publicada en la ventana del evento",
+      "Conexiones salientes del servidor tras la peticion, para ver la segunda etapa",
+      "Version exacta del componente vulnerable en ejecucion"
+    ],
+    "cierre_automatico": [
+      "Escaneo automatizado (web_010) cuya c-ip pertenece al rango declarado\ndel escaner de vulnerabilidades autorizado, con marca de tiempo dentro\nde su ventana programada, y sin ninguna respuesta 200 a rutas que no\nfiguren en el inventario de la aplicacion.\n",
+      "Peticion con patron conocido de inyeccion o de salto de directorio\nbloqueada por el WAF con respuesta 403, contra una ruta que no existe\nen el inventario de endpoints de la aplicacion, y sin ninguna peticion\nposterior de la misma c-ip que devuelva 200 en la hora siguiente.\n"
+    ],
+    "contencion": [
+      {
+        "accion": "Poner en cuarentena el fichero aparecido bajo la raiz publicada, sacandolo del arbol servido y conservando ruta y hash",
+        "radio": "objeto",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Matar el proceso hijo lanzado por el servidor web, por PID y hora de arranque",
+        "radio": "proceso",
+        "aprobacion": "no",
+        "reversible": "no"
+      },
+      {
+        "accion": "Invalidar la sesion o el token JWT concreto abusado",
+        "radio": "objeto",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Publicar en el WAF la regla de bloqueo para la c-ip o el patron de origen",
+        "radio": "organizacion",
+        "aprobacion": "si",
+        "reversible": "si"
+      }
+    ],
+    "requiere_persona": [
+      "Sacar el servidor del balanceo o aislarlo",
+      "Aplicar el parche o desplegar la version corregida",
+      "Rotar las credenciales que el SSRF pudo obtener del servicio de metadatos",
+      "Decidir si la aplicacion se considera comprometida y se reconstruye"
+    ],
+    "escalado": {
+      "a": "L2",
+      "plazo_min": 15,
+      "a_L3_si": "Hay hijo del proceso del servidor web, fichero nuevo bajo la raiz publicada o respuesta 200 al patron de explotacion"
+    }
+  },
+  "xdr": {
+    "nombre": "Manipulacion de la telemetria y de las defensas",
+    "enriquecimiento": [
+      "consola_edr",
+      "inventario",
+      "calendario_cambios",
+      "directorio",
+      "cti_local",
+      "historico_siem"
+    ],
+    "evidencia": [
+      "Ultimo latido del sensor y los limites exactos del hueco de telemetria",
+      "Todo lo que el equipo envio en las 6 h anteriores al hueco",
+      "La ruta o el proceso excluidos y que ficheros hay hoy en esa ruta",
+      "Instalacion de servicio y carga de driver en la ventana",
+      "Actividad de red del equipo vista desde el cortafuegos y el proxy",
+      "Configuracion de arranque del equipo, marcada como no fiable"
+    ],
+    "cierre_automatico": [],
+    "contencion": [
+      {
+        "accion": "Aislar el endpoint en la red, aplicando y verificando el aislamiento fuera del agente",
+        "radio": "equipo",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Marcar el equipo como telemetria no fiable en el inventario, con la fecha de inicio del hueco",
+        "radio": "equipo",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Fijar retencion extendida sobre la telemetria anterior al hueco",
+        "radio": "equipo",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Desplegar la regla de bloqueo del driver vulnerable en la politica de la flota",
+        "radio": "organizacion",
+        "aprobacion": "si",
+        "reversible": "si"
+      }
+    ],
+    "requiere_persona": [
+      "Reinstalar o rearrancar el sensor",
+      "Retirar la exclusion de antivirus",
+      "Reconstruir el equipo",
+      "Revisar si la misma exclusion o la misma politica estan en mas equipos"
+    ],
+    "escalado": {
+      "a": "L2",
+      "plazo_min": 10,
+      "a_L3_si": "El sensor se desinstalo, se cargo un driver vulnerable conocido o se forzo el arranque en modo seguro",
+      "nota_plazo": "El plazo se cuenta desde el inicio del hueco de telemetria, no desde la\nalerta: entre uno y otra puede haber horas, y son precisamente las horas de\nlas que no hay datos.\n"
+    }
+  },
+  "zta": {
+    "nombre": "Desviaciones del modelo de confianza cero",
+    "enriquecimiento": [
+      "inventario",
+      "registro_excepciones",
+      "directorio",
+      "itsm",
+      "historico_siem"
+    ],
+    "evidencia": [
+      "El valor exacto de la desviacion, no su categoria",
+      "Desde cuando existe la desviacion",
+      "Alcance real de la desviacion en el parque",
+      "Para el borrado de auditoria, los eventos inmediatamente anteriores y si hubo arranque despues",
+      "Cambio concreto en el fichero de dependencias, con quien lo firmo"
+    ],
+    "cierre_automatico": [
+      "Protocolo en claro (zta_net_001) hacia un activo que figura en el\ninventario de sistemas heredados con excepcion aprobada, en vigor y con\nfecha de remediacion futura, y con el origen dentro del segmento\ndeclarado en esa misma excepcion.\n",
+      "Montaje de almacenamiento extraible (zta_dev_001) cuyo numero de serie\nfigura en la lista de soportes cifrados aprobados y cuyo titular\nregistrado coincide con el usuario de la sesion.\n",
+      "Instalacion de paquete desde repositorio no aprobado (zta_sup_002) en un\nequipo de la unidad organizativa de desarrollo con permiso explicito\nregistrado, cuando el indice de origen es un espejo mantenido por la\norganizacion.\n"
+    ],
+    "contencion": [
+      {
+        "accion": "Abrir o actualizar la tarea de desviacion contra el propietario del activo, con la evidencia y el plazo del plan",
+        "radio": "objeto",
+        "aprobacion": "no",
+        "reversible": "si"
+      },
+      {
+        "accion": "Aislar el endpoint en la red, unicamente para el borrado del registro de auditoria",
+        "radio": "objeto",
+        "aprobacion": "no",
+        "reversible": "si"
+      }
+    ],
+    "requiere_persona": [
+      "Aprobar, denegar o prorrogar una excepcion",
+      "Fijar la fecha de remediacion",
+      "Retirar o segmentar el equipamiento heredado",
+      "Deshabilitar la autenticacion heredada en el inquilino"
+    ],
+    "escalado": {
+      "a": "L2",
+      "plazo_min": 240,
+      "a_L3_si": "La alerta es borrado del registro de auditoria sin apagado ordenado posterior",
+      "nota_plazo": "El plazo es largo a proposito. Estas alertas son desviaciones de\narquitectura, no incidentes en curso: tratarlas con el reloj de un\nincidente agota al turno y no acelera ninguna correccion, porque quien\ncorrige no esta de guardia. La unica excepcion es la que sube a L3.\n"
+    }
+  },
+  "_generico": {
+    "nombre": "Generico (familia sin playbook)",
+    "enriquecimiento": [
+      "cti_local",
+      "inventario"
+    ],
+    "evidencia": [],
+    "cierre_automatico": [],
+    "contencion": [],
+    "requiere_persona": [
+      "Toda la alerta: no hay playbook para esta familia"
+    ],
+    "escalado": {
+      "a": "L2",
+      "plazo_min": 30
+    }
+  }
+}
