@@ -80,14 +80,14 @@ Durante la fusión se validaron las reglas originales contra pySigma y aparecier
 dos defectos que ya estaban en `main`:
 
 1. **Etiquetas de táctica no canónicas.** Las 28 reglas usaban la forma antigua
-   con guion bajo (`attack.credential_access`). La taxonomía oficial de ATT&CK
+   con guion bajo (`attack.credential-access`). La taxonomía oficial de ATT&CK
    —el campo `x_mitre_shortname` del STIX de MITRE, que es de donde pySigma saca
    la lista de valores válidos— usa **guion**: `attack.credential-access`.
    `ATTACKTagValidator` rechaza la forma con guion bajo. Normalizadas las 14
    tácticas en los 7 ficheros afectados.
 
 2. **Referencias ATT&CK rotas en las 14 reglas que las llevaban.** Todas
-   apuntaban a `https://attack.mitre.org/techniques/001`, `/002`, `/003`…
+   apuntaban a `https://attack.mitre.org/techniques/T1562/001`, `/002`, `/003`…
    El generador original había hecho `tag.split(".")[-1]` sobre
    `attack.t1003.001`, quedándose con el sufijo de subtécnica y perdiendo la
    técnica base. La URL correcta de una subtécnica es

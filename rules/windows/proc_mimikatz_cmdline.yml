@@ -3,11 +3,11 @@ id: 8553ddab-9379-519b-8ed8-fbc8a931c5cb
 status: experimental
 description: Comandos tipicos de Mimikatz (sekurlsa, logonpasswords, etc.).
 references:
-- https://attack.mitre.org/techniques/001
+- https://attack.mitre.org/techniques/T1562/001
 author: C. Villalba
 date: 2026/07/16
 tags:
-- attack.credential_access
+- attack.credential-access
 - attack.t1003.001
 logsource:
   category: process_creation

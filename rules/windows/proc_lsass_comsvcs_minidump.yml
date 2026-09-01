@@ -3,11 +3,11 @@ id: acf9587b-9530-5da0-9b93-ec6a683d3cb6
 status: experimental
 description: rundll32 comsvcs.dll MiniDump sobre LSASS para robar credenciales.
 references:
-- https://attack.mitre.org/techniques/001
+- https://attack.mitre.org/techniques/T1562/001
 author: C. Villalba
 date: 2026/07/16
 tags:
-- attack.credential_access
+- attack.credential-access
 - attack.t1003.001
 logsource:
   category: process_creation

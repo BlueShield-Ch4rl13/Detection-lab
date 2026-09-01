@@ -9,7 +9,7 @@ date: 2026/07/16
 tags:
 - attack.execution
 - attack.t1059.001
-- attack.command_and_control
+- attack.command-and-control
 - attack.t1105
 logsource:
   category: process_creation
