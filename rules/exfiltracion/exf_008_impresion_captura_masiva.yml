@@ -1,0 +1,80 @@
+title: Impresion o captura masiva de documentos
+id: 615a5461-b233-5af9-8142-3107cbf4ad2f
+status: experimental
+description: |
+    Salida analogica de datos: lo que se imprime o se fotografia de la pantalla no lo ve
+    el DLP de red ni el de correo. Como imprimir es una accion normal de oficina, la
+    regla nunca dispara con la herramienta sola: pide herramienta de impresion o de
+    captura mas un objetivo, sea un documento, una carpeta de perfil o una impresora
+    remota. La segunda via cubre la copia directa de los ficheros de cola de impresion,
+    que reconstruyen el documento sin abrirlo.
+references:
+    - https://attack.mitre.org/techniques/T1113/
+    - https://attack.mitre.org/techniques/T1052/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.collection
+    - attack.exfiltration
+    - attack.t1113
+    - attack.t1052
+    - iso27001-2022.a-7-10
+    - iso27001-2022.a-8-12
+    - iso27001-2022.a-8-3
+    - nist.ac-19
+    - nist.ac-3
+    - nist.mp-7
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_impresion:
+        - Image|endswith: '\print.exe'
+        - CommandLine|contains:
+            - 'printui.dll,PrintUIEntry'
+            - 'mshtml.dll,PrintHTML'
+            - 'Out-Printer'
+            - '-Verb Print'
+            - 'PrintTo'
+    selection_captura:
+        - Image|endswith:
+            - '\psr.exe'
+            - '\SnippingTool.exe'
+            - '\ScreenSketch.exe'
+        - CommandLine|contains:
+            - 'savescreenshot'
+            - 'CopyFromScreen'
+            - 'Graphics]::FromImage'
+    selection_objetivo:
+        CommandLine|contains:
+            - '.doc'
+            - '.xls'
+            - '.ppt'
+            - '.pdf'
+            - '.csv'
+            - '\Documents\'
+            - '\Desktop\'
+            - '\Downloads\'
+            - '/output'
+            - '/maxsc'
+            - '/d:\\'
+    selection_spool_proceso:
+        Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\xcopy.exe'
+            - '\robocopy.exe'
+            - '\7z.exe'
+            - '\rar.exe'
+    selection_spool_ruta:
+        CommandLine|contains:
+            - '\System32\spool\PRINTERS'
+            - '\spool\PRINTERS\'
+            - '.spl'
+    condition: ((selection_impresion or selection_captura) and selection_objetivo) or (selection_spool_proceso and selection_spool_ruta)
+falsepositives:
+    - Impresion normal de oficina desde la linea de comandos en aplicaciones de gestion que lanzan print.exe por lote, que hay que excluir por proceso padre o por equipo
+    - Herramientas de soporte que graban la pantalla para documentar una incidencia, acotables por usuario y por ventana de intervencion
+    - Utilidades de gestion de colas de impresion en servidores de impresion, que deben excluirse por nombre de servidor
+level: medium

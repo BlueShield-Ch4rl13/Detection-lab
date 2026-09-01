@@ -1,0 +1,77 @@
+title: Desinstalacion o parada del sensor EDR
+id: ecfb6cc4-b994-572b-938e-786bba873895
+status: experimental
+description: |
+    El atacante con privilegios locales no pelea contra el EDR: lo quita. La regla exige
+    la combinacion de un nombre de agente de seguridad con una accion de borrado de
+    servicio, desinstalacion por MSI o WMI, o parada del proceso. Se distingue de la
+    regla de defensas deshabilitadas en que alli se apagan funciones de Defender y aqui
+    desaparece el agente entero, y con el toda la telemetria posterior del equipo.
+references:
+    - https://attack.mitre.org/techniques/T1562/001/
+    - https://attack.mitre.org/techniques/T1489/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.defense-evasion
+    - attack.impact
+    - attack.t1562.001
+    - attack.t1489
+    - iso27001-2022.a-5-29
+    - iso27001-2022.a-8-7
+    - nist.au-9
+    - nist.cm-7
+    - nist.cp-10
+    - nist.ir-4
+    - nist.si-3
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_agente:
+        CommandLine|contains:
+            - 'WinDefend'
+            - 'WdNisSvc'
+            - 'MsSense'
+            - 'SenseIR'
+            - 'CSFalconService'
+            - 'CSFalconContainer'
+            - 'CsUninstallTool'
+            - 'CrowdStrike'
+            - 'WindowsSensor'
+            - 'SentinelAgent'
+            - 'SentinelOne'
+            - 'sentinelctl'
+            - 'CyveraService'
+            - 'cyserver'
+            - 'cytool'
+            - 'Cortex XDR'
+            - 'WazuhSvc'
+            - 'wazuh-agent'
+            - 'OssecSvc'
+            - 'CarbonBlack'
+            - 'CbDefense'
+            - 'SAVService'
+            - 'Sysmon64'
+    selection_accion:
+        CommandLine|contains:
+            - 'sc delete'
+            - 'sc.exe delete'
+            - 'sc stop'
+            - 'sc.exe stop'
+            - 'sc config'
+            - 'net stop'
+            - 'Stop-Service'
+            - 'Remove-Service'
+            - 'msiexec /x'
+            - 'msiexec.exe /x'
+            - 'call uninstall'
+            - 'Uninstall-Package'
+            - '/uninstall'
+            - ' -u '
+            - 'start= disabled'
+    condition: selection_agente and selection_accion
+falsepositives:
+    - Migracion planificada de EDR, que debe llegar con ventana de cambio y desde la consola de despliegue
+    - Reinstalacion del agente por el equipo de puesto, identificable porque el mismo equipo vuelve a reportar en minutos
+level: critical

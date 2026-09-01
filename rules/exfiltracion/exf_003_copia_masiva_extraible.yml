@@ -1,0 +1,82 @@
+title: Copia masiva de documentos a unidad extraible
+id: 9c354515-fc16-58cf-8197-a2b2ec4798b1
+status: experimental
+description: |
+    La via de salida que no pasa por el proxy ni por el correo. Como el evento de
+    escritura en disco es de los mas ruidosos que existe, la regla exige cuatro cosas a
+    la vez: destino fuera de la unidad de sistema, extension de documento o de
+    contenedor, un proceso de copia o de archivado como origen, y que la ruta no sea de
+    copia de seguridad. Completa a la regla de montaje de almacenamiento extraible, que
+    ve el USB conectarse pero no ve que se lleva.
+references:
+    - https://attack.mitre.org/techniques/T1052/001/
+    - https://attack.mitre.org/techniques/T1005/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.exfiltration
+    - attack.collection
+    - attack.t1052.001
+    - attack.t1005
+    - iso27001-2022.a-7-10
+    - iso27001-2022.a-8-12
+    - iso27001-2022.a-8-3
+    - nist.ac-19
+    - nist.ac-3
+    - nist.mp-7
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_unidad:
+        TargetFilename|startswith:
+            - 'D:\'
+            - 'E:\'
+            - 'F:\'
+            - 'G:\'
+            - 'H:\'
+            - 'I:\'
+            - 'J:\'
+    selection_contenido:
+        TargetFilename|endswith:
+            - '.doc'
+            - '.docx'
+            - '.xls'
+            - '.xlsx'
+            - '.ppt'
+            - '.pptx'
+            - '.pdf'
+            - '.csv'
+            - '.pst'
+            - '.ost'
+            - '.zip'
+            - '.rar'
+            - '.7z'
+            - '.kdbx'
+            - '.sql'
+            - '.bak'
+    selection_proceso:
+        Image|endswith:
+            - '\explorer.exe'
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\robocopy.exe'
+            - '\xcopy.exe'
+            - '\7z.exe'
+            - '\rar.exe'
+            - '\winrar.exe'
+            - '\TOTALCMD64.EXE'
+            - '\FreeCommander.exe'
+    filtro_respaldo:
+        TargetFilename|contains:
+            - '\Backup\'
+            - '\Veeam'
+            - '\WindowsImageBackup\'
+            - '\System Volume Information\'
+            - '\$RECYCLE.BIN\'
+    condition: selection_unidad and selection_contenido and selection_proceso and not filtro_respaldo
+falsepositives:
+    - Unidades de red mapeadas con letra, que escriben igual que un USB; hay que fijar las letras realmente extraibles del parque antes de desplegar
+    - Discos secundarios internos usados como almacen de trabajo en estaciones de diseno o de video, excluibles por equipo
+level: medium

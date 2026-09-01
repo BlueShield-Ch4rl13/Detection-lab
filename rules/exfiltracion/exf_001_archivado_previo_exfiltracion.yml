@@ -1,0 +1,70 @@
+title: Archivado masivo previo a la exfiltracion
+id: 7cb435fe-faee-5668-9a71-cca1d1caeccc
+status: experimental
+description: |
+    El paso que casi nunca falta antes de sacar datos: comprimir lo recolectado en un
+    solo fichero, ponerle contrasena para que el DLP no lo lea y partirlo en volumenes
+    para que pase por el proxy sin destacar por tamano. La regla exige la combinacion de
+    un archivador con una opcion de cifrado o troceado, o con una ruta de documentos,
+    para no disparar con cada descompresion normal de un adjunto.
+references:
+    - https://attack.mitre.org/techniques/T1560/001/
+    - https://attack.mitre.org/techniques/T1074/001/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.collection
+    - attack.exfiltration
+    - attack.t1560.001
+    - attack.t1074.001
+    - iso27001-2022.a-8-12
+    - nist.ac-4
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_herramienta:
+        - Image|endswith:
+            - '\rar.exe'
+            - '\winrar.exe'
+            - '\7z.exe'
+            - '\7za.exe'
+            - '\7zg.exe'
+            - '\7zr.exe'
+            - '\zip.exe'
+            - '\tar.exe'
+            - '\makecab.exe'
+            - '\wzzip.exe'
+            - '\peazip.exe'
+        - CommandLine|contains:
+            - 'Compress-Archive'
+            - 'System.IO.Compression.ZipFile'
+            - 'ZipFile]::CreateFromDirectory'
+    selection_opcion:
+        CommandLine|contains:
+            - ' -hp'
+            - ' -p'
+            - '-mhe=on'
+            - ' -v'
+            - ' -m5'
+            - ' -ssw'
+            - ' -r '
+            - '-t7z'
+            - '--password'
+    selection_ruta:
+        CommandLine|contains:
+            - '\Documents\'
+            - '\Desktop\'
+            - '\Downloads\'
+            - '\Users\Public\'
+            - '.pst'
+            - '.ost'
+            - '.docx'
+            - '.xlsx'
+            - '.pdf'
+            - '.kdbx'
+    condition: selection_herramienta and (selection_opcion or selection_ruta)
+falsepositives:
+    - Copias de seguridad de usuario hechas a mano antes de renovar el equipo, que se distinguen porque el destino es la unidad local y no hay subida posterior
+    - Empaquetado de entregables por equipos de desarrollo, acotable por nombre de equipo o por ruta de proyecto
+level: medium

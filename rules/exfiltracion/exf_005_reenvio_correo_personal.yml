@@ -1,0 +1,65 @@
+title: Reenvio automatico de correo a dominio personal
+id: 41402951-6235-5e8c-af8c-4253f01fab6b
+status: experimental
+description: |
+    Exfiltracion continua y sin esfuerzo: una vez puesta la regla, cada correo que
+    llegue al buzon sale solo hacia una cuenta que la empresa no controla. Se diferencia
+    de la deteccion generica de reglas de buzon en que aqui se exige que el destino sea
+    un proveedor de correo de consumo, lo que descarta el reenvio entre buzones
+    corporativos y convierte el aviso en algo accionable: o es cuenta comprometida o es
+    un empleado sacando informacion antes de irse.
+references:
+    - https://attack.mitre.org/techniques/T1114/003/
+    - https://attack.mitre.org/techniques/T1020/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.collection
+    - attack.exfiltration
+    - attack.t1114.003
+    - attack.t1020
+    - iso27001-2022.a-8-12
+    - iso27001-2022.a-8-3
+    - nist.ac-3
+    - nist.ac-4
+logsource:
+    product: m365
+    service: exchange
+detection:
+    selection_operacion:
+        Operation:
+            - 'New-InboxRule'
+            - 'Set-InboxRule'
+            - 'UpdateInboxRules'
+            - 'Set-Mailbox'
+            - 'New-TransportRule'
+            - 'Set-TransportRule'
+    selection_reenvio:
+        Parameters|contains:
+            - 'ForwardTo'
+            - 'RedirectTo'
+            - 'ForwardAsAttachmentTo'
+            - 'ForwardingSmtpAddress'
+            - 'ForwardingAddress'
+            - 'DeliverToMailboxAndForward'
+    selection_dominio_personal:
+        Parameters|contains:
+            - '@gmail.com'
+            - '@googlemail.com'
+            - '@outlook.com'
+            - '@hotmail.com'
+            - '@live.com'
+            - '@yahoo.com'
+            - '@yahoo.es'
+            - '@proton.me'
+            - '@protonmail.com'
+            - '@icloud.com'
+            - '@gmx.'
+            - '@mail.ru'
+            - '@yandex.'
+            - '@tutanota.com'
+    condition: all of selection_*
+falsepositives:
+    - Directivo que reenvia a su cuenta personal por comodidad, que sigue siendo una fuga de datos y debe tratarse como incidencia de politica, no cerrarse como falso positivo
+    - Buzones de prueba usados por el equipo de correo contra cuentas propias, excluibles por UserId
+level: critical

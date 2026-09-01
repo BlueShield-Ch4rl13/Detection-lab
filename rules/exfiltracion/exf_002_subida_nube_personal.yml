@@ -1,0 +1,56 @@
+title: Subida a almacenamiento personal en la nube
+id: 86ac3970-5716-5339-b2d3-651daf876a27
+status: experimental
+description: |
+    Salida de datos por el canal mas comodo que tiene el usuario: su cuenta personal de
+    almacenamiento o un servicio de envio anonimo. La regla no se conforma con ver el
+    dominio, exige que el metodo sea POST o PUT, que es lo que separa la subida de la
+    simple navegacion o del anuncio incrustado en otra pagina. Frente a la deteccion por
+    volumen, aqui basta un fichero pequeno si el destino es una cuenta personal.
+references:
+    - https://attack.mitre.org/techniques/T1567/002/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.exfiltration
+    - attack.t1567.002
+    - iso27001-2022.a-8-12
+    - iso27001-2022.a-8-23
+    - nist.ac-4
+    - nist.sc-7
+logsource:
+    category: proxy
+detection:
+    selection_metodo:
+        cs-method:
+            - 'POST'
+            - 'PUT'
+    selection_destino:
+        c-uri|contains:
+            - 'content.dropboxapi.com'
+            - 'api.dropboxapi.com/2/files/upload'
+            - 'dropbox.com/upload'
+            - 'mega.nz'
+            - 'mega.io'
+            - 'api.mega.co.nz'
+            - 'wetransfer.com'
+            - 'we.tl/'
+            - 'anonfiles.com'
+            - 'gofile.io'
+            - 'pcloud.com'
+            - 'pcloud.link'
+            - 'filebin.net'
+            - 'catbox.moe'
+            - 'file.io'
+            - 'uguu.se'
+            - 'bashupload.com'
+            - 'temp.sh'
+    filtro_corporativo:
+        c-uri|contains:
+            - '.midominio.local'
+            - '-my.sharepoint.com'
+    condition: selection_metodo and selection_destino and not filtro_corporativo
+falsepositives:
+    - Recepcion de material de un cliente o proveedor que solo trabaja con enlaces de transferencia, que hay que documentar y excluir por usuario
+    - Sincronizacion de una cuenta personal instalada antes de aplicar la politica de puesto, que se corrige retirando el cliente
+level: high

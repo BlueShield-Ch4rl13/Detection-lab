@@ -1,0 +1,73 @@
+title: Salto de directorio hacia ficheros fuera de la raiz web
+id: 55e75c84-7f45-56b8-8072-a0d1c6724aae
+status: experimental
+description: |
+    El servidor solo deberia servir lo que cuelga de su raiz. Una peticion que sube niveles
+    con secuencias de punto-punto busca lo que hay fuera: credenciales, claves y ficheros de
+    configuracion. La variante que de verdad se escapa de los filtros es la codificada dos
+    veces, porque el proxy la normaliza una vez y la aplicacion la vuelve a decodificar,
+    asi que el ataque solo se ve entero en el punto donde se registra la URI cruda.
+references:
+    - https://attack.mitre.org/techniques/T1190/
+    - https://attack.mitre.org/techniques/T1083/
+    - https://owasp.org/www-community/attacks/Path_Traversal
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.initial-access
+    - attack.t1190
+    - attack.discovery
+    - attack.t1083
+    - iso27001-2022.a-8-28
+    - iso27001-2022.a-8-3
+    - iso27001-2022.a-8-8
+    - nist.ac-3
+    - nist.ra-5
+    - nist.sc-7
+    - nist.si-10
+logsource:
+    category: webserver
+detection:
+    patron_secuencia:
+        c-uri|contains:
+            - '../../'
+            - '..%2f..%2f'
+            - '%2e%2e%2f%2e%2e%2f'
+            - '..%5c..%5c'
+            - '%2e%2e%5c'
+            - '....//'
+            - '..;/'
+            - '%c0%ae%c0%ae'
+            - '..%c0%af'
+            - '..%ef%bc%8f'
+    patron_doble_codificacion:
+        c-uri|contains:
+            - '..%252f'
+            - '%252e%252e%252f'
+            - '..%255c'
+            - '%25252e%25252e'
+            - '%%32%65%%32%65'
+    patron_objetivo:
+        c-uri|contains:
+            - '/etc/passwd'
+            - '/etc/shadow'
+            - '/proc/self/environ'
+            - '/proc/self/cmdline'
+            - '/var/log/auth.log'
+            - '/root/.ssh/id_rsa'
+            - '/.aws/credentials'
+            - '/wp-config.php'
+            - '/web.config'
+            - '\windows\win.ini'
+            - '/windows/system32/drivers/etc/hosts'
+    filtro_mapa_fuente:
+        c-uri|endswith:
+            - '.map'
+            - '.css'
+            - '.mjs'
+    condition: 1 of patron_* and not filtro_mapa_fuente
+falsepositives:
+    - Mapas de codigo y paquetes de front-end que conservan rutas relativas con ../ dentro del propio fichero; se filtran por extension y ademas responden 200 de forma constante
+    - Clientes de sincronizacion mal configurados que piden ficheros de plantilla como .env o web.config; se distinguen porque el patron es siempre la misma ruta y el servidor responde 404
+    - Comprobaciones de cumplimiento que recorren rutas conocidas, que hay que excluir por c-ip del escaner
+level: high

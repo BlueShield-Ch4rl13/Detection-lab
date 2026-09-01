@@ -1,0 +1,70 @@
+title: Volcado de base de datos a ruta de usuario
+id: 509613e3-9423-5cd4-9a5c-e24c82dcdb94
+status: experimental
+description: |
+    Un volcado completo concentra en un fichero lo que de otro modo costaria meses
+    sacar consulta a consulta, y es el paso previo obligado de casi toda extorsion por
+    filtracion de datos. Lo que separa el volcado del atacante del respaldo del
+    administrador es el destino: la copia legitima va al almacen de respaldo, no al
+    escritorio ni al perfil del usuario. Por eso se exige herramienta de volcado y ruta
+    de perfil o carpeta temporal a la vez.
+references:
+    - https://attack.mitre.org/techniques/T1005/
+    - https://attack.mitre.org/techniques/T1074/001/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.collection
+    - attack.exfiltration
+    - attack.t1005
+    - attack.t1074.001
+    - iso27001-2022.a-8-12
+    - iso27001-2022.a-8-3
+    - nist.ac-3
+    - nist.ac-4
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_herramienta:
+        - Image|endswith:
+            - '\mysqldump.exe'
+            - '\mysqlsh.exe'
+            - '\pg_dump.exe'
+            - '\pg_dumpall.exe'
+            - '\sqlcmd.exe'
+            - '\bcp.exe'
+            - '\expdp.exe'
+            - '\exp.exe'
+            - '\mongodump.exe'
+            - '\mongoexport.exe'
+            - '\sqlite3.exe'
+        - CommandLine|contains:
+            - 'Invoke-Sqlcmd'
+            - 'BACKUP DATABASE'
+            - 'INTO OUTFILE'
+            - 'INTO DUMPFILE'
+            - 'COPY ( SELECT'
+    selection_destino_usuario:
+        CommandLine|contains:
+            - '\Users\'
+            - '\Desktop\'
+            - '\Downloads\'
+            - '\Documents\'
+            - '\AppData\'
+            - '\Temp\'
+            - '\ProgramData\'
+            - '\Public\'
+            - '\PerfLogs\'
+            - '\Windows\Tasks\'
+    filtro_respaldo:
+        CommandLine|contains:
+            - '\Backup\'
+            - '\dbbackup\'
+            - '\Veeam'
+            - '\SQLBackups\'
+    condition: selection_herramienta and selection_destino_usuario and not filtro_respaldo
+falsepositives:
+    - Volcado puntual de un administrador de base de datos para depurar, que debe hacerse desde el servidor y hacia el almacen de respaldo, no desde un puesto
+    - Exportacion de datos de prueba en entornos de desarrollo, acotable por segmento de red o por nombre de equipo
+level: high

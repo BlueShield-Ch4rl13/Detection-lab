@@ -1,0 +1,55 @@
+title: Reglas ASR desactivadas o puestas en auditoria
+id: dd15d35d-deb4-58ee-89a9-da35a6b7c576
+status: experimental
+description: |
+    Las reglas de reduccion de superficie de ataque son las que cortan el patron de
+    Office lanzando interpretes, las macros que descargan y el robo de credenciales de
+    LSASS. Pasarlas a Disabled o a AuditMode las deja registrando sin bloquear, que es
+    peor que apagarlas porque el panel sigue en verde. El cambio legitimo llega por
+    Intune o GPO sobre el parque entero; aqui se ve un equipo suelto cambiando su propia
+    politica.
+references:
+    - https://attack.mitre.org/techniques/T1562/001/
+    - https://attack.mitre.org/techniques/T1112/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.defense-evasion
+    - attack.t1562.001
+    - attack.t1112
+    - iso27001-2022.a-8-7
+    - iso27001-2022.a-8-9
+    - nist.au-9
+    - nist.cm-5
+    - nist.cm-6
+    - nist.cm-7
+    - nist.si-3
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_asr_cmdlet:
+        CommandLine|contains: 'AttackSurfaceReductionRules_Actions'
+    selection_asr_estado:
+        CommandLine|contains:
+            - 'Disabled'
+            - 'AuditMode'
+            - 'Warn'
+            - 'Actions 0'
+            - 'Actions 2'
+    selection_asr_borrado:
+        CommandLine|contains:
+            - 'Remove-MpPreference -AttackSurfaceReductionRules_Ids'
+            - 'AttackSurfaceReductionOnlyExclusions'
+    selection_asr_registro:
+        CommandLine|contains:
+            - 'Windows Defender Exploit Guard\ASR\Rules'
+            - 'Windows Defender Exploit Guard\Controlled Folder Access'
+            - 'Windows Defender Exploit Guard\Network Protection'
+            - 'EnableControlledFolderAccess'
+            - 'EnableNetworkProtection'
+    condition: (selection_asr_cmdlet and selection_asr_estado) or selection_asr_borrado or selection_asr_registro
+falsepositives:
+    - Paso a modo auditoria durante el despliegue inicial de ASR, que se reconoce porque afecta a muchos equipos a la vez y sale de la consola de gestion
+    - Exclusion puntual de una aplicacion de negocio incompatible, que debe estar aprobada y acotada a un identificador de regla
+level: high

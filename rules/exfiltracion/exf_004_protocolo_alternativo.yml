@@ -1,0 +1,82 @@
+title: Exfiltracion por protocolo alternativo
+id: d7d8f746-4313-5fa0-9046-e3ac00a56827
+status: experimental
+description: |
+    Cuando el proxy filtra la salida web, el dato se va por donde nadie mira: ICMP con
+    carga util llena, FTP en claro o un recurso SMB hacia una direccion de fuera. Para
+    el ICMP se pide la herramienta y un tamano de paquete grande a la vez, porque un
+    ping suelto es trafico normal y un ping de 65500 bytes repetido es un canal. El FTP
+    y el SMB salientes se marcan siempre: en una red corporativa moderna no tienen uso
+    legitimo hacia Internet.
+references:
+    - https://attack.mitre.org/techniques/T1048/003/
+    - https://attack.mitre.org/techniques/T1048/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.exfiltration
+    - attack.t1048
+    - attack.t1048.003
+    - iso27001-2022.a-8-12
+    - nist.ac-4
+    - nist.sc-7
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_icmp_herramienta:
+        Image|endswith:
+            - '\ping.exe'
+            - '\hping3.exe'
+            - '\nping.exe'
+    selection_icmp_carga:
+        CommandLine|contains:
+            - ' -l 65500'
+            - ' -l 32767'
+            - ' -l 16384'
+            - ' -l 8192'
+            - ' -l 4096'
+            - ' -l 2048'
+            - ' -l 1472'
+            - ' -l 1400'
+            - ' -l 1024'
+            - '--data-size'
+            - '--data-string'
+    selection_ftp:
+        CommandLine|contains:
+            - 'ftp -s:'
+            - 'ftp.exe -s:'
+            - 'ftp -n -i -s'
+            - 'curl ftp://'
+            - 'ftp://'
+            - 'Net.FtpWebRequest'
+            - 'WinSCP.com /command'
+            - 'pscp.exe '
+            - 'psftp.exe -b'
+    selection_smb:
+        CommandLine|contains:
+            - 'net use \\'
+            - 'net.exe use \\'
+            - 'New-PSDrive -Root \\'
+            - 'copy \\'
+            - 'robocopy \\'
+    filtro_red_interna:
+        CommandLine|contains:
+            - '.midominio.local'
+            - '\\10.'
+            - '\\192.168.'
+            - '\\172.16.'
+            - '\\172.17.'
+            - '\\172.18.'
+            - '\\172.19.'
+            - '\\172.2'
+            - '\\172.30.'
+            - '\\172.31.'
+            - '\\127.0.0.1'
+            - '\\localhost'
+    condition: (selection_icmp_herramienta and selection_icmp_carga) or selection_ftp or (selection_smb and not filtro_red_interna)
+falsepositives:
+    - Diagnostico de MTU con ping de tamano fijo por parte de redes, acotado a equipos de administracion y a una ventana corta
+    - Integraciones antiguas que aun publican ficheros por FTP a un socio, que deben inventariarse y excluirse por destino
+    - Servidores de fichero internos referidos por nombre corto sin sufijo de dominio, que hay que anadir al filtro de red interna al desplegar
+level: high

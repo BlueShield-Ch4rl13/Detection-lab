@@ -1,0 +1,84 @@
+title: Inyeccion de comandos del sistema operativo en un parametro
+id: b727143e-e54b-5f68-b0f1-3eaedab083a4
+status: experimental
+description: |
+    Cuando la aplicacion pasa un parametro a una llamada de sistema sin sanear, al atacante le
+    basta con cerrar el argumento y encadenar otro comando. El separador solo no sirve como
+    deteccion, porque el punto y coma y la barra vertical aparecen en filtros y en listas de
+    valores; lo que no aparece en un parametro legitimo es el separador seguido del nombre de un
+    binario del sistema, y por eso se exigen las dos mitades dentro de la misma peticion.
+references:
+    - https://attack.mitre.org/techniques/T1059/004/
+    - https://attack.mitre.org/techniques/T1190/
+    - https://owasp.org/www-community/attacks/Command_Injection
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.execution
+    - attack.t1059.004
+    - attack.initial-access
+    - attack.t1190
+    - iso27001-2022.a-8-28
+    - iso27001-2022.a-8-7
+    - iso27001-2022.a-8-8
+    - nist.cm-7
+    - nist.ra-5
+    - nist.sc-7
+    - nist.si-10
+    - nist.si-3
+logsource:
+    category: webserver
+detection:
+    ancla_parametro:
+        c-uri|contains: '='
+    patron_separador:
+        c-uri|contains:
+            - ';'
+            - '%3b'
+            - '|'
+            - '%7c'
+            - '&&'
+            - '%26%26'
+            - '$('
+            - '%24%28'
+            - '%60'
+            - '%0a'
+            - '%0d%0a'
+            - '%0asleep'
+    patron_binario:
+        c-uri|contains:
+            - 'whoami'
+            - 'uname -a'
+            - 'uname%20-a'
+            - 'cat /etc/passwd'
+            - 'cat%20/etc/passwd'
+            - '/bin/sh'
+            - '/bin/bash'
+            - 'bash -c'
+            - 'bash%20-c'
+            - 'wget '
+            - 'wget%20'
+            - 'curl -'
+            - 'curl%20-'
+            - 'nc -e'
+            - 'nc%20-e'
+            - 'ping -c'
+            - 'ping%20-c'
+            - 'nslookup '
+            - 'certutil'
+            - 'powershell'
+            - 'base64 -d'
+            - 'base64%20-d'
+            - 'chmod +x'
+            - 'chmod%20%2bx'
+    filtro_diagnostico_admin:
+        c-uri|contains:
+            - '/admin/tools/ping'
+            - '/diagnostics/traceroute'
+            - '/nagios/cgi-bin/'
+    condition: ancla_parametro and patron_separador and patron_binario and not filtro_diagnostico_admin
+falsepositives:
+    - Paneles de administracion de equipos de red y de hosting que ofrecen ping, traceroute o nslookup como funcion; se excluyen por ruta y ademas solo son alcanzables tras autenticacion
+    - Sistemas de monitorizacion que pasan la linea de comprobacion completa en la URL del complemento, patron habitual en interfaces heredadas de Nagios
+    - Documentacion y foros internos publicados sobre el mismo servidor, donde el texto de un comando puede viajar en el parametro de busqueda; se distinguen por el endpoint de busqueda y por respuesta 200 sin efectos posteriores
+level: high

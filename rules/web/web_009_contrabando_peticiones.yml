@@ -1,0 +1,70 @@
+title: Contrabando de peticiones HTTP entre proxy y servidor final
+id: de82f1ac-3617-5ae8-89c8-36ac8513f35c
+status: experimental
+description: |
+    El contrabando aprovecha que el proxy delantero y el servidor de origen no se ponen de
+    acuerdo sobre donde termina una peticion: uno hace caso a Content-Length y el otro a
+    Transfer-Encoding. Lo que sobra del cuerpo se pega al principio de la peticion del siguiente
+    usuario, lo que permite saltarse los controles del proxy y robar sesiones ajenas. En el log
+    solo quedan los restos: cabeceras dentro de la ruta, saltos de linea y metodos imposibles.
+references:
+    - https://attack.mitre.org/techniques/T1190/
+    - https://portswigger.net/web-security/request-smuggling
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.initial-access
+    - attack.t1190
+    - iso27001-2022.a-8-28
+    - iso27001-2022.a-8-8
+    - nist.ra-5
+    - nist.sc-7
+    - nist.si-10
+logsource:
+    category: webserver
+detection:
+    patron_cabecera_en_uri:
+        c-uri|contains:
+            - 'content-length:'
+            - 'transfer-encoding:'
+            - 'content-length%3a'
+            - 'transfer-encoding%3a'
+            - 'transfer-encoding%20%3a'
+            - 'te:%20chunked'
+            - 'chunked%0d%0a'
+    patron_salto_de_linea:
+        c-uri|contains:
+            - '%0d%0a'
+            - '%0a%0d'
+            - '%250d%250a'
+            - '%00%0d%0a'
+            - '%e5%98%8a%e5%98%8d'
+    seleccion_desincronizacion:
+        sc-status:
+            - '400'
+            - '408'
+            - '501'
+    filtro_metodo_estandar:
+        cs-method:
+            - 'GET'
+            - 'POST'
+            - 'HEAD'
+            - 'PUT'
+            - 'DELETE'
+            - 'OPTIONS'
+            - 'PATCH'
+            - 'CONNECT'
+            - 'TRACE'
+            - 'PROPFIND'
+            - 'PROPPATCH'
+            - 'MKCOL'
+            - 'COPY'
+            - 'MOVE'
+            - 'LOCK'
+            - 'UNLOCK'
+    condition: 1 of patron_* or (seleccion_desincronizacion and not filtro_metodo_estandar)
+falsepositives:
+    - Clientes rotos y bots que envian peticiones mal formadas y generan 400 con un metodo basura; se separan porque llegan de una sola c-ip y no van seguidos de trafico con exito hacia rutas privilegiadas
+    - Herramientas de prueba de carga y escaneres de protocolo que abren conexiones a medias, acotables por origen y ventana
+    - Aplicaciones que aceptan una URL completa como parametro y arrastran saltos de linea codificados de un texto pegado por el usuario, distinguibles porque el salto no va acompanado de nombre de cabecera
+level: high

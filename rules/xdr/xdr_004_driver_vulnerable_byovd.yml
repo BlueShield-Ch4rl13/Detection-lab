@@ -1,0 +1,67 @@
+title: Carga de driver vulnerable conocido
+id: aff7e57c-74cd-5ce2-a1ee-a5329b52a838
+status: experimental
+description: |
+    BYOVD: el atacante trae un driver firmado y legitimo con una vulnerabilidad que le
+    da lectura y escritura en memoria de kernel, y desde ahi mata los procesos
+    protegidos del EDR sin tocar ni un servicio. Filtrar por firma no sirve, porque
+    estos ficheros estan correctamente firmados; lo que los delata es el nombre y el
+    hecho de que ningun equipo del parque tiene motivo para cargarlos.
+references:
+    - https://attack.mitre.org/techniques/T1068/
+    - https://attack.mitre.org/techniques/T1562/001/
+    - https://www.loldrivers.io/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.privilege-escalation
+    - attack.defense-evasion
+    - attack.t1068
+    - attack.t1562.001
+    - iso27001-2022.a-8-7
+    - iso27001-2022.a-8-8
+    - nist.au-9
+    - nist.cm-7
+    - nist.ra-5
+    - nist.si-2
+    - nist.si-3
+logsource:
+    category: driver_load
+    product: windows
+detection:
+    selection_driver:
+        ImageLoaded|endswith:
+            - '\RTCore64.sys'
+            - '\DBUtil_2_3.sys'
+            - '\gdrv.sys'
+            - '\iqvw64e.sys'
+            - '\procexp152.sys'
+            - '\aswArPot.sys'
+            - '\kprocesshacker.sys'
+            - '\viragt64.sys'
+            - '\truesight.sys'
+            - '\mhyprot2.sys'
+            - '\dbk64.sys'
+            - '\WinRing0x64.sys'
+            - '\speedfan.sys'
+            - '\ucorew64.sys'
+    selection_ruta_usuario:
+        ImageLoaded|contains:
+            - '\Users\'
+            - '\AppData\'
+            - '\Temp\'
+            - '\ProgramData\'
+            - '\PerfLogs\'
+            - '\$Recycle.Bin\'
+    selection_firma_debil:
+        SignatureStatus:
+            - 'Unavailable'
+            - 'Expired'
+            - 'Revoked'
+            - 'Untrusted'
+            - 'Invalid'
+    condition: selection_driver or (selection_ruta_usuario and selection_firma_debil)
+falsepositives:
+    - Utilidades de diagnostico de hardware o de overclocking instaladas por el fabricante del portatil, que hay que inventariar y bloquear por politica
+    - Herramientas forenses o de soporte cargadas por el propio SOC, identificables por equipo y por ventana de intervencion
+level: critical

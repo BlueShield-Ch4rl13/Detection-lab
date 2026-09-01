@@ -1,0 +1,58 @@
+title: Subida de codigo o secretos a repositorio publico
+id: 27880277-c1d6-5d19-abcd-fced9180a797
+status: experimental
+description: |
+    Un git push a una cuenta personal de GitHub saca codigo, claves de API y ficheros de
+    configuracion sin tocar el proxy de ficheros ni el correo, y ademas queda publicado.
+    El caso mas grave no es el push sino el remote add previo hacia un servidor que no
+    es el corporativo, porque revela intencion. La regla exige herramienta, accion y
+    destino publico a la vez, y excluye la plataforma interna, que es donde ocurre el
+    trabajo legitimo.
+references:
+    - https://attack.mitre.org/techniques/T1567/001/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.exfiltration
+    - attack.t1567.001
+    - iso27001-2022.a-8-12
+    - iso27001-2022.a-8-23
+    - nist.ac-4
+    - nist.sc-7
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_herramienta:
+        - Image|endswith:
+            - '\git.exe'
+            - '\git-remote-https.exe'
+        - CommandLine|contains: 'git '
+    selection_accion:
+        CommandLine|contains:
+            - ' push'
+            - 'remote add'
+            - 'remote set-url'
+            - 'clone --mirror'
+            - 'bundle create'
+    selection_destino_publico:
+        CommandLine|contains:
+            - 'github.com'
+            - 'gist.github.com'
+            - 'gitlab.com'
+            - 'bitbucket.org'
+            - 'gitee.com'
+            - 'codeberg.org'
+            - 'sourceforge.net'
+            - 'huggingface.co'
+    filtro_plataforma_interna:
+        CommandLine|contains:
+            - 'github.midominio.local'
+            - 'gitlab.midominio.local'
+            - '.midominio.local'
+            - 'dev.azure.com/miorganizacion'
+    condition: selection_herramienta and selection_accion and selection_destino_publico and not filtro_plataforma_interna
+falsepositives:
+    - Contribucion aprobada a proyectos de codigo abierto, que debe salir de equipos y cuentas registradas y puede excluirse por usuario
+    - Uso de GitHub Enterprise Cloud como plataforma corporativa, en cuyo caso hay que mover su organizacion al filtro interno antes de desplegar
+level: high

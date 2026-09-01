@@ -1,0 +1,68 @@
+title: Escaneo automatizado del servidor web por herramienta conocida
+id: 78f6cdf2-999e-5685-ba49-7dbd83b1b127
+status: experimental
+description: |
+    Antes de explotar hay que enumerar, y esa fase deja una huella distinta a la de un usuario:
+    cientos de rutas que no existen, sin referer y a ritmo constante. Muchas herramientas se
+    anuncian en el User-Agent porque no esperan resistencia; cuando el operador lo cambia, queda
+    el agente ausente junto a 404 en cadena. El recuento por c-ip que convierte eso en veredicto
+    de escaneo se hace en el SIEM, porque Sigma no expresa proporciones de estado en una regla.
+references:
+    - https://attack.mitre.org/techniques/T1595/002/
+    - https://attack.mitre.org/techniques/T1595/003/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.reconnaissance
+    - attack.t1595.002
+    - attack.t1595.003
+    - iso27001-2022.a-8-8
+    - nist.ra-5
+    - nist.sc-7
+logsource:
+    category: webserver
+detection:
+    patron_agente_herramienta:
+        c-useragent|contains:
+            - 'sqlmap/'
+            - 'nikto'
+            - 'nuclei'
+            - 'feroxbuster'
+            - 'gobuster'
+            - 'dirbuster'
+            - 'dirsearch'
+            - 'wfuzz'
+            - 'ffuf'
+            - 'wpscan'
+            - 'acunetix'
+            - 'nessus'
+            - 'openvas'
+            - 'zgrab'
+            - 'masscan'
+            - 'nmap scripting engine'
+            - 'zaproxy'
+            - 'arachni'
+            - 'whatweb'
+            - 'commix'
+    seleccion_agente_ausente:
+        c-useragent:
+            - '-'
+            - ''
+    seleccion_no_encontrado:
+        sc-status: '404'
+    filtro_rastreador_legitimo:
+        c-useragent|contains:
+            - 'googlebot'
+            - 'bingbot'
+            - 'applebot'
+            - 'duckduckbot'
+            - 'uptimerobot'
+            - 'pingdom'
+            - 'statuscake'
+            - 'ahrefsbot'
+    condition: (patron_agente_herramienta or (seleccion_agente_ausente and seleccion_no_encontrado)) and not filtro_rastreador_legitimo
+falsepositives:
+    - Pruebas de intrusion y analisis de vulnerabilidades contratados, que producen exactamente esta senal; deben excluirse por c-ip de origen y por ventana pactada, nunca desactivando la regla
+    - Comprobadores de disponibilidad y rastreadores de SEO que piden rutas inexistentes con agente propio, ya excluidos los mas comunes por nombre
+    - Clientes de API internos mal configurados que no envian User-Agent y piden endpoints retirados; se distinguen porque repiten siempre la misma ruta en lugar de recorrer un diccionario
+level: medium

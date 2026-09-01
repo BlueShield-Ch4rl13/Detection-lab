@@ -1,0 +1,82 @@
+title: Cross-site scripting reflejado en la peticion
+id: 26c0385f-f87b-5461-95a6-ce33ef181491
+status: experimental
+description: |
+    En el XSS reflejado el payload viaja en la peticion y la aplicacion lo devuelve dentro de la
+    respuesta, de modo que se ejecuta en el navegador de la victima con su sesion. Marcar una
+    etiqueta HTML suelta llena la cola de ruido: lo que no aparece en trafico normal es la
+    etiqueta acompanada de un vector de ejecucion, sea manejador de evento, esquema javascript o
+    acceso a la cookie. Se exige 200 porque lo reflejado en una pagina servida es lo explotable.
+references:
+    - https://attack.mitre.org/techniques/T1059/007/
+    - https://attack.mitre.org/techniques/T1189/
+    - https://owasp.org/www-community/attacks/xss/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.execution
+    - attack.t1059.007
+    - attack.initial-access
+    - attack.t1189
+    - iso27001-2022.a-8-23
+    - iso27001-2022.a-8-7
+    - nist.cm-7
+    - nist.sc-18
+    - nist.si-3
+logsource:
+    category: webserver
+detection:
+    ancla_reflejo:
+        sc-status: '200'
+        cs-method:
+            - 'GET'
+            - 'POST'
+    patron_inequivoco:
+        c-uri|contains:
+            - '<script>alert('
+            - '%3Cscript%3Ealert'
+            - '"><script'
+            - '%22%3E%3Cscript'
+            - '<svg/onload='
+            - '<svg%2Fonload'
+            - 'onerror=alert'
+            - 'onerror%3Dalert'
+            - 'javascript:alert('
+            - 'document.location=document.cookie'
+    patron_etiqueta:
+        c-uri|contains:
+            - '<script'
+            - '%3Cscript'
+            - '<img'
+            - '%3Cimg'
+            - '<svg'
+            - '%3Csvg'
+            - '<iframe'
+            - '%3Ciframe'
+            - '<body'
+            - '<details'
+    patron_vector:
+        c-uri|contains:
+            - 'onerror='
+            - 'onload='
+            - 'onmouseover='
+            - 'onfocus='
+            - 'ontoggle='
+            - 'onanimationstart='
+            - 'javascript:'
+            - 'document.cookie'
+            - 'string.fromcharcode'
+            - 'eval('
+            - 'fetch('
+    filtro_editor:
+        c-uri|contains:
+            - '/wp-admin/post.php'
+            - '/ckeditor/'
+            - '/tinymce/'
+            - '/admin/content/edit'
+    condition: ancla_reflejo and (patron_inequivoco or (patron_etiqueta and patron_vector)) and not filtro_editor
+falsepositives:
+    - Editores enriquecidos y paneles de contenido que envian HTML del propio autor; se excluyen las rutas mas comunes y conviene anadir las del gestor que use el sitio
+    - Plataformas de formacion y entornos de prueba de seguridad publicados en la misma granja (DVWA, juice-shop), que hay que separar por host virtual
+    - Parametros de redireccion que arrastran una URL completa con marcado; se distinguen porque no llevan manejador de evento, motivo por el que la regla exige etiqueta y vector a la vez
+level: high

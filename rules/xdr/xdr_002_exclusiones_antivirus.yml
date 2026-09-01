@@ -1,0 +1,57 @@
+title: Exclusion anadida al antivirus
+id: f2911a10-3ceb-586b-ac05-7f270c3b4561
+status: experimental
+description: |
+    Una exclusion es la forma mas silenciosa de cegar al antivirus: no apaga nada, no
+    genera error y deja un hueco permanente donde el malware se ejecuta sin analisis.
+    Se mira el registro y no la linea de comandos porque Add-MpPreference con
+    -ExclusionPath, -ExclusionProcess o -ExclusionExtension aterriza en esta misma clave,
+    igual que la exclusion empujada por GPO o por la API, y asi se ven las tres vias.
+references:
+    - https://attack.mitre.org/techniques/T1562/001/
+    - https://attack.mitre.org/techniques/T1112/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.defense-evasion
+    - attack.t1562.001
+    - attack.t1112
+    - iso27001-2022.a-8-7
+    - iso27001-2022.a-8-9
+    - nist.au-9
+    - nist.cm-5
+    - nist.cm-6
+    - nist.cm-7
+    - nist.si-3
+logsource:
+    category: registry_event
+    product: windows
+detection:
+    selection_clave:
+        TargetObject|contains:
+            - '\Windows Defender\Exclusions\Paths\'
+            - '\Windows Defender\Exclusions\Processes\'
+            - '\Windows Defender\Exclusions\Extensions\'
+            - '\Windows Defender\Exclusions\IpAddresses\'
+            - '\Windows Defender\Exclusions\TemporaryPaths\'
+            - '\Windows Defender Exploit Guard\ASR\ASROnlyExclusions\'
+    selection_ubicacion:
+        TargetObject|contains:
+            - '\AppData\'
+            - '\Users\Public\'
+            - '\Temp\'
+            - '\ProgramData\'
+            - '\PerfLogs\'
+            - '\$Recycle.Bin\'
+            - '\Downloads\'
+            - '.exe'
+            - '.dll'
+            - '.ps1'
+            - '.bat'
+            - '.vbs'
+            - '.scr'
+    condition: selection_clave and selection_ubicacion
+falsepositives:
+    - Exclusiones de producto documentadas, como las de servidores de base de datos o de correo, que deben estar en una lista de rutas aprobadas
+    - Instaladores que se autoexcluyen durante el despliegue, reconocibles porque el proceso que escribe es el propio MSI del fabricante
+level: high

@@ -1,0 +1,93 @@
+title: Subida de fichero con extension ejecutable al directorio publicado
+id: 6aa670b8-fbb8-5a7a-bef6-7786f81b33e8
+status: experimental
+description: |
+    Una aplicacion que acepta adjuntos debe guardarlos como datos. Cuando el fichero que entra
+    termina en una extension que el motor del servidor interpreta y ademas cae bajo la raiz web,
+    deja de ser un adjunto y pasa a ser codigo invocable: es el paso previo a la webshell. Se
+    exige metodo de escritura y respuesta de exito, porque un 403 no cambia el estado, y se
+    vigilan la extension doble y el corte con byte nulo, que solo existen para burlar el filtro.
+references:
+    - https://attack.mitre.org/techniques/T1505/003/
+    - https://attack.mitre.org/techniques/T1190/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.persistence
+    - attack.t1505.003
+    - attack.initial-access
+    - attack.t1190
+    - iso27001-2022.a-8-28
+    - iso27001-2022.a-8-8
+    - iso27001-2022.a-8-9
+    - nist.cm-5
+    - nist.ra-5
+    - nist.sc-7
+    - nist.si-10
+    - nist.si-7
+logsource:
+    category: webserver
+detection:
+    ancla_exito:
+        sc-status:
+            - '200'
+            - '201'
+            - '204'
+    metodo_escritura_directa:
+        cs-method:
+            - 'PUT'
+            - 'MOVE'
+            - 'COPY'
+            - 'MKCOL'
+    metodo_formulario:
+        cs-method: 'POST'
+    extension_interpretada:
+        c-uri|endswith:
+            - '.php'
+            - '.php3'
+            - '.php4'
+            - '.php5'
+            - '.php7'
+            - '.phtml'
+            - '.phar'
+            - '.jsp'
+            - '.jspx'
+            - '.jspf'
+            - '.asp'
+            - '.aspx'
+            - '.ashx'
+            - '.asmx'
+            - '.cshtml'
+            - '.cgi'
+            - '.pl'
+            - '.py'
+            - '.sh'
+    directorio_de_subida:
+        c-uri|contains:
+            - '/uploads/'
+            - '/upload/'
+            - '/wp-content/uploads/'
+            - '/files/'
+            - '/adjuntos/'
+            - '/media/'
+            - '/avatars/'
+            - '/tmp/'
+            - '/images/'
+    extension_doble_o_nula:
+        c-uri|contains:
+            - '.php.'
+            - '.php%00'
+            - '.php;'
+            - '.phtml.'
+            - '.jsp.'
+            - '.jsp%00'
+            - '.asp;'
+            - '.aspx;'
+            - '.asp%00'
+            - '.php%20'
+    condition: ancla_exito and ((metodo_escritura_directa and extension_interpretada) or (metodo_formulario and directorio_de_subida and extension_interpretada) or extension_doble_o_nula)
+falsepositives:
+    - Despliegues por WebDAV y sincronizacion de contenido con PUT contra el directorio publicado, que son legitimos pero deben venir de la IP del sistema de despliegue y en ventana de cambio; fuera de eso son el mismo evento que un ataque
+    - Aplicaciones que sirven scripts desde una carpeta llamada media o images por herencia historica, lo que obliga a acotar la lista de directorios al arbol real del sitio
+    - Editores de plantillas de un CMS que guardan ficheros .php de tema desde el panel, distinguibles por ruta bajo el directorio del tema y por usuario administrador identificado
+level: high

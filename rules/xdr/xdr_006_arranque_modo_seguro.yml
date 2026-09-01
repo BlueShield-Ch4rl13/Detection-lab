@@ -1,0 +1,57 @@
+title: Arranque en modo seguro forzado por bcdedit
+id: 7e1ef1be-ea1d-528d-b861-c463a02f6d1f
+status: experimental
+description: |
+    En modo seguro solo arrancan los servicios registrados bajo la clave SafeBoot, y la
+    mayoria de los EDR no estan ahi: el equipo levanta ciego. Es la maniobra previa
+    tipica del ransomware, que anade su propio servicio a SafeBoot\Minimal y reinicia
+    para cifrar sin vigilancia. Un cambio de configuracion de arranque en un puesto de
+    usuario no tiene explicacion operativa; en soporte se hace desde el menu de
+    recuperacion, no con bcdedit.
+references:
+    - https://attack.mitre.org/techniques/T1562/009/
+    - https://attack.mitre.org/techniques/T1112/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.defense-evasion
+    - attack.t1562.009
+    - attack.t1112
+    - iso27001-2022.a-8-7
+    - iso27001-2022.a-8-9
+    - nist.au-9
+    - nist.cm-5
+    - nist.cm-6
+    - nist.cm-7
+    - nist.si-3
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_bcdedit:
+        CommandLine|contains:
+            - '/set safeboot'
+            - '/set {default} safeboot'
+            - '/set {current} safeboot'
+            - 'safeboot minimal'
+            - 'safeboot network'
+            - 'Set-BcdElement -Element safeboot'
+            - 'safebootalternateshell'
+    selection_safeboot_clave:
+        CommandLine|contains:
+            - 'Control\SafeBoot\Minimal'
+            - 'Control\SafeBoot\Network'
+    selection_modificacion:
+        CommandLine|contains:
+            - 'reg add'
+            - 'reg delete'
+            - 'reg.exe add'
+            - 'reg.exe delete'
+            - 'New-ItemProperty'
+            - 'Set-ItemProperty'
+            - 'Remove-Item'
+    condition: selection_bcdedit or (selection_safeboot_clave and selection_modificacion)
+falsepositives:
+    - Reparacion de un equipo por soporte tras un fallo de arranque, que deberia ir acompanada de un ticket y del bcdedit /deletevalue posterior
+    - Bancos de pruebas de imagen donde se automatiza el arranque en modo seguro, que conviene excluir por nombre de equipo
+level: critical

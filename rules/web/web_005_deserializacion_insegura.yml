@@ -1,0 +1,75 @@
+title: Deserializacion insegura de datos controlados por el cliente
+id: 181d03b7-775f-5078-8b13-1d374ecf7bf7
+status: experimental
+description: |
+    Deserializar es reconstruir objetos, y reconstruir un objeto ejecuta codigo del propio
+    lenguaje antes de que la aplicacion valide nada: por eso una cadena serializada que llega
+    del cliente vale como ejecucion remota sin vulnerabilidad de memoria. La ventaja para la
+    deteccion es que cada formato tiene cabecera fija: el flujo Java empieza por los mismos
+    cuatro bytes, PHP declara tipo y longitud, y el binario de .NET tiene prologo constante.
+references:
+    - https://attack.mitre.org/techniques/T1190/
+    - https://owasp.org/www-project-top-ten/2017/A8_2017-Insecure_Deserialization
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.initial-access
+    - attack.t1190
+    - iso27001-2022.a-8-28
+    - iso27001-2022.a-8-8
+    - nist.ra-5
+    - nist.sc-7
+    - nist.si-10
+logsource:
+    category: webserver
+detection:
+    ancla_parametro:
+        c-uri|contains: '='
+    patron_java:
+        c-uri|contains:
+            - 'rO0AB'
+            - 'aced0005'
+            - '%ac%ed%00%05'
+            - 'rO0ABXNyA'
+            - 'javax.management.BadAttributeValueExpException'
+    patron_php:
+        c-uri|re: 'O:[0-9]{1,3}:"'
+    patron_php_gadget:
+        c-uri|contains:
+            - '__destruct'
+            - '__wakeup'
+            - 'phar://'
+            - 'a:2:{i:0;'
+            - 'O%3A8%3A%22'
+    patron_dotnet:
+        c-uri|contains:
+            - 'AAEAAAD/////'
+            - 'AAEAAAD%2F%2F%2F%2F%2F'
+            - 'ObjectDataProvider'
+            - 'System.Configuration.Install.AssemblyInstaller'
+            - 'TypeConfuseDelegate'
+            - '$type":"System.'
+    patron_otros_lenguajes:
+        c-uri|contains:
+            - '_$$ND_FUNC$$_'
+            - '!ruby/object:'
+            - '!!python/object/apply'
+            - '!!javax.script.ScriptEngineManager'
+            - '!!com.sun.rowset.JdbcRowSetImpl'
+            - 'c__builtin__'
+            - 'csubprocess'
+    patron_contaminacion_prototipo:
+        # Contaminacion de prototipos: la entrada modifica Object.prototype y con
+        # ello el comportamiento de objetos que nunca la tocaron. En Node acaba en
+        # ejecucion remota via child_process; en el navegador, en XSS.
+        c-uri|contains:
+            - '__proto__'
+            - '%5f%5fproto%5f%5f'
+            - 'constructor[prototype]'
+            - 'constructor%5bprototype%5d'
+    condition: patron_java or patron_dotnet or patron_otros_lenguajes or patron_contaminacion_prototipo or (ancla_parametro and (patron_php or patron_php_gadget))
+falsepositives:
+    - Portales Java antiguos que serializan el estado de paginacion o el token de vista en un parametro y envian rO0AB en cada peticion; se reconocen porque siempre es el mismo endpoint y la estructura del valor no cambia, y se excluyen por esa ruta concreta
+    - Marcos PHP que exponen objetos serializados en cookies de sesion reescritas a la URL, poco frecuente pero visible como valor constante por usuario
+    - Herramientas de migracion y exportacion que suben volcados serializados a un endpoint de administracion, acotables por ruta y por usuario autenticado
+level: critical

@@ -1,0 +1,72 @@
+title: Abuso de token JWT con algoritmo nulo o cabecera manipulada
+id: 38ee5d40-5490-515d-970a-41e86baeee8b
+status: experimental
+description: |
+    Un JWT solo vale lo que vale su firma. Si el verificador acepta el algoritmo que le dice la
+    cabecera del propio token, el atacante pone none y se emite el usuario que quiera; el mismo
+    error de confianza aparece cuando kid apunta a un fichero del sistema para forzar una clave
+    conocida, o cuando jku y x5u traen la clave publica desde un servidor ajeno. La cabecera va
+    en base64url sin cifrar, asi que el prefijo delata el algoritmo, y nadie legitimo pone none.
+references:
+    - https://attack.mitre.org/techniques/T1606/
+    - https://attack.mitre.org/techniques/T1550/001/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.credential-access
+    - attack.t1606
+    - attack.defense-evasion
+    - attack.lateral-movement
+    - attack.t1550.001
+    - iso27001-2022.a-8-5
+    - nist.ac-3
+    - nist.ia-2
+    - nist.ia-5
+    - nist.sc-23
+logsource:
+    category: webserver
+detection:
+    patron_cabecera_algoritmo_nulo:
+        c-uri|contains:
+            - 'eyJhbGciOiJub25l'
+            - 'eyJhbGciOiJOb25l'
+            - 'eyJhbGciOiJOT05F'
+            - 'eyJhbGciOiJuT25F'
+            - 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25l'
+    patron_cabecera_manipulada:
+        c-uri|contains:
+            - 'eyJhbGciOiJIUzI1NiIsImtpZCI6Ii4u'
+            - 'eyJhbGciOiJSUzI1NiIsImprdSI6Imh0'
+            - 'eyJhbGciOiJSUzI1NiIsIng1dSI6Imh0'
+    patron_declaracion_en_claro:
+        c-uri|contains:
+            - '"alg":"none"'
+            - '%22alg%22%3a%22none%22'
+            - 'alg=none'
+            - 'algorithm=none'
+    ancla_token:
+        c-uri|contains:
+            - 'eyJ'
+            - 'token='
+            - 'jwt='
+            - 'access_token='
+            - 'id_token='
+    patron_clave_externa:
+        c-uri|contains:
+            - 'kid=../'
+            - 'kid=..%2f'
+            - 'kid=/dev/null'
+            - 'kid=/etc/passwd'
+            - 'jku=http'
+            - 'x5u=http'
+    filtro_documentacion:
+        c-uri|contains:
+            - '/.well-known/jwks.json'
+            - '/swagger-ui'
+            - '/api-docs'
+    condition: (1 of patron_cabecera_* or patron_declaracion_en_claro or (ancla_token and patron_clave_externa)) and not filtro_documentacion
+falsepositives:
+    - Portales de pruebas y depuradores de token alojados internamente, donde alguien pega un JWT de ejemplo con alg none para ensenar el fallo; se distinguen por la ruta de la herramienta y por venir de un puesto de desarrollo
+    - Enlaces de recuperacion o de invitacion que llevan el token en la URL de forma legitima: casan con el ancla pero no con ninguna cabecera manipulada, motivo por el que el ancla nunca dispara sola
+    - Federaciones que usan jku de forma valida contra un dominio propio, que hay que permitir por el dominio concreto y no por el parametro
+level: high

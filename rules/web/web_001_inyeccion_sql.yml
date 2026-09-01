@@ -1,0 +1,77 @@
+title: Inyeccion SQL en parametros de la peticion HTTP
+id: 5b946d0c-6486-51b6-86ac-a04257362d97
+status: experimental
+description: |
+    Una cadena de consulta normal lleva identificadores, fechas y texto de busqueda: no
+    lleva la gramatica de un motor SQL. Lo que separa el ataque del trafico legitimo no es
+    la palabra suelta sino la combinacion de un parametro con construcciones que solo
+    tienen sentido si el valor se concatena dentro de la sentencia: union de conjuntos,
+    condiciones siempre ciertas, funciones de espera y lectura del catalogo interno.
+references:
+    - https://attack.mitre.org/techniques/T1190/
+    - https://owasp.org/www-community/attacks/SQL_Injection
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.initial-access
+    - attack.t1190
+    - iso27001-2022.a-8-28
+    - iso27001-2022.a-8-8
+    - nist.ra-5
+    - nist.sc-7
+    - nist.si-10
+logsource:
+    category: webserver
+detection:
+    ancla_parametro:
+        c-uri|contains: '='
+    patron_union:
+        c-uri|contains:
+            - 'union select'
+            - 'union+select'
+            - 'union%20select'
+            - 'union all select'
+            - 'union%0aselect'
+            - 'union%23%0aselect'
+            - 'union%09select'
+    patron_booleana:
+        c-uri|contains:
+            - "' or 1=1"
+            - "' or '1'='1"
+            - "') or ('1'='1"
+            - "' or 'a'='a"
+            - "' and 1=2"
+            - "admin'--"
+            - '%27%20or%201%3d1'
+            - '%27+or+%271%27%3d%271'
+    patron_temporal:
+        c-uri|contains:
+            - 'sleep(5)'
+            - 'sleep(10)'
+            - 'pg_sleep('
+            - 'waitfor delay'
+            - 'benchmark(10000'
+            - 'dbms_pipe.receive_message'
+    patron_catalogo:
+        c-uri|contains:
+            - 'information_schema.tables'
+            - 'information_schema.columns'
+            - 'sys.databases'
+            - '@@version'
+            - 'group_concat('
+            - 'extractvalue('
+            - 'updatexml('
+            - 'load_file('
+            - 'into outfile'
+    filtro_consola_bd:
+        c-uri|contains:
+            - '/phpmyadmin/'
+            - '/adminer.php'
+            - '/pgadmin4/'
+            - '/_sql/'
+    condition: ancla_parametro and 1 of patron_* and not filtro_consola_bd
+falsepositives:
+    - Consolas de administracion de base de datos publicadas en la intranet, donde la sentencia viaja en el parametro por diseno; las tres mas comunes ya salen por ruta, ampliar la lista si hay otras
+    - Buscador propio del sitio en el que alguien pega texto tecnico o una consulta de ejemplo; se distingue porque llega de un usuario autenticado, con referer del propio dominio y sin repeticion
+    - Escaneres de vulnerabilidad autorizados, que hay que acotar por c-ip de origen y por la ventana en la que estan programados
+level: high

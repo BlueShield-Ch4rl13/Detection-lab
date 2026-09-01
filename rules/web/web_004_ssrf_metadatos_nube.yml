@@ -1,0 +1,73 @@
+title: Peticion falsificada desde el servidor hacia metadatos de nube
+id: 14f67b94-16ff-58af-93ce-db950441a7e8
+status: experimental
+description: |
+    El servicio de metadatos de la instancia solo es alcanzable desde la propia maquina y
+    entrega credenciales temporales del rol asignado, asi que quien consigue que la aplicacion
+    lo consulte por el se lleva las llaves de la cuenta de nube. Ningun cliente legitimo pide
+    desde fuera una direccion de enlace local: si aparece dentro de un parametro, alguien apunta
+    la descarga del servidor contra si mismo. Se cubren las formas ofuscadas de la direccion.
+references:
+    - https://attack.mitre.org/techniques/T1552/005/
+    - https://attack.mitre.org/techniques/T1190/
+    - https://owasp.org/www-community/attacks/Server_Side_Request_Forgery
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.credential-access
+    - attack.t1552.005
+    - attack.initial-access
+    - attack.t1190
+    - iso27001-2022.a-5-17
+    - iso27001-2022.a-8-28
+    - iso27001-2022.a-8-8
+    - nist.ia-5
+    - nist.ra-5
+    - nist.sc-28
+    - nist.sc-7
+    - nist.si-10
+logsource:
+    category: webserver
+detection:
+    ancla_parametro:
+        c-uri|contains: '='
+    patron_destino_metadatos:
+        c-uri|contains:
+            - '169.254.169.254'
+            - 'metadata.google.internal'
+            - '169.254.170.2'
+            - '100.100.100.200'
+            - 'fd00:ec2::254'
+            - 'metadata.tencentyun.com'
+    patron_destino_ofuscado:
+        c-uri|contains:
+            - '2852039166'
+            - '0xa9fea9fe'
+            - '0251.0376.0251.0376'
+            - '169.254.169.254.nip.io'
+            - '::ffff:169.254.169.254'
+            - '%31%36%39%2e%32%35%34%2e%31%36%39%2e%32%35%34'
+    patron_ruta_credencial:
+        c-uri|contains:
+            - 'latest/meta-data/iam/security-credentials'
+            - 'latest/api/token'
+            - 'latest/user-data'
+            - 'computemetadata/v1/instance/service-accounts'
+            - 'metadata/identity/oauth2/token'
+            - '/metadata/instance'
+            - '/metadata/v1/'
+    patron_esquema_interno:
+        c-uri|contains:
+            - '=file:///'
+            - '=gopher://'
+            - '=dict://'
+            - '=http://127.0.0.1'
+            - '=http://localhost'
+            - '=http://[::1]'
+            - '=http://0.0.0.0'
+    condition: patron_destino_metadatos or patron_destino_ofuscado or (ancla_parametro and (patron_ruta_credencial or patron_esquema_interno))
+falsepositives:
+    - Portales internos de documentacion de nube que enlazan la URL del servicio de metadatos como ejemplo; se distinguen porque la cadena viaja en la ruta de un documento y no dentro de un parametro
+    - Integraciones legitimas de previsualizacion de enlaces y validadores de webhook, que piden URLs arbitrarias por diseno y deben excluirse por endpoint concreto
+    - Pruebas de seguridad de la propia organizacion contra proteccion SSRF, acotables por c-ip y ventana
+level: critical

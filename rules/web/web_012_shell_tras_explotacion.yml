@@ -1,0 +1,113 @@
+title: Shell lanzada por el proceso del servidor web tras explotacion
+id: 27b637ca-3100-593b-966f-e3a57d366e3b
+status: experimental
+description: |
+    Aqui termina la cadena que empieza en una peticion maliciosa: el proceso que atiende HTTP
+    deja de servir contenido y engendra un interprete. Un servidor sano ejecuta muy pocos hijos
+    y siempre los mismos, asi que la senal esta en el parentesco, no en el comando. El matiz que
+    evita ahogar la cola es que php-fpm si llama al shell para enviar correo o convertir
+    imagenes: por eso solo alertan la herramienta de red, la shell interactiva y el reconocimiento.
+references:
+    - https://attack.mitre.org/techniques/T1190/
+    - https://attack.mitre.org/techniques/T1505/003/
+    - https://attack.mitre.org/techniques/T1059/004/
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.execution
+    - attack.t1059.004
+    - attack.persistence
+    - attack.t1505.003
+    - attack.initial-access
+    - attack.t1190
+    - iso27001-2022.a-8-28
+    - iso27001-2022.a-8-7
+    - iso27001-2022.a-8-8
+    - iso27001-2022.a-8-9
+    - nist.cm-5
+    - nist.cm-7
+    - nist.ra-5
+    - nist.sc-7
+    - nist.si-10
+    - nist.si-3
+    - nist.si-7
+logsource:
+    category: process_creation
+    product: linux
+detection:
+    ancla_padre_web:
+        ParentImage|contains:
+            - '/nginx'
+            - '/apache2'
+            - '/httpd'
+            - '/php-fpm'
+            - '/php-cgi'
+            - '/lighttpd'
+            - '/caddy'
+            - '/uwsgi'
+            - '/gunicorn'
+            - '/puma'
+            - '/unicorn'
+    hijo_herramienta_de_red:
+        Image|endswith:
+            - '/nc'
+            - '/ncat'
+            - '/netcat'
+            - '/socat'
+            - '/telnet'
+            - '/nmap'
+            - '/ssh'
+    hijo_interprete:
+        Image|endswith:
+            - '/bash'
+            - '/sh'
+            - '/dash'
+            - '/zsh'
+            - '/ksh'
+            - '/python'
+            - '/python3'
+            - '/perl'
+            - '/ruby'
+            - '/lua'
+    patron_shell_interactiva:
+        CommandLine|contains:
+            - '/dev/tcp/'
+            - '/dev/udp/'
+            - 'bash -i'
+            - 'sh -i'
+            - 'mkfifo'
+            - 'rm /tmp/f'
+            - 'pty.spawn'
+            - 'import socket'
+            - 'setsid'
+            - 'script -qc'
+    patron_reconocimiento:
+        CommandLine|contains:
+            - 'whoami'
+            - 'uname -a'
+            - 'id -u'
+            - '/etc/passwd'
+            - '/etc/shadow'
+            - 'crontab -l'
+            - 'sudo -l'
+            - 'curl http'
+            - 'wget http'
+            - 'chmod +x'
+            - 'base64 -d'
+            - 'history -c'
+    filtro_mantenimiento:
+        CommandLine|contains:
+            - '/usr/sbin/sendmail'
+            - '/usr/bin/ffmpeg'
+            - '/usr/bin/gs '
+            - 'wp-cron.php'
+            - 'artisan schedule:run'
+            - 'artisan queue:work'
+            - '/usr/sbin/logrotate'
+            - 'newrelic-daemon'
+    condition: ancla_padre_web and (hijo_herramienta_de_red or (hijo_interprete and 1 of patron_*)) and not filtro_mantenimiento
+falsepositives:
+    - Aplicaciones PHP que envian correo o convierten ficheros llamando al shell, motivo por el que el interprete solo no basta y hay que anadir a filtro_mantenimiento las rutas propias del sitio
+    - Tareas programadas del framework arrancadas desde el mismo arbol de procesos del servidor, reconocibles por la linea de comandos fija y por ejecutarse a horas exactas
+    - Sondas de monitorizacion que consultan estado con curl desde un hook de la aplicacion; se distinguen porque la URL de destino es siempre interna y conocida
+level: critical

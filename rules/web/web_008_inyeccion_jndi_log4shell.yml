@@ -1,0 +1,66 @@
+title: Inyeccion JNDI en peticion HTTP tipo Log4Shell
+id: 05f15af6-525d-5749-b494-4e52e9eea166
+status: experimental
+description: |
+    La familia Log4Shell no explota la aplicacion sino la biblioteca que escribe sus registros:
+    cualquier dato que acabe en una linea de log se interpreta como plantilla y provoca una
+    consulta JNDI al servidor del atacante, que devuelve la clase a ejecutar. Eso cambia donde
+    mirar, porque el payload rara vez va en la ruta: llega en User-Agent o en Referer, campos
+    que casi nadie inspecciona. Esa sintaxis no existe en trafico normal, ni siquiera troceada.
+references:
+    - https://attack.mitre.org/techniques/T1190/
+    - https://attack.mitre.org/techniques/T1059/
+    - https://nvd.nist.gov/vuln/detail/CVE-2021-44228
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.initial-access
+    - attack.t1190
+    - attack.execution
+    - attack.t1059
+    - iso27001-2022.a-8-28
+    - iso27001-2022.a-8-7
+    - iso27001-2022.a-8-8
+    - nist.cm-7
+    - nist.ra-5
+    - nist.sc-7
+    - nist.si-10
+    - nist.si-3
+logsource:
+    category: webserver
+detection:
+    patron_uri:
+        c-uri|contains:
+            - '${jndi:'
+            - '%24%7bjndi'
+            - '%2524%257bjndi'
+            - 'jndi%3aldap'
+            - '%6a%6e%64%69%3a'
+            - '${lower:j}'
+            - '${upper:j}'
+            - '${::-j}'
+            - '${${'
+    patron_agente_usuario:
+        c-useragent|contains:
+            - '${jndi:'
+            - '%24%7bjndi'
+            - 'jndi%3aldap'
+            - '%6a%6e%64%69%3a'
+            - '${lower:j}'
+            - '${upper:j}'
+            - '${::-j}'
+            - '${${'
+    patron_referer:
+        cs-Referrer|contains:
+            - '${jndi:'
+            - '%24%7bjndi'
+            - 'jndi%3aldap'
+            - '${lower:j}'
+            - '${::-j}'
+            - '${${'
+    condition: 1 of patron_*
+falsepositives:
+    - Escaneres de superficie de ataque y servicios de bug bounty que envian sondas JNDI con dominio de interaccion propio; se reconocen por el dominio de la sonda y por proceder de rangos publicados, y siguen mereciendo revision porque confirman que el campo llega al log
+    - Cadenas de plantilla de integracion continua o de gestores de configuracion que viajan sin expandir en un parametro y llegan a casar con la sustitucion anidada; por eso la regla no busca ${ a secas, solo la palabra jndi y las tres formas conocidas de trocear la letra j
+    - Ejercicios internos de verificacion de parcheo, que deben registrarse por c-ip y ventana antes de lanzarlos
+level: critical

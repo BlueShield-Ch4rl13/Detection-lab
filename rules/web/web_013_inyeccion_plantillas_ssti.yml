@@ -1,0 +1,83 @@
+title: Inyeccion en plantillas del lado servidor
+id: f3fa9ef7-36af-5959-a8c6-1ea48f8ab0bb
+status: experimental
+description: |
+    Cuando la entrada del usuario acaba dentro de una plantilla en vez de dentro
+    de los datos que la plantilla pinta, el motor la evalua como codigo. De ahi a
+    ejecucion remota hay un paso corto y bien documentado en Jinja2, Freemarker,
+    Velocity, Twig y Spring EL. Lo que distingue el ataque del texto normal es que
+    la carga util nunca es una expresion suelta: siempre lleva el delimitador del
+    motor rodeando una operacion o una clase del entorno de ejecucion.
+references:
+    - https://attack.mitre.org/techniques/T1190/
+    - https://portswigger.net/research/server-side-template-injection
+author: BlueShield-Ch4rl13
+date: 2026-08-31
+tags:
+    - attack.initial-access
+    - attack.execution
+    - attack.t1190
+    - iso27001-2022.a-8-28
+    - iso27001-2022.a-8-8
+    - nist.ra-5
+    - nist.sc-7
+    - nist.si-10
+logsource:
+    category: webserver
+detection:
+    ancla_parametro:
+        c-uri|contains: '='
+    patron_sonda:
+        # La sonda clasica: una operacion aritmetica dentro del delimitador. Si
+        # la respuesta trae el resultado, la plantilla ha evaluado la entrada.
+        c-uri|contains:
+            - '{{7*7}}'
+            - '{{7*''7''}}'
+            - '%7b%7b7*7%7d%7d'
+            - '${7*7}'
+            - '#{7*7}'
+            - '<%= 7*7'
+            - '@(7*7)'
+    patron_ejecucion_java:
+        # Freemarker, Velocity y Spring EL: acceso al entorno de ejecucion.
+        c-uri|contains:
+            - 'T(java.lang.Runtime)'
+            - 'java.lang.Runtime.getRuntime'
+            - 'freemarker.template.utility.Execute'
+            - 'class.getClassLoader'
+            - '$class.inspect'
+            - 'org.apache.commons.collections'
+    patron_ejecucion_python:
+        # Jinja2 y Mako: escapada por la jerarquia de clases hasta os.popen.
+        c-uri|contains:
+            - '__globals__'
+            - '__subclasses__'
+            - '__builtins__'
+            - '__mro__'
+            - 'self._TemplateReference'
+            - 'cycler.__init__'
+            - 'lipsum.__globals__'
+    patron_ejecucion_otros:
+        # Twig, Smarty y plantillas de Ruby.
+        c-uri|contains:
+            - '_self.env.registerUndefinedFilterCallback'
+            - 'system(''id'')'
+            - '{php}'
+            - '<%= `'
+    filtro_plantillas_cliente:
+        # Angular, Vue y Handlebars usan la misma notacion de dobles llaves en el
+        # navegador. Una peticion a un fichero de plantilla o a un recurso
+        # estatico no es inyeccion: es la plantilla legitima viajando.
+        c-uri|endswith:
+            - '.js'
+            - '.map'
+            - '.vue'
+            - '.hbs'
+            - '.mustache'
+            - '.html'
+    condition: ancla_parametro and 1 of patron_* and not filtro_plantillas_cliente
+falsepositives:
+    - Formularios donde alguien pega documentacion o un fragmento de plantilla; llega de usuario autenticado, con referer propio y sin repeticion desde la misma IP
+    - Escaneres de vulnerabilidad autorizados, que hay que acotar por c-ip y por la ventana en la que estan programados
+    - Aplicaciones que aceptan plantillas por diseno, como generadores de informes o de correo; hay que excluirlas por ruta y revisar aparte que su motor este en modo aislado
+level: critical
