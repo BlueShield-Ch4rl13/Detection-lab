@@ -1,18 +1,22 @@
-name: Validar reglas Sigma
+name: Validar y generar
 
 on:
   push:
     paths:
       - 'rules/**'
       - 'tools/**'
+      - 'requirements.txt'
       - '.github/workflows/validate.yml'
   pull_request:
     paths:
       - 'rules/**'
       - 'tools/**'
+      - 'requirements.txt'
+  workflow_dispatch:
 
 jobs:
-  validate:
+  validar:
+    name: Reglas Sigma y contenido multi-SIEM
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -20,15 +24,44 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
+          cache: pip
 
       - name: Instalar dependencias
         run: pip install -r requirements.txt
 
-      - name: Validar reglas y medir cobertura ATT&CK
-        run: python tools/validate.py
+      - name: Comprobar que todas las reglas tienen UUID
+        run: python tools/stamp_sigma_ids.py --check
+
+      - name: Validar con el validador de pySigma
+        run: sigma check --validation-config tools/sigma_validacion.yml rules/
+
+      # Regenera deploy/ y falla si el resultado no coincide con lo commiteado.
+      # Es lo que impide que una regla se modifique sin regenerar sus consultas:
+      # sin esta comprobacion, deploy/ se queda desfasado en silencio y lo que
+      # se despliega deja de ser lo que dice el repositorio.
+      - name: Regenerar el contenido de los cuatro SIEM
+        run: python tools/build.py
+
+      - name: Comprobar que deploy/ estaba al dia
+        run: |
+          if ! git diff --quiet -- deploy/; then
+            echo "::error::deploy/ no coincide con rules/. Ejecuta 'python tools/build.py' y haz commit del resultado."
+            git diff --stat -- deploy/
+            exit 1
+          fi
+          echo "deploy/ esta sincronizado con rules/"
+
+      - name: Validar la biblioteca y medir la cobertura ATT&CK
+        run: python tools/validate.py --estricto
 
       - name: Publicar la capa de cobertura (ATT&CK Navigator)
         uses: actions/upload-artifact@v7
         with:
           name: attack-navigator-coverage
           path: navigator/coverage-layer.json
+
+      - name: Publicar el contenido desplegable
+        uses: actions/upload-artifact@v7
+        with:
+          name: contenido-multi-siem
+          path: deploy/
