@@ -12,7 +12,7 @@
   todas las condiciones de una regla, de modo que un OR de Sigma se convierte en
   varias reglas que comparten identificador SOC y grupos.
 
-  Reglas generadas: 139  |  desde 87 ficheros Sigma
+  Reglas generadas: 152  |  desde 100 ficheros Sigma
 -->
 <group name="soc,soc_sigma,">
 
@@ -826,6 +826,76 @@
   <rule id="101073" level="8">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\bitsadmin\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(/transfer|/create|/addfile)</field>
+    <description>PROC-BITSADMIN-TRANSFER: Descarga con BITSAdmin</description>
+    <mitre>
+      <id>T1197</id>
+    </mitre>
+    <group>soc_sigma,soc_bitsadmin,proc_bitsadmin_transfer,</group>
+  </rule>
+
+  <rule id="101074" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\certutil\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(urlcache|\-decode|\-decodehex|split)</field>
+    <description>PROC-CERTUTIL-DOWNLOAD: Certutil usado para descargar o decodificar</description>
+    <mitre>
+      <id>T1105</id>
+      <id>T1140</id>
+    </mitre>
+    <group>soc_sigma,soc_certutil,proc_certutil_download,</group>
+  </rule>
+
+  <rule id="101075" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(Set\-MpPreference|DisableRealtimeMonitoring|DisableAntiSpyware|MpPreference\ \-Exclusion|Add\-MpPreference)</field>
+    <description>PROC-DEFENDER-TAMPER: Manipulacion de Windows Defender</description>
+    <mitre>
+      <id>T1562.001</id>
+    </mitre>
+    <group>soc_sigma,soc_defender,proc_defender_tamper,</group>
+  </rule>
+
+  <rule id="101076" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*comsvcs\.dll)(?=.*MiniDump)</field>
+    <description>PROC-LSASS-COMSVCS: Volcado de LSASS via comsvcs MiniDump</description>
+    <mitre>
+      <id>T1003.001</id>
+    </mitre>
+    <group>soc_sigma,soc_lsass,proc_lsass_comsvcs,</group>
+  </rule>
+
+  <rule id="101077" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(sekurlsa|logonpasswords|lsadump|privilege::debug|kerberos::)</field>
+    <description>PROC-MIMIKATZ-CMDLINE: Indicadores de Mimikatz en linea de comandos</description>
+    <mitre>
+      <id>T1003.001</id>
+    </mitre>
+    <group>soc_sigma,soc_mimikatz,proc_mimikatz_cmdline,</group>
+  </rule>
+
+  <rule id="101078" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\mshta\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(http|javascript:|vbscript:)</field>
+    <description>PROC-MSHTA-EXECUTION: Ejecucion sospechosa de mshta</description>
+    <mitre>
+      <id>T1218.005</id>
+    </mitre>
+    <group>soc_sigma,soc_mshta,proc_mshta_execution,</group>
+  </rule>
+
+  <rule id="101079" level="8">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*net)(?=.*user)</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)/add</field>
     <description>PROC-NET-USER: Creacion de cuenta local</description>
@@ -835,7 +905,7 @@
     <group>soc_sigma,soc_net,proc_net_user,</group>
   </rule>
 
-  <rule id="101074" level="12">
+  <rule id="101080" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.parentImage" type="pcre2">(?i)(\\winword\.exe|\\excel\.exe|\\powerpnt\.exe|\\outlook\.exe)$</field>
@@ -848,7 +918,56 @@
     <group>soc_sigma,soc_office,proc_office_spawning,</group>
   </rule>
 
-  <rule id="101075" level="8">
+  <rule id="101081" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\powershell\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(DownloadString|DownloadFile|Net\.WebClient|Invoke\-WebRequest|IEX|Invoke\-Expression)</field>
+    <description>PROC-POWERSHELL-DOWNLOAD: Cradle de descarga en PowerShell</description>
+    <mitre>
+      <id>T1059.001</id>
+      <id>T1105</id>
+    </mitre>
+    <group>soc_sigma,soc_powershell,proc_powershell_download,</group>
+  </rule>
+
+  <rule id="101082" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\powershell\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(\-enc|\-EncodedCommand|\ \-e\ )</field>
+    <description>PROC-POWERSHELL-ENCODED: PowerShell con comando codificado</description>
+    <mitre>
+      <id>T1059.001</id>
+    </mitre>
+    <group>soc_sigma,soc_powershell,proc_powershell_encoded,</group>
+  </rule>
+
+  <rule id="101083" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\regsvr32\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(/i:http|scrobj\.dll)</field>
+    <description>PROC-REGSVR32-SCRIPTLET: Regsvr32 ejecutando scriptlet remoto (Squiblydoo)</description>
+    <mitre>
+      <id>T1218.010</id>
+    </mitre>
+    <group>soc_sigma,soc_regsvr32,proc_regsvr32_scriptlet,</group>
+  </rule>
+
+  <rule id="101084" level="8">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\schtasks\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)/create</field>
+    <description>PROC-SCHEDULED-TASK: Creacion de tarea programada via schtasks</description>
+    <mitre>
+      <id>T1053.005</id>
+    </mitre>
+    <group>soc_sigma,soc_scheduled,proc_scheduled_task,</group>
+  </rule>
+
+  <rule id="101085" level="8">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\sc\.exe$</field>
@@ -861,7 +980,29 @@
     <group>soc_sigma,soc_service,proc_service_create,</group>
   </rule>
 
-  <rule id="101076" level="8">
+  <rule id="101086" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(delete\ shadows|shadowcopy\ delete|resize\ shadowstorage)</field>
+    <description>PROC-VSSADMIN-DELETE: Borrado de instantaneas (anti-recuperacion)</description>
+    <mitre>
+      <id>T1490</id>
+    </mitre>
+    <group>soc_sigma,soc_vssadmin,proc_vssadmin_delete,</group>
+  </rule>
+
+  <rule id="101087" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(1)$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(wevtutil\ cl|wevtutil\ clear\-log|Clear\-EventLog)</field>
+    <description>PROC-WEVTUTIL-CLEAR: Borrado de registros de eventos</description>
+    <mitre>
+      <id>T1070.001</id>
+    </mitre>
+    <group>soc_sigma,soc_wevtutil,proc_wevtutil_clear,</group>
+  </rule>
+
+  <rule id="101088" level="8">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\wmic\.exe$</field>
@@ -873,7 +1014,18 @@
     <group>soc_sigma,soc_wmic,proc_wmic_process,</group>
   </rule>
 
-  <rule id="101077" level="12">
+  <rule id="101089" level="8">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID" type="pcre2">^(13)$</field>
+    <field name="win.eventdata.targetObject" type="pcre2">(?i)(\\CurrentVersion\\Run\\|\\CurrentVersion\\RunOnce\\)</field>
+    <description>REG-RUN-KEY: Persistencia por clave Run (registro)</description>
+    <mitre>
+      <id>T1547.001</id>
+    </mitre>
+    <group>soc_sigma,soc_run,reg_run_key,</group>
+  </rule>
+
+  <rule id="101090" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^4769$</field>
     <field name="win.eventdata.ticketOptions" type="pcre2">(?i)^0x40810000$</field>
@@ -887,7 +1039,7 @@
     <group>soc_sigma,soc_ad,soc_ad_001,</group>
   </rule>
 
-  <rule id="101078" level="12">
+  <rule id="101091" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^4768$</field>
     <field name="win.eventdata.preAuthType" type="pcre2">(?i)^0$</field>
@@ -900,7 +1052,7 @@
     <group>soc_sigma,soc_ad,soc_ad_002,</group>
   </rule>
 
-  <rule id="101079" level="14">
+  <rule id="101092" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^4662$</field>
     <field name="win.eventdata.properties" type="pcre2">(?i)(1131f6aa\-9c07\-11d1\-f79f\-00c04fc2dcd2|1131f6ad\-9c07\-11d1\-f79f\-00c04fc2dcd2|89e95b76\-444d\-4c62\-991a\-0facbeda640c)</field>
@@ -913,7 +1065,7 @@
     <group>soc_sigma,soc_ad,soc_ad_003,</group>
   </rule>
 
-  <rule id="101080" level="14">
+  <rule id="101093" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^4769$</field>
     <field name="win.eventdata.serviceName" type="pcre2">(?i)^krbtgt</field>
@@ -925,7 +1077,7 @@
     <group>soc_sigma,soc_ad,soc_ad_004,</group>
   </rule>
 
-  <rule id="101081" level="14">
+  <rule id="101094" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(\\Rubeus\.exe|\\mimikatz\.exe|\\kekeo\.exe|\\GetUserSPNs\.exe)$</field>
@@ -937,7 +1089,7 @@
     <group>soc_sigma,soc_ad,soc_ad_005,</group>
   </rule>
 
-  <rule id="101082" level="14">
+  <rule id="101095" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.originalFileName" type="pcre2">(?i)^(Rubeus\.exe|mimikatz\.exe)$</field>
@@ -949,7 +1101,7 @@
     <group>soc_sigma,soc_ad,soc_ad_005,</group>
   </rule>
 
-  <rule id="101083" level="14">
+  <rule id="101096" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(kerberoast|asreproast|lsadump::dcsync|sekurlsa::logonpasswords|sekurlsa::tickets|kerberos::golden|kerberos::ptt|GetUserSPNs\.py|GetNPUsers\.py|secretsdump\.py)</field>
@@ -961,7 +1113,7 @@
     <group>soc_sigma,soc_ad,soc_ad_005,</group>
   </rule>
 
-  <rule id="101084" level="12">
+  <rule id="101097" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^4624$</field>
     <field name="win.eventdata.logonType" type="pcre2">(?i)^9$</field>
@@ -975,7 +1127,7 @@
     <group>soc_sigma,soc_ad,soc_ad_006,</group>
   </rule>
 
-  <rule id="101085" level="8">
+  <rule id="101098" level="8">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(\\SharpHound\.exe|\\AzureHound\.exe)$</field>
@@ -987,7 +1139,7 @@
     <group>soc_sigma,soc_ad,soc_ad_007,</group>
   </rule>
 
-  <rule id="101086" level="8">
+  <rule id="101099" level="8">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(Invoke\-BloodHound|SharpHound\.ps1|\-CollectionMethod\ All)</field>
@@ -999,7 +1151,7 @@
     <group>soc_sigma,soc_ad,soc_ad_007,</group>
   </rule>
 
-  <rule id="101087" level="8">
+  <rule id="101100" level="8">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(\\net\.exe|\\net1\.exe)$</field>
@@ -1012,7 +1164,7 @@
     <group>soc_sigma,soc_ad,soc_ad_007,</group>
   </rule>
 
-  <rule id="101088" level="8">
+  <rule id="101101" level="8">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\dsquery\.exe$</field>
@@ -1025,7 +1177,7 @@
     <group>soc_sigma,soc_ad,soc_ad_007,</group>
   </rule>
 
-  <rule id="101089" level="12">
+  <rule id="101102" level="12">
     <if_group>windows</if_group>
     <field name="win.system.providerName" type="pcre2">(?i)^Service\ Control\ Manager$</field>
     <field name="win.system.eventID" type="pcre2">(?i)^7045$</field>
@@ -1037,7 +1189,7 @@
     <group>soc_sigma,soc_ad,soc_ad_008,</group>
   </rule>
 
-  <rule id="101090" level="12">
+  <rule id="101103" level="12">
     <if_group>windows</if_group>
     <field name="win.system.providerName" type="pcre2">(?i)^Service\ Control\ Manager$</field>
     <field name="win.system.eventID" type="pcre2">(?i)^7045$</field>
@@ -1049,7 +1201,7 @@
     <group>soc_sigma,soc_ad,soc_ad_008,</group>
   </rule>
 
-  <rule id="101091" level="12">
+  <rule id="101104" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.parentImage" type="pcre2">(?i)(\\WmiPrvSE\.exe|\\wsmprovhost\.exe|\\winrshost\.exe)$</field>
@@ -1062,7 +1214,7 @@
     <group>soc_sigma,soc_ad,soc_ad_009,</group>
   </rule>
 
-  <rule id="101092" level="12">
+  <rule id="101105" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(\\SharpGPOAbuse\.exe|\\pyGPOAbuse\.py)$</field>
@@ -1073,7 +1225,7 @@
     <group>soc_sigma,soc_ad,soc_ad_010,</group>
   </rule>
 
-  <rule id="101093" level="12">
+  <rule id="101106" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(SharpGPOAbuse|New\-GPOImmediateTask|\-\-AddComputerTask|\-\-AddUserTask)</field>
@@ -1084,7 +1236,7 @@
     <group>soc_sigma,soc_ad,soc_ad_010,</group>
   </rule>
 
-  <rule id="101094" level="12">
+  <rule id="101107" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*\\SYSVOL\\)(?=.*\\Policies\\)</field>
@@ -1096,7 +1248,7 @@
     <group>soc_sigma,soc_ad,soc_ad_010,</group>
   </rule>
 
-  <rule id="101095" level="8">
+  <rule id="101108" level="8">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^4741$</field>
     <field name="win.eventdata.subjectUserName" negate="yes" type="pcre2">(?i)\$$</field>
@@ -1107,7 +1259,7 @@
     <group>soc_sigma,soc_ad,soc_ad_011,</group>
   </rule>
 
-  <rule id="101096" level="14">
+  <rule id="101109" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(\\Certify\.exe|\\Certipy\.exe)$</field>
@@ -1118,7 +1270,7 @@
     <group>soc_sigma,soc_ad,soc_ad_012,</group>
   </rule>
 
-  <rule id="101097" level="14">
+  <rule id="101110" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(Certify\.exe\ request|certipy\ req|certipy\ auth|Rubeus\.exe\ asktgt)</field>
@@ -1129,7 +1281,7 @@
     <group>soc_sigma,soc_ad,soc_ad_012,</group>
   </rule>
 
-  <rule id="101098" level="14">
+  <rule id="101111" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*certreq)(?=.*san:)</field>
@@ -1140,7 +1292,7 @@
     <group>soc_sigma,soc_ad,soc_ad_012,</group>
   </rule>
 
-  <rule id="101099" level="14">
+  <rule id="101112" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*comsvcs\.dll)(?=.*MiniDump)</field>
@@ -1151,7 +1303,7 @@
     <group>soc_sigma,soc_edr,soc_edr_001,</group>
   </rule>
 
-  <rule id="101100" level="14">
+  <rule id="101113" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(\\procdump\.exe|\\procdump64\.exe|\\dumpert\.exe|\\nanodump\.exe)$</field>
@@ -1163,7 +1315,7 @@
     <group>soc_sigma,soc_edr,soc_edr_001,</group>
   </rule>
 
-  <rule id="101101" level="14">
+  <rule id="101114" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.originalFileName" type="pcre2">(?i)^(procdump|procdump64\.exe)$</field>
@@ -1175,7 +1327,7 @@
     <group>soc_sigma,soc_edr,soc_edr_001,</group>
   </rule>
 
-  <rule id="101102" level="14">
+  <rule id="101115" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*rundll32)(?=.*dbghelp)(?=.*MiniDumpWriteDump)</field>
@@ -1186,7 +1338,7 @@
     <group>soc_sigma,soc_edr,soc_edr_001,</group>
   </rule>
 
-  <rule id="101103" level="12">
+  <rule id="101116" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(10)$</field>
     <field name="win.eventdata.targetImage" type="pcre2">(?i)\\lsass\.exe$</field>
@@ -1199,7 +1351,7 @@
     <group>soc_sigma,soc_edr,soc_edr_002,</group>
   </rule>
 
-  <rule id="101104" level="14">
+  <rule id="101117" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\vssadmin\.exe$</field>
@@ -1211,7 +1363,7 @@
     <group>soc_sigma,soc_edr,soc_edr_003,</group>
   </rule>
 
-  <rule id="101105" level="14">
+  <rule id="101118" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\wmic\.exe$</field>
@@ -1223,7 +1375,7 @@
     <group>soc_sigma,soc_edr,soc_edr_003,</group>
   </rule>
 
-  <rule id="101106" level="14">
+  <rule id="101119" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\wbadmin\.exe$</field>
@@ -1235,7 +1387,7 @@
     <group>soc_sigma,soc_edr,soc_edr_003,</group>
   </rule>
 
-  <rule id="101107" level="14">
+  <rule id="101120" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\bcdedit\.exe$</field>
@@ -1247,7 +1399,7 @@
     <group>soc_sigma,soc_edr,soc_edr_003,</group>
   </rule>
 
-  <rule id="101108" level="14">
+  <rule id="101121" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(Get\-WmiObject\ Win32_Shadowcopy|Remove\-Item\ \-Path\ C:\\Windows\\System32\\Recovery)</field>
@@ -1258,7 +1410,7 @@
     <group>soc_sigma,soc_edr,soc_edr_003,</group>
   </rule>
 
-  <rule id="101109" level="12">
+  <rule id="101122" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(Set\-MpPreference\ \-DisableRealtimeMonitoring\ \$true|Set\-MpPreference\ \-DisableBehaviorMonitoring\ \$true|Set\-MpPreference\ \-DisableIOAVProtection\ \$true|Add\-MpPreference\ \-ExclusionPath|DisableAntiSpyware|DisableAntiVirus)</field>
@@ -1270,7 +1422,7 @@
     <group>soc_sigma,soc_edr,soc_edr_004,</group>
   </rule>
 
-  <rule id="101110" level="12">
+  <rule id="101123" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(netsh\ advfirewall\ set\ allprofiles\ state\ off|netsh\ firewall\ set\ opmode\ disable)</field>
@@ -1282,7 +1434,7 @@
     <group>soc_sigma,soc_edr,soc_edr_004,</group>
   </rule>
 
-  <rule id="101111" level="12">
+  <rule id="101124" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(sc\ stop\ WinDefend|sc\ config\ WinDefend\ start=\ disabled|sc\ stop\ Sense|sc\ stop\ wazuh|Stop\-Service\ \-Name\ Sense|net\ stop\ "Windows\ Defender)</field>
@@ -1294,7 +1446,7 @@
     <group>soc_sigma,soc_edr,soc_edr_004,</group>
   </rule>
 
-  <rule id="101112" level="12">
+  <rule id="101125" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(auditpol\ /clear|auditpol\ /set\ /category:.*\ /success:disable|wevtutil\ cl\ |wevtutil\ sl\ )</field>
@@ -1306,7 +1458,7 @@
     <group>soc_sigma,soc_edr,soc_edr_004,</group>
   </rule>
 
-  <rule id="101113" level="12">
+  <rule id="101126" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\certutil\.exe$</field>
@@ -1323,7 +1475,7 @@
     <group>soc_sigma,soc_edr,soc_edr_005,</group>
   </rule>
 
-  <rule id="101114" level="12">
+  <rule id="101127" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\bitsadmin\.exe$</field>
@@ -1340,7 +1492,7 @@
     <group>soc_sigma,soc_edr,soc_edr_005,</group>
   </rule>
 
-  <rule id="101115" level="12">
+  <rule id="101128" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\mshta\.exe$</field>
@@ -1357,7 +1509,7 @@
     <group>soc_sigma,soc_edr,soc_edr_005,</group>
   </rule>
 
-  <rule id="101116" level="12">
+  <rule id="101129" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\regsvr32\.exe$</field>
@@ -1374,7 +1526,7 @@
     <group>soc_sigma,soc_edr,soc_edr_005,</group>
   </rule>
 
-  <rule id="101117" level="12">
+  <rule id="101130" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(DownloadString\(|DownloadFile\(|Invoke\-WebRequest|Net\.WebClient|Start\-BitsTransfer)</field>
@@ -1391,7 +1543,7 @@
     <group>soc_sigma,soc_edr,soc_edr_005,</group>
   </rule>
 
-  <rule id="101118" level="12">
+  <rule id="101131" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(\\powershell\.exe|\\pwsh\.exe)$</field>
@@ -1404,7 +1556,7 @@
     <group>soc_sigma,soc_edr,soc_edr_006,</group>
   </rule>
 
-  <rule id="101119" level="14">
+  <rule id="101132" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(11|23)$</field>
     <field name="win.eventdata.targetFilename" type="pcre2">(?i)(\.locked|\.encrypted|\.crypt|\.lockbit|\.blackcat|\.royal|\.akira|\.basta|\.cactus|\.play)$</field>
@@ -1415,7 +1567,7 @@
     <group>soc_sigma,soc_edr,soc_edr_007,</group>
   </rule>
 
-  <rule id="101120" level="14">
+  <rule id="101133" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(11|23)$</field>
     <field name="win.eventdata.targetFilename" type="pcre2">(?i)(readme_for_decrypt|how_to_decrypt|recover_your_files|restore\-my\-files|_readme\.txt|HOW\ TO\ BACK\ FILES|RESTORE_FILES_INFO)</field>
@@ -1426,7 +1578,7 @@
     <group>soc_sigma,soc_edr,soc_edr_007,</group>
   </rule>
 
-  <rule id="101121" level="12">
+  <rule id="101134" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\schtasks\.exe$</field>
@@ -1439,7 +1591,7 @@
     <group>soc_sigma,soc_edr,soc_edr_008,</group>
   </rule>
 
-  <rule id="101122" level="12">
+  <rule id="101135" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\schtasks\.exe$</field>
@@ -1452,7 +1604,7 @@
     <group>soc_sigma,soc_edr,soc_edr_008,</group>
   </rule>
 
-  <rule id="101123" level="12">
+  <rule id="101136" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(12|13|14)$</field>
     <field name="win.eventdata.targetObject" type="pcre2">(?i)(\\CurrentVersion\\Run|\\CurrentVersion\\RunOnce|\\Winlogon\\Shell|\\Winlogon\\Userinit|\\CurrentVersion\\Explorer\\User\ Shell\ Folders)</field>
@@ -1464,7 +1616,7 @@
     <group>soc_sigma,soc_edr,soc_edr_009,</group>
   </rule>
 
-  <rule id="101124" level="12">
+  <rule id="101137" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(8)$</field>
     <field name="win.eventdata.targetImage" type="pcre2">(?i)(\\explorer\.exe|\\svchost\.exe|\\winlogon\.exe|\\lsass\.exe|\\rundll32\.exe|\\dllhost\.exe|\\notepad\.exe|\\werfault\.exe)$</field>
@@ -1476,7 +1628,7 @@
     <group>soc_sigma,soc_edr,soc_edr_010,</group>
   </rule>
 
-  <rule id="101125" level="12">
+  <rule id="101138" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(8)$</field>
     <field name="win.eventdata.targetImage" type="pcre2">(?i)(\\explorer\.exe|\\svchost\.exe|\\winlogon\.exe|\\lsass\.exe|\\rundll32\.exe|\\dllhost\.exe|\\notepad\.exe|\\werfault\.exe)$</field>
@@ -1488,7 +1640,7 @@
     <group>soc_sigma,soc_edr,soc_edr_010,</group>
   </rule>
 
-  <rule id="101126" level="14">
+  <rule id="101139" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(17|18)$</field>
     <field name="win.eventdata.pipeName" type="pcre2">(?i)^(\\msagent_|\\postex_|\\postex_ssh_|\\status_|\\mojo_|\\wkssvc_|\\ntsvcs_|\\sliver\-|\\MSSE\-)</field>
@@ -1499,7 +1651,7 @@
     <group>soc_sigma,soc_edr,soc_edr_011,</group>
   </rule>
 
-  <rule id="101127" level="8">
+  <rule id="101140" level="8">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(\\AppData\\Local\\Temp\\|\\Windows\\Temp\\|\\Users\\Public\\|\\\$Recycle\.Bin\\|\\AppData\\Roaming\\)</field>
@@ -1512,7 +1664,7 @@
     <group>soc_sigma,soc_edr,soc_edr_012,</group>
   </rule>
 
-  <rule id="101128" level="8">
+  <rule id="101141" level="8">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^6416$</field>
     <field name="win.eventdata.className" type="pcre2">(?i)(DiskDrive|USB|WPD)</field>
@@ -1524,7 +1676,7 @@
     <group>soc_sigma,soc_dev,zta_dev_001,</group>
   </rule>
 
-  <rule id="101129" level="12">
+  <rule id="101142" level="12">
     <decoded_as>json</decoded_as>
     <field name="data.ResultType" type="pcre2">(?i)^0$</field>
     <field name="data.ClientAppUsed" type="pcre2">(?i)^(IMAP4|POP3|SMTP|MAPI\ Over\ HTTP|Exchange\ ActiveSync|Other\ clients|Authenticated\ SMTP|Exchange\ Web\ Services)$</field>
@@ -1536,7 +1688,7 @@
     <group>soc_sigma,soc_id,zta_id_001,</group>
   </rule>
 
-  <rule id="101130" level="12">
+  <rule id="101143" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^4624$</field>
     <field name="win.eventdata.logonType" type="pcre2">(?i)^(2|7|10|11)$</field>
@@ -1549,7 +1701,7 @@
     <group>soc_sigma,soc_id,zta_id_002,</group>
   </rule>
 
-  <rule id="101131" level="8">
+  <rule id="101144" level="8">
     <decoded_as>json</decoded_as>
     <field name="win.eventdata.destinationPort" type="pcre2">(?i)^(21|23|69|110|143|389|512|513|514)$</field>
     <field name="win.eventdata.initiated" type="pcre2">(?i)^true$</field>
@@ -1560,7 +1712,7 @@
     <group>soc_sigma,soc_net,zta_net_001,</group>
   </rule>
 
-  <rule id="101132" level="12">
+  <rule id="101145" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(7)$</field>
     <field name="win.eventdata.imageLoaded" type="pcre2">(?i)(\\AppData\\Local\\Temp\\|\\AppData\\Roaming\\|\\Users\\Public\\|\\ProgramData\\|\\Windows\\Temp\\|\\\$Recycle\.Bin\\)</field>
@@ -1575,7 +1727,7 @@
     <group>soc_sigma,soc_sup,zta_sup_001,</group>
   </rule>
 
-  <rule id="101133" level="12">
+  <rule id="101146" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(7)$</field>
     <field name="win.eventdata.imageLoaded" type="pcre2">(?i)(\\AppData\\Local\\Temp\\|\\AppData\\Roaming\\|\\Users\\Public\\|\\ProgramData\\|\\Windows\\Temp\\|\\\$Recycle\.Bin\\)</field>
@@ -1590,7 +1742,7 @@
     <group>soc_sigma,soc_sup,zta_sup_001,</group>
   </rule>
 
-  <rule id="101134" level="8">
+  <rule id="101147" level="8">
     <decoded_as>json</decoded_as>
     <field name="win.eventdata.image" type="pcre2">(?i)(/pip|/pip3|/npm|/yarn|/gem|/go|/cargo|/composer)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(install\ git\+|install\ http://|install\ https://|\-\-index\-url|\-\-extra\-index\-url|\-\-registry|install\ github\.com/)</field>
@@ -1603,7 +1755,7 @@
     <group>soc_sigma,soc_sup,zta_sup_002,</group>
   </rule>
 
-  <rule id="101135" level="8">
+  <rule id="101148" level="8">
     <decoded_as>json</decoded_as>
     <field name="win.eventdata.image" type="pcre2">(?i)(/pip|/pip3|/npm|/yarn|/gem|/go|/cargo|/composer)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*curl)(?=.*install)</field>
@@ -1616,7 +1768,7 @@
     <group>soc_sigma,soc_sup,zta_sup_002,</group>
   </rule>
 
-  <rule id="101136" level="8">
+  <rule id="101149" level="8">
     <decoded_as>json</decoded_as>
     <field name="win.eventdata.targetFilename" type="pcre2">(?i)(/package\-lock\.json|/yarn\.lock|/pnpm\-lock\.yaml|/poetry\.lock|/Pipfile\.lock|/requirements\.txt|/go\.sum|/Cargo\.lock|/composer\.lock|/Gemfile\.lock)$</field>
     <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(/git|/npm|/yarn|/pnpm|/poetry|/pip|/pip3|/go|/cargo|/composer|/bundle)$</field>
@@ -1627,7 +1779,7 @@
     <group>soc_sigma,soc_sup,zta_sup_003,</group>
   </rule>
 
-  <rule id="101137" level="14">
+  <rule id="101150" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^(1102|1100)$</field>
     <description>ZTA-VIS-001: Borrado o reduccion del registro de auditoria [1/2]</description>
@@ -1638,7 +1790,7 @@
     <group>soc_sigma,soc_vis,zta_vis_001,</group>
   </rule>
 
-  <rule id="101138" level="14">
+  <rule id="101151" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^4719$</field>
     <description>ZTA-VIS-001: Borrado o reduccion del registro de auditoria [2/2]</description>

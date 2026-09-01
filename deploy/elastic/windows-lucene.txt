@@ -4,17 +4,56 @@
 # Proceso del sistema con conexion saliente inusual  [medium]
 (process.executable.caseless:(*\\rundll32.exe OR *\\regsvr32.exe OR *\\mshta.exe)) AND network.direction:egress
 
+# Descarga con BITSAdmin  [medium]
+process.executable.caseless:*\\bitsadmin.exe AND (process.command_line:(*\/transfer* OR *\/create* OR *\/addfile*))
+
+# Certutil usado para descargar o decodificar  [high]
+process.executable.caseless:*\\certutil.exe AND (process.command_line:(*urlcache* OR *\-decode* OR *\-decodehex* OR *split*))
+
+# Manipulacion de Windows Defender  [high]
+process.command_line:(*Set\-MpPreference* OR *DisableRealtimeMonitoring* OR *DisableAntiSpyware* OR *MpPreference\ \-Exclusion* OR *Add\-MpPreference*)
+
+# Volcado de LSASS via comsvcs MiniDump  [critical]
+process.command_line:*comsvcs.dll* AND process.command_line:*MiniDump*
+
+# Indicadores de Mimikatz en linea de comandos  [critical]
+process.command_line:(*sekurlsa* OR *logonpasswords* OR *lsadump* OR *privilege\:\:debug* OR *kerberos\:\:*)
+
+# Ejecucion sospechosa de mshta  [high]
+process.executable.caseless:*\\mshta.exe AND (process.command_line:(*http* OR *javascript\:* OR *vbscript\:*))
+
 # Creacion de cuenta local  [medium]
 (process.command_line:*net* AND process.command_line:*user*) AND process.command_line:*\/add*
 
 # Documento de Office lanzando shell  [high]
 (process.parent.executable.caseless:(*\\winword.exe OR *\\excel.exe OR *\\powerpnt.exe OR *\\outlook.exe)) AND (process.executable.caseless:(*\\cmd.exe OR *\\powershell.exe OR *\\wscript.exe OR *\\cscript.exe OR *\\mshta.exe))
 
+# Cradle de descarga en PowerShell  [high]
+process.executable.caseless:*\\powershell.exe AND (process.command_line:(*DownloadString* OR *DownloadFile* OR *Net.WebClient* OR *Invoke\-WebRequest* OR *IEX* OR *Invoke\-Expression*))
+
+# PowerShell con comando codificado  [high]
+process.executable.caseless:*\\powershell.exe AND (process.command_line:(*\-enc* OR *\-EncodedCommand* OR *\ \-e\ *))
+
+# Regsvr32 ejecutando scriptlet remoto (Squiblydoo)  [high]
+process.executable.caseless:*\\regsvr32.exe AND (process.command_line:(*\/i\:http* OR *scrobj.dll*))
+
+# Creacion de tarea programada via schtasks  [medium]
+process.executable.caseless:*\\schtasks.exe AND process.command_line:*\/create*
+
 # Creacion de servicio via sc.exe  [medium]
 process.executable.caseless:*\\sc.exe AND process.command_line:*create* AND (process.command_line:(*binPath* OR *binpath\=*))
 
+# Borrado de instantaneas (anti-recuperacion)  [critical]
+process.command_line:(*delete\ shadows* OR *shadowcopy\ delete* OR *resize\ shadowstorage*)
+
+# Borrado de registros de eventos  [high]
+process.command_line:(*wevtutil\ cl* OR *wevtutil\ clear\-log* OR *Clear\-EventLog*)
+
 # Ejecucion via WMIC process call create  [medium]
 process.executable.caseless:*\\wmic.exe AND (process.command_line:*process* AND process.command_line:*call* AND process.command_line:*create*)
+
+# Persistencia por clave Run (registro)  [medium]
+registry.path:(*\\CurrentVersion\\Run\\* OR *\\CurrentVersion\\RunOnce\\*)
 
 # Kerberoasting - solicitud masiva de tickets de servicio con RC4  [high]
 winlog.channel:Security AND ((event.code:4769 AND winlog.event_data.TicketOptions:0x40810000 AND winlog.event_data.TicketEncryptionType:0x17) AND (NOT (service.name:(*$ OR krbtgt))))
