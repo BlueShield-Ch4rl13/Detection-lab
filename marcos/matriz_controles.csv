@@ -1,0 +1,128 @@
+regla,dominio,titulo,severidad,mitre,nist_800_53,iso_27001_2022,justificacion
+soc_cld_001_consentimiento_oauth,cloud,Consentimiento concedido a una aplicacion no verificada,high,T1550,"AC-3,IA-2",A.8.5,T1550: uso de material de autenticacion alternativo
+soc_cld_002_metodo_mfa_registrado,cloud,Metodo MFA registrado tras un inicio de sesion de riesgo,medium,T1098,"AC-2,AC-6","A.5.16,A.5.18",T1098: manipulacion de cuenta
+soc_cld_003_password_spraying,cloud,Fallo de autenticacion en Entra ID por credencial invalida,informational,T1110,"AC-7,IA-2",A.8.5,T1110: intentos fallidos de autenticacion
+soc_cld_004_token_robado,cloud,Inicio de sesion correcto en Entra ID,informational,T1539,"IA-2,SC-23",A.8.5,T1539: robo de sesion
+soc_cld_005_rol_privilegiado,cloud,Alta en un rol privilegiado de Entra ID,high,T1098,"AC-2,AC-6","A.5.16,A.5.18",T1098: manipulacion de cuenta
+soc_cld_006_acceso_condicional,cloud,Politica de acceso condicional modificada o deshabilitada,high,T1556,"AC-2,IA-2",A.8.5,T1556: modificacion del proceso de autenticacion
+soc_cld_007_credencial_service_principal,cloud,Credencial anadida a una aplicacion o service principal,high,T1098,"AC-2,AC-6","A.5.16,A.5.18",T1098: manipulacion de cuenta
+soc_cld_008_origen_anonimizado,cloud,Inicio de sesion desde una red de anonimizacion,high,T1090,SC-7,"A.8.20,A.8.22",T1090: proxy de conexion
+soc_cld_009_dispositivo_no_conforme,cloud,Dispositivo no conforme accediendo a un recurso corporativo,medium,T1078,"AC-2,AC-6","A.5.15,A.8.2",T1078: uso de cuenta valida
+soc_cld_010_saas_no_aprobado,cloud,Subida de datos a un servicio SaaS no aprobado,medium,T1567,"AC-4,SC-7","A.8.12,A.8.23",T1567: exfiltracion por servicio web
+cont_escape_a_namespaces_host,contenedores,Escape de contenedor hacia los namespaces del host,critical,T1611,"AC-6,SC-39",A.8.2,T1611: escape del contenedor
+cont_socket_runtime_accedido,contenedores,Acceso al socket del runtime de contenedores,critical,"T1610,T1611","AC-6,CM-7,SC-39","A.8.2,A.8.9",T1610: despliegue de contenedor | T1611: escape del contenedor
+k8s_capacidades_peligrosas,contenedores,Contenedor con capacidades de kernel peligrosas,high,T1611,"AC-6,SC-39",A.8.2,T1611: escape del contenedor
+k8s_escalada_por_rolebinding,contenedores,Enlace a un rol con privilegios de administrador del cluster,high,T1078,"AC-2,AC-6","A.5.15,A.8.2",T1078: uso de cuenta valida
+k8s_exec_en_pod,contenedores,Ejecucion interactiva dentro de un pod,medium,T1609,"AC-6,AU-12",A.8.2,T1609: comando en el administrador de contenedores
+k8s_lectura_masiva_secretos,contenedores,Lectura de secretos de Kubernetes,medium,T1552,"IA-5,SC-28",A.5.17,T1552: credenciales en fichero o configuracion
+k8s_montaje_hostpath,contenedores,Pod que monta una ruta sensible del nodo,critical,T1611,"AC-6,SC-39",A.8.2,T1611: escape del contenedor
+k8s_pod_privilegiado,contenedores,Creacion de pod privilegiado,high,"T1610,T1611","AC-6,CM-7,SC-39","A.8.2,A.8.9",T1610: despliegue de contenedor | T1611: escape del contenedor
+soc_mail_001_dominio_reciente,correo,Correo desde un dominio recien registrado,medium,T1566,"AT-2,SI-8","A.6.3,A.8.23",T1566: phishing
+soc_mail_002_suplantacion_directivo,correo,Suplantacion de directivo en el nombre para mostrar,high,T1534,SI-8,A.6.3,T1534: suplantacion interna
+soc_mail_003_fallo_dmarc,correo,Fallo de autenticacion de correo en el dominio propio,high,T1566,"AT-2,SI-8","A.6.3,A.8.23",T1566: phishing
+soc_mail_004_adjunto_sospechoso,correo,Adjunto con formato usado para entrega de malware,high,T1566,"AT-2,SI-8","A.6.3,A.8.23",T1566: phishing
+soc_mail_005_url_pulsada,correo,Usuario pulsa una URL de phishing bloqueada o permitida,high,T1566,"AT-2,SI-8","A.6.3,A.8.23",T1566: phishing
+soc_mail_006_regla_buzon_externa,correo,Regla de buzon con reenvio externo creada,high,"T1114,T1564","AC-3,AU-9","A.8.12,A.8.15,A.8.3",T1114: recoleccion de correo | T1564: ocultacion de artefactos
+soc_mail_007_envio_masivo_interno,correo,Correo entregado desde una cuenta interna,informational,T1534,SI-8,A.6.3,T1534: suplantacion interna
+soc_mail_008_html_smuggling,correo,HTML smuggling en adjunto,high,T1027,SI-3,A.8.7,T1027: ofuscacion
+exf_001_archivado_previo_exfiltracion,exfiltracion,Archivado masivo previo a la exfiltracion,medium,"T1074,T1560",AC-4,A.8.12,T1074: preparacion de datos para la salida | T1560: archivado de datos recogidos
+exf_002_subida_nube_personal,exfiltracion,Subida a almacenamiento personal en la nube,high,T1567,"AC-4,SC-7","A.8.12,A.8.23",T1567: exfiltracion por servicio web
+exf_003_copia_masiva_extraible,exfiltracion,Copia masiva de documentos a unidad extraible,medium,"T1005,T1052","AC-19,AC-3,MP-7","A.7.10,A.8.12,A.8.3",T1005: recoleccion de datos del sistema local | T1052: exfiltracion por medio fisico
+exf_004_protocolo_alternativo,exfiltracion,Exfiltracion por protocolo alternativo,high,T1048,"AC-4,SC-7",A.8.12,T1048: exfiltracion por protocolo alternativo
+exf_005_reenvio_correo_personal,exfiltracion,Reenvio automatico de correo a dominio personal,critical,"T1020,T1114","AC-3,AC-4","A.8.12,A.8.3",T1020: exfiltracion automatizada | T1114: recoleccion de correo
+exf_006_repositorio_publico_codigo,exfiltracion,Subida de codigo o secretos a repositorio publico,high,T1567,"AC-4,SC-7","A.8.12,A.8.23",T1567: exfiltracion por servicio web
+exf_007_volcado_base_datos,exfiltracion,Volcado de base de datos a ruta de usuario,high,"T1005,T1074","AC-3,AC-4","A.8.12,A.8.3",T1005: recoleccion de datos del sistema local | T1074: preparacion de datos para la salida
+exf_008_impresion_captura_masiva,exfiltracion,Impresion o captura masiva de documentos,medium,"T1052,T1113","AC-19,AC-3,MP-7","A.7.10,A.8.12,A.8.3",T1052: exfiltracion por medio fisico | T1113: captura de pantalla
+lin_base64_decode_exec,linux,Ejecucion de payload codificado en base64,high,"T1059,T1140","CM-7,SI-3",A.8.7,T1059: interprete de comandos | T1140: desofuscacion de carga util
+lin_chmod_tmp_exec,linux,Permisos de ejecucion en /tmp o /dev/shm,medium,T1222,AC-3,A.8.3,T1222: modificacion de permisos
+lin_cron_persistence,linux,Persistencia por cron,medium,T1053,"CM-5,CM-7",A.8.9,T1053: tarea programada
+lin_disable_history,linux,Deshabilitar historial de shell (anti-forense),medium,T1070,"AU-11,AU-9",A.8.15,T1070: borrado de rastro en el registro
+lin_download_pipe_shell,linux,Descarga tuberia a shell (curl|bash),high,"T1059,T1105","CM-7,SC-7,SI-3",A.8.7,T1059: interprete de comandos | T1105: transferencia de herramientas al interior
+lin_ld_preload,linux,Modificacion de ld.so.preload (rootkit),critical,T1574,"CM-5,SI-7",A.8.9,T1574: secuestro del flujo de ejecucion
+lin_read_shadow,linux,Lectura de /etc/shadow,high,T1003,"AC-6,IA-5","A.5.17,A.8.5",T1003: volcado de credenciales: proteccion del autenticador
+lin_reverse_shell,linux,Shell inversa (bash /dev/tcp),high,T1059,"CM-7,SI-3",A.8.7,T1059: interprete de comandos
+lin_ssh_authorized_keys,linux,Adicion de clave SSH (authorized_keys),high,T1098,"AC-2,AC-6","A.5.16,A.5.18",T1098: manipulacion de cuenta
+lin_useradd,linux,Creacion o modificacion de cuenta,medium,T1136,AC-2,A.5.16,T1136: alta de cuenta
+mac_borrado_de_registros,macos,Borrado de registros del sistema en macOS,high,T1070,"AU-11,AU-9",A.8.15,T1070: borrado de rastro en el registro
+mac_descarga_y_ejecucion,macos,Descarga y ejecucion directa en macOS,high,"T1059,T1105","CM-7,SC-7,SI-3",A.8.7,T1059: interprete de comandos | T1105: transferencia de herramientas al interior
+mac_gatekeeper_deshabilitado,macos,Gatekeeper deshabilitado o cuarentena eliminada,high,"T1553,T1562","AU-9,CM-14,CM-7,SI-3,SI-7",A.8.7,T1553: subversion del control de confianza | T1562: deterioro de las defensas
+mac_osascript_sospechoso,macos,AppleScript ejecutando shell o descargando codigo,high,T1059,"CM-7,SI-3",A.8.7,T1059: interprete de comandos
+mac_persistencia_launchagent,macos,Persistencia por LaunchAgent o LaunchDaemon,medium,T1543,"CM-5,CM-6",A.8.9,T1543: creacion o modificacion de servicio
+mac_tcc_manipulacion,macos,Manipulacion de la base de datos TCC,high,T1548,AC-6,A.8.2,T1548: elusion del mecanismo de elevacion
+mac_usuario_oculto_creado,macos,Creacion de usuario local u oculto en macOS,high,T1136,AC-2,A.5.16,T1136: alta de cuenta
+mac_volcado_llavero,macos,Acceso o volcado del llavero de macOS,critical,T1555,IA-5,"A.5.17,A.8.5",T1555: credenciales almacenadas
+soc_net_001_beaconing,red,Patron de beaconing hacia un destino externo,medium,T1071,"SC-7,SI-4","A.8.20,A.8.23",T1071: canal de mando y control
+soc_net_002_c2_servicio_legitimo,red,Canal de mando sobre un servicio legitimo,high,T1102,SC-7,A.8.23,T1102: servicio web como canal
+soc_net_003_dns_tunel,red,Tunelizacion o exfiltracion por DNS,high,T1071,"SC-7,SI-4","A.8.20,A.8.23",T1071: canal de mando y control
+soc_net_005_webshell,red,Interaccion con webshell,critical,T1505,"CM-5,SI-7",A.8.9,T1505: componente de software del servidor
+soc_net_006_exfiltracion_volumen,red,Volumen de subida anomalo hacia el exterior,medium,T1048,"AC-4,SC-7",A.8.12,T1048: exfiltracion por protocolo alternativo
+web_001_inyeccion_sql,web,Inyeccion SQL en parametros de la peticion HTTP,high,T1190,"RA-5,SC-7,SI-10","A.8.28,A.8.8",T1190: explotacion de aplicacion publicada
+web_002_xss_reflejado,web,Cross-site scripting reflejado en la peticion,high,"T1059,T1189","CM-7,SC-18,SI-3","A.8.23,A.8.7",T1059: interprete de comandos | T1189: compromiso desde el navegador
+web_003_salto_de_directorio,web,Salto de directorio hacia ficheros fuera de la raiz web,high,"T1083,T1190","AC-3,RA-5,SC-7,SI-10","A.8.28,A.8.3,A.8.8",T1083: descubrimiento de ficheros y directorios | T1190: explotacion de aplicacion publicada
+web_004_ssrf_metadatos_nube,web,Peticion falsificada desde el servidor hacia metadatos de nube,critical,"T1190,T1552","IA-5,RA-5,SC-28,SC-7,SI-10","A.5.17,A.8.28,A.8.8",T1190: explotacion de aplicacion publicada | T1552: credenciales en fichero o configuracion
+web_005_deserializacion_insegura,web,Deserializacion insegura de datos controlados por el cliente,critical,T1190,"RA-5,SC-7,SI-10","A.8.28,A.8.8",T1190: explotacion de aplicacion publicada
+web_006_subida_fichero_ejecutable,web,Subida de fichero con extension ejecutable al directorio publicado,high,"T1190,T1505","CM-5,RA-5,SC-7,SI-10,SI-7","A.8.28,A.8.8,A.8.9",T1190: explotacion de aplicacion publicada | T1505: componente de software del servidor
+web_007_inyeccion_de_comandos,web,Inyeccion de comandos del sistema operativo en un parametro,high,"T1059,T1190","CM-7,RA-5,SC-7,SI-10,SI-3","A.8.28,A.8.7,A.8.8",T1059: interprete de comandos | T1190: explotacion de aplicacion publicada
+web_008_inyeccion_jndi_log4shell,web,Inyeccion JNDI en peticion HTTP tipo Log4Shell,critical,"T1059,T1190","CM-7,RA-5,SC-7,SI-10,SI-3","A.8.28,A.8.7,A.8.8",T1059: interprete de comandos | T1190: explotacion de aplicacion publicada
+web_009_contrabando_peticiones,web,Contrabando de peticiones HTTP entre proxy y servidor final,high,T1190,"RA-5,SC-7,SI-10","A.8.28,A.8.8",T1190: explotacion de aplicacion publicada
+web_010_escaneo_automatizado,web,Escaneo automatizado del servidor web por herramienta conocida,medium,T1595,"RA-5,SC-7",A.8.8,T1595: escaneo activo
+web_011_abuso_de_token_jwt,web,Abuso de token JWT con algoritmo nulo o cabecera manipulada,high,"T1550,T1606","AC-3,IA-2,IA-5,SC-23",A.8.5,T1550: uso de material de autenticacion alternativo | T1606: falsificacion de credencial web
+web_012_shell_tras_explotacion,web,Shell lanzada por el proceso del servidor web tras explotacion,critical,"T1059,T1190,T1505","CM-5,CM-7,RA-5,SC-7,SI-10,SI-3,SI-7","A.8.28,A.8.7,A.8.8,A.8.9",T1059: interprete de comandos | T1190: explotacion de aplicacion publicada | T1505: componente de software del servidor
+web_013_inyeccion_plantillas_ssti,web,Inyeccion en plantillas del lado servidor,critical,T1190,"RA-5,SC-7,SI-10","A.8.28,A.8.8",T1190: explotacion de aplicacion publicada
+ad_013_dcshadow,windows,DCShadow - registro de un controlador de dominio falso,critical,T1207,"AC-6,CM-5",A.8.2,T1207: controlador de dominio no autorizado
+ad_014_sid_history,windows,Inyeccion de SID history en una cuenta del dominio,critical,T1134,"AC-3,AC-6",A.8.2,T1134: manipulacion de tokens de acceso
+ad_015_delegacion_kerberos,windows,"Abuso de delegacion Kerberos - constrained, unconstrained y RBCD",critical,"T1098,T1550","AC-2,AC-3,AC-6,IA-2","A.5.16,A.5.18,A.8.5",T1098: manipulacion de cuenta | T1550: uso de material de autenticacion alternativo
+ad_016_adminsdholder,windows,Modificacion de AdminSDHolder o del descriptor de seguridad de un objeto de directorio,critical,"T1098,T1222","AC-2,AC-3,AC-6","A.5.16,A.5.18,A.8.3",T1098: manipulacion de cuenta | T1222: modificacion de permisos
+ad_017_lectura_laps,windows,Lectura de contrasenas de administrador local gestionadas por LAPS,high,"T1087,T1555","AC-2,IA-5","A.5.16,A.5.17,A.8.5",T1087: enumeracion de cuentas | T1555: credenciales almacenadas
+ad_018_extraccion_ntds,windows,Extraccion de la base de datos ntds.dit del controlador de dominio,critical,T1003,"AC-6,IA-5","A.5.17,A.8.5",T1003: volcado de credenciales: proteccion del autenticador
+ad_019_coercion_ntlm,windows,Coercion de autenticacion y relay NTLM contra el controlador de dominio,high,"T1187,T1557","IA-2,SC-8","A.8.24,A.8.5",T1187: coercion de autenticacion | T1557: interceptacion de la autenticacion
+cred_001_volcado_colmenas_registro,windows,"Volcado de las colmenas SAM, SYSTEM y SECURITY",critical,T1003,"AC-6,IA-5","A.5.17,A.8.5",T1003: volcado de credenciales: proteccion del autenticador
+cred_002_credenciales_navegador,windows,Acceso a los almacenes de credenciales del navegador,high,"T1539,T1555","IA-2,IA-5,SC-23","A.5.17,A.8.5",T1539: robo de sesion | T1555: credenciales almacenadas
+cred_003_abuso_dpapi,windows,Abuso de DPAPI - masterkeys y clave de respaldo del dominio,critical,"T1003,T1555","AC-6,IA-5","A.5.17,A.8.5",T1003: volcado de credenciales: proteccion del autenticador | T1555: credenciales almacenadas
+cred_004_descenso_wdigest,windows,Descenso de version a WDigest para cachear credenciales en claro,high,"T1003,T1112","AC-6,CM-5,CM-6,IA-5","A.5.17,A.8.5,A.8.9",T1003: volcado de credenciales: proteccion del autenticador | T1112: modificacion del registro
+cred_005_credenciales_nube_ssh,windows,Robo de ficheros de credenciales de nube y de SSH,high,T1552,"IA-5,SC-28",A.5.17,T1552: credenciales en fichero o configuracion
+cred_006_gestores_contrasenas,windows,Acceso a bases de datos de gestores de contrasenas,high,T1555,IA-5,"A.5.17,A.8.5",T1555: credenciales almacenadas
+cred_007_credenciales_cacheadas_vault,windows,Volcado de credenciales cacheadas y del Administrador de credenciales de Windows,high,"T1003,T1555","AC-6,IA-5","A.5.17,A.8.5",T1003: volcado de credenciales: proteccion del autenticador | T1555: credenciales almacenadas
+net_rare_process_external_conn,windows,Proceso del sistema con conexion saliente inusual,medium,T1071,"SC-7,SI-4","A.8.20,A.8.23",T1071: canal de mando y control
+proc_net_user_add,windows,Creacion de cuenta local,medium,T1136,AC-2,A.5.16,T1136: alta de cuenta
+proc_office_spawning_shell,windows,Documento de Office lanzando shell,high,"T1204,T1566","AT-2,SI-3,SI-8","A.6.3,A.8.23,A.8.7",T1204: ejecucion inducida al usuario | T1566: phishing
+proc_service_create_scexe,windows,Creacion de servicio via sc.exe,medium,T1543,"CM-5,CM-6",A.8.9,T1543: creacion o modificacion de servicio
+proc_wmic_process_call_create,windows,Ejecucion via WMIC process call create,medium,T1047,"AC-17,CM-7",A.8.20,T1047: instrumental de gestion de Windows
+soc_ad_001_kerberoasting,windows,Kerberoasting - solicitud masiva de tickets de servicio con RC4,high,T1558,"IA-2,IA-5",A.8.5,T1558: abuso de tiquetes Kerberos
+soc_ad_002_asrep_roasting,windows,AS-REP Roasting - peticion sin preautenticacion Kerberos,high,T1558,"IA-2,IA-5",A.8.5,T1558: abuso de tiquetes Kerberos
+soc_ad_003_dcsync,windows,DCSync - replicacion de directorio desde un equipo que no es DC,critical,T1003,"AC-6,IA-5","A.5.17,A.8.5",T1003: volcado de credenciales: proteccion del autenticador
+soc_ad_004_golden_ticket,windows,Indicio de Golden Ticket - TGS de krbtgt con cifrado degradado,critical,T1558,"IA-2,IA-5",A.8.5,T1558: abuso de tiquetes Kerberos
+soc_ad_005_herramientas_kerberos,windows,Herramienta de abuso de Kerberos ejecutada,critical,"T1003,T1558","AC-6,IA-2,IA-5","A.5.17,A.8.5",T1003: volcado de credenciales: proteccion del autenticador | T1558: abuso de tiquetes Kerberos
+soc_ad_006_pass_the_hash,windows,Pass-the-Hash y Overpass-the-Hash,high,T1550,"AC-3,IA-2",A.8.5,T1550: uso de material de autenticacion alternativo
+soc_ad_007_enumeracion_dominio,windows,Enumeracion de Active Directory - BloodHound y comandos de reconocimiento,medium,"T1069,T1087",AC-2,"A.5.16,A.5.18",T1069: descubrimiento de grupos de permisos | T1087: enumeracion de cuentas
+soc_ad_008_psexec_remoto,windows,Ejecucion remota tipo PsExec,high,T1569,CM-7,A.8.9,T1569: ejecucion por servicio del sistema
+soc_ad_009_wmi_winrm_remoto,windows,Ejecucion remota por WMI o WinRM,high,"T1021,T1047","AC-17,CM-7,SC-7","A.6.7,A.8.20",T1021: servicio remoto | T1047: instrumental de gestion de Windows
+soc_ad_010_abuso_gpo,windows,Modificacion sospechosa de directiva de grupo,high,T1484,"AC-6,CM-5",A.8.9,T1484: modificacion de la politica del dominio
+soc_ad_011_cuenta_equipo_creada,windows,Cuenta de equipo creada por un usuario no administrador,medium,T1136,AC-2,A.5.16,T1136: alta de cuenta
+soc_ad_012_abuso_adcs,windows,Abuso de servicios de certificados de Active Directory,critical,T1649,"IA-5,SC-12",A.8.24,T1649: robo de certificados
+soc_edr_001_volcado_lsass,windows,Volcado de memoria de LSASS,critical,T1003,"AC-6,IA-5","A.5.17,A.8.5",T1003: volcado de credenciales: proteccion del autenticador
+soc_edr_002_acceso_lsass_sysmon,windows,Acceso a memoria de LSASS con permisos de lectura,high,T1003,"AC-6,IA-5","A.5.17,A.8.5",T1003: volcado de credenciales: proteccion del autenticador
+soc_edr_003_borrado_copias_sombra,windows,Destruccion de copias de seguridad y puntos de restauracion,critical,T1490,"CP-10,CP-9",A.8.13,T1490: inhibicion de la recuperacion
+soc_edr_004_defensas_deshabilitadas,windows,Defensas de seguridad deshabilitadas,high,"T1070,T1562","AU-11,AU-9,CM-7,SI-3","A.8.15,A.8.7",T1070: borrado de rastro en el registro | T1562: deterioro de las defensas
+soc_edr_005_lolbins_descarga,windows,LOLBin usado para descargar y ejecutar,high,"T1105,T1140,T1197,T1218","CM-7,SC-7,SI-3",A.8.7,T1105: transferencia de herramientas al interior | T1140: desofuscacion de carga util | T1197: transferencia por servicio del sistema | T1218: binario firmado usado como proxy
+soc_edr_006_powershell_ofuscado,windows,PowerShell codificado u ofuscado,high,"T1027,T1059","CM-7,SI-3",A.8.7,T1027: ofuscacion | T1059: interprete de comandos
+soc_edr_007_cifrado_masivo,windows,Cifrado masivo de ficheros por ransomware,critical,T1486,"CP-10,CP-9,IR-4","A.5.26,A.8.13",T1486: cifrado con fines de impacto
+soc_edr_008_persistencia_tarea,windows,Tarea programada sospechosa,high,T1053,"CM-5,CM-7",A.8.9,T1053: tarea programada
+soc_edr_009_persistencia_registro,windows,Persistencia por claves de arranque del registro,high,T1547,"CM-5,CM-6",A.8.9,T1547: ejecucion automatica en el arranque
+soc_edr_010_inyeccion_procesos,windows,Inyeccion de codigo en proceso remoto,high,T1055,"SI-3,SI-7",A.8.7,T1055: inyeccion en procesos
+soc_edr_011_pipe_c2,windows,Named pipe caracteristico de framework de C2,critical,T1071,"SC-7,SI-4","A.8.20,A.8.23",T1071: canal de mando y control
+soc_edr_012_ejecucion_desde_temp,windows,Ejecucion de binario desde una ruta de escritura de usuario,medium,T1204,"AT-2,SI-3",A.8.7,T1204: ejecucion inducida al usuario
+xdr_001_desinstalacion_sensor_edr,xdr,Desinstalacion o parada del sensor EDR,critical,"T1489,T1562","AU-9,CM-7,CP-10,IR-4,SI-3","A.5.29,A.8.7",T1489: parada de servicio | T1562: deterioro de las defensas
+xdr_002_exclusiones_antivirus,xdr,Exclusion anadida al antivirus,high,"T1112,T1562","AU-9,CM-5,CM-6,CM-7,SI-3","A.8.7,A.8.9",T1112: modificacion del registro | T1562: deterioro de las defensas
+xdr_003_reglas_asr_desactivadas,xdr,Reglas ASR desactivadas o puestas en auditoria,high,"T1112,T1562","AU-9,CM-5,CM-6,CM-7,SI-3","A.8.7,A.8.9",T1112: modificacion del registro | T1562: deterioro de las defensas
+xdr_004_driver_vulnerable_byovd,xdr,Carga de driver vulnerable conocido,critical,"T1068,T1562","AU-9,CM-7,RA-5,SI-2,SI-3","A.8.7,A.8.8",T1068: explotacion para elevar privilegios | T1562: deterioro de las defensas
+xdr_005_telemetria_etw_manipulada,xdr,Manipulacion del canal de telemetria ETW,high,T1562,"AU-9,CM-7,SI-3",A.8.7,T1562: deterioro de las defensas
+xdr_006_arranque_modo_seguro,xdr,Arranque en modo seguro forzado por bcdedit,critical,"T1112,T1562","AU-9,CM-5,CM-6,CM-7,SI-3","A.8.7,A.8.9",T1112: modificacion del registro | T1562: deterioro de las defensas
+zta_dev_001_almacenamiento_extraible,zta,Montaje de almacenamiento extraible,medium,"T1052,T1091","AC-19,MP-7","A.7.10,A.8.12",T1052: exfiltracion por medio fisico | T1091: propagacion por medio extraible
+zta_id_001_autenticacion_heredada,zta,Uso de protocolo de autenticacion heredado,high,"T1078,T1556","AC-2,AC-6,IA-2","A.5.15,A.8.2,A.8.5",T1078: uso de cuenta valida | T1556: modificacion del proceso de autenticacion
+zta_id_002_cuenta_servicio_interactiva,zta,Cuenta de servicio con inicio de sesion interactivo,high,T1078,"AC-2,AC-6","A.5.15,A.8.2",T1078: uso de cuenta valida
+zta_net_001_protocolo_en_claro,zta,Protocolo en claro hacia un recurso que exige cifrado,medium,T1040,SC-8,"A.8.20,A.8.24",T1040: trafico sin cifrar
+zta_sup_001_libreria_ruta_no_estandar,zta,Carga de libreria desde una ruta no estandar,high,T1574,"CM-5,SI-7",A.8.9,T1574: secuestro del flujo de ejecucion
+zta_sup_002_paquete_repositorio_no_aprobado,zta,Instalacion de paquete desde un repositorio no aprobado,medium,T1195,"CM-14,SR-11,SR-3","A.5.19,A.8.30",T1195: compromiso de la cadena de suministro
+zta_sup_003_fichero_dependencias_modificado,zta,Modificacion de un fichero de dependencias o lockfile,medium,T1195,"CM-14,SR-11,SR-3","A.5.19,A.8.30",T1195: compromiso de la cadena de suministro
+zta_vis_001_borrado_registro_auditoria,zta,Borrado o reduccion del registro de auditoria,critical,"T1070,T1562","AU-11,AU-9,CM-7,SI-3","A.8.15,A.8.7",T1070: borrado de rastro en el registro | T1562: deterioro de las defensas
