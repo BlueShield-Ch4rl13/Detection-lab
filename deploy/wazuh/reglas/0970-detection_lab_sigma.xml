@@ -12,7 +12,7 @@
   todas las condiciones de una regla, de modo que un OR de Sigma se convierte en
   varias reglas que comparten identificador SOC y grupos.
 
-  Reglas generadas: 278  |  desde 141 ficheros Sigma
+  Reglas generadas: 260  |  desde 127 ficheros Sigma
 -->
 <group name="soc,soc_sigma,detectionlab,">
 
@@ -1074,62 +1074,7 @@
     <info type="text">playbook=red; severidad_thehive=3; origen=soc_net_003_dns_tunel.yml</info>
   </rule>
 
-  <rule id="101084" level="12">
-    <decoded_as>json</decoded_as>
-    <field name="data.c-uri" type="pcre2">(?i)(\$\{jndi:|%24%7Bjndi|\$\{lower:j\})</field>
-    <description>SOC-NET-004: Explotacion de vulnerabilidad web contra un servicio publicado [1/5]</description>
-    <mitre>
-      <id>T1190</id>
-    </mitre>
-    <group>detectionlab,soc_sigma,soc_red,soc_net_004,auto_analisis,sev_high,</group>
-    <info type="text">playbook=red; severidad_thehive=3; origen=soc_net_004_explotacion_web.yml</info>
-  </rule>
-
-  <rule id="101085" level="12">
-    <decoded_as>json</decoded_as>
-    <field name="data.c-uri" type="pcre2">(?i)(\.\./\.\./|\.\.%2f\.\.%2f|%2e%2e%2f|/etc/passwd|c:\\windows\\win\.ini)</field>
-    <description>SOC-NET-004: Explotacion de vulnerabilidad web contra un servicio publicado [2/5]</description>
-    <mitre>
-      <id>T1190</id>
-    </mitre>
-    <group>detectionlab,soc_sigma,soc_red,soc_net_004,auto_analisis,sev_high,</group>
-    <info type="text">playbook=red; severidad_thehive=3; origen=soc_net_004_explotacion_web.yml</info>
-  </rule>
-
-  <rule id="101086" level="12">
-    <decoded_as>json</decoded_as>
-    <field name="data.c-uri" type="pcre2">(?i)(\ union\ select|union\+select|'\ or\ 1=1|sleep\(5\)|benchmark\(|waitfor\ delay)</field>
-    <description>SOC-NET-004: Explotacion de vulnerabilidad web contra un servicio publicado [3/5]</description>
-    <mitre>
-      <id>T1190</id>
-    </mitre>
-    <group>detectionlab,soc_sigma,soc_red,soc_net_004,auto_analisis,sev_high,</group>
-    <info type="text">playbook=red; severidad_thehive=3; origen=soc_net_004_explotacion_web.yml</info>
-  </rule>
-
-  <rule id="101087" level="12">
-    <decoded_as>json</decoded_as>
-    <field name="data.c-uri" type="pcre2">(?i)(rO0AB|aced0005|__proto__)</field>
-    <description>SOC-NET-004: Explotacion de vulnerabilidad web contra un servicio publicado [4/5]</description>
-    <mitre>
-      <id>T1190</id>
-    </mitre>
-    <group>detectionlab,soc_sigma,soc_red,soc_net_004,auto_analisis,sev_high,</group>
-    <info type="text">playbook=red; severidad_thehive=3; origen=soc_net_004_explotacion_web.yml</info>
-  </rule>
-
-  <rule id="101088" level="12">
-    <decoded_as>json</decoded_as>
-    <field name="data.c-uri" type="pcre2">(?i)(\$\{T\(java\.lang\.Runtime\)|\{\{7.*7\}\}|&lt;%=\ )</field>
-    <description>SOC-NET-004: Explotacion de vulnerabilidad web contra un servicio publicado [5/5]</description>
-    <mitre>
-      <id>T1190</id>
-    </mitre>
-    <group>detectionlab,soc_sigma,soc_red,soc_net_004,auto_analisis,sev_high,</group>
-    <info type="text">playbook=red; severidad_thehive=3; origen=soc_net_004_explotacion_web.yml</info>
-  </rule>
-
-  <rule id="101089" level="14">
+  <rule id="101084" level="14">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)(\.php|\.jsp|\.jspx|\.aspx|\.ashx)</field>
     <field name="data.c-uri" type="pcre2">(?i)(cmd=|exec=|shell=|passthru\(|system\(|whoami|net\ user|powershell|/bin/bash|eval\()</field>
@@ -1141,7 +1086,7 @@
     <info type="text">playbook=red; severidad_thehive=4; origen=soc_net_005_webshell.yml</info>
   </rule>
 
-  <rule id="101090" level="8">
+  <rule id="101085" level="8">
     <decoded_as>json</decoded_as>
     <field name="data.cs-method" type="pcre2">(?i)^(POST|PUT)$</field>
     <field name="data.c-uri" negate="yes" type="pcre2">(?i)(sharepoint\.com|onedrive\.live\.com|\.midominio\.local)</field>
@@ -1153,7 +1098,7 @@
     <info type="text">playbook=red; severidad_thehive=2; origen=soc_net_006_exfiltracion_volumen.yml</info>
   </rule>
 
-  <rule id="101091" level="12">
+  <rule id="101086" level="12">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)=</field>
     <field name="data.c-uri" type="pcre2">(?i)(union\ select|union\+select|union%20select|union\ all\ select|union%0aselect|union%23%0aselect|union%09select)</field>
@@ -1166,7 +1111,7 @@
     <info type="text">playbook=web; severidad_thehive=3; origen=web_001_inyeccion_sql.yml</info>
   </rule>
 
-  <rule id="101092" level="12">
+  <rule id="101087" level="12">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)=</field>
     <field name="data.c-uri" type="pcre2">(?i)('\ or\ 1=1|'\ or\ '1'='1|'\)\ or\ \('1'='1|'\ or\ 'a'='a|'\ and\ 1=2|admin'\-\-|%27%20or%201%3d1|%27\+or\+%271%27%3d%271)</field>
@@ -1179,7 +1124,7 @@
     <info type="text">playbook=web; severidad_thehive=3; origen=web_001_inyeccion_sql.yml</info>
   </rule>
 
-  <rule id="101093" level="12">
+  <rule id="101088" level="12">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)=</field>
     <field name="data.c-uri" type="pcre2">(?i)(sleep\(5\)|sleep\(10\)|pg_sleep\(|waitfor\ delay|benchmark\(10000|dbms_pipe\.receive_message)</field>
@@ -1192,7 +1137,7 @@
     <info type="text">playbook=web; severidad_thehive=3; origen=web_001_inyeccion_sql.yml</info>
   </rule>
 
-  <rule id="101094" level="12">
+  <rule id="101089" level="12">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)=</field>
     <field name="data.c-uri" type="pcre2">(?i)(information_schema\.tables|information_schema\.columns|sys\.databases|@@version|group_concat\(|extractvalue\(|updatexml\(|load_file\(|into\ outfile)</field>
@@ -1205,7 +1150,7 @@
     <info type="text">playbook=web; severidad_thehive=3; origen=web_001_inyeccion_sql.yml</info>
   </rule>
 
-  <rule id="101095" level="12">
+  <rule id="101090" level="12">
     <decoded_as>json</decoded_as>
     <field name="data.sc-status" type="pcre2">(?i)^200$</field>
     <field name="data.cs-method" type="pcre2">(?i)^(GET|POST)$</field>
@@ -1220,7 +1165,7 @@
     <info type="text">playbook=web; severidad_thehive=3; origen=web_002_xss_reflejado.yml</info>
   </rule>
 
-  <rule id="101096" level="12">
+  <rule id="101091" level="12">
     <decoded_as>json</decoded_as>
     <field name="data.sc-status" type="pcre2">(?i)^200$</field>
     <field name="data.cs-method" type="pcre2">(?i)^(GET|POST)$</field>
@@ -1236,7 +1181,7 @@
     <info type="text">playbook=web; severidad_thehive=3; origen=web_002_xss_reflejado.yml</info>
   </rule>
 
-  <rule id="101097" level="12">
+  <rule id="101092" level="12">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)(\.\./\.\./|\.\.%2f\.\.%2f|%2e%2e%2f%2e%2e%2f|\.\.%5c\.\.%5c|%2e%2e%5c|\.\.\.\.//|\.\.;/|%c0%ae%c0%ae|\.\.%c0%af|\.\.%ef%bc%8f)</field>
     <field name="data.c-uri" negate="yes" type="pcre2">(?i)(\.map|\.css|\.mjs)$</field>
@@ -1249,7 +1194,7 @@
     <info type="text">playbook=web; severidad_thehive=3; origen=web_003_salto_de_directorio.yml</info>
   </rule>
 
-  <rule id="101098" level="12">
+  <rule id="101093" level="12">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)(\.\.%252f|%252e%252e%252f|\.\.%255c|%25252e%25252e|%%32%65%%32%65)</field>
     <field name="data.c-uri" negate="yes" type="pcre2">(?i)(\.map|\.css|\.mjs)$</field>
@@ -1262,7 +1207,7 @@
     <info type="text">playbook=web; severidad_thehive=3; origen=web_003_salto_de_directorio.yml</info>
   </rule>
 
-  <rule id="101099" level="12">
+  <rule id="101094" level="12">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)(/etc/passwd|/etc/shadow|/proc/self/environ|/proc/self/cmdline|/var/log/auth\.log|/root/\.ssh/id_rsa|/\.aws/credentials|/wp\-config\.php|/web\.config|\\windows\\win\.ini|/windows/system32/drivers/etc/hosts)</field>
     <field name="data.c-uri" negate="yes" type="pcre2">(?i)(\.map|\.css|\.mjs)$</field>
@@ -1275,7 +1220,7 @@
     <info type="text">playbook=web; severidad_thehive=3; origen=web_003_salto_de_directorio.yml</info>
   </rule>
 
-  <rule id="101100" level="14">
+  <rule id="101095" level="14">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)(169\.254\.169\.254|metadata\.google\.internal|169\.254\.170\.2|100\.100\.100\.200|fd00:ec2::254|metadata\.tencentyun\.com)</field>
     <description>WEB-004-SSRF: Peticion falsificada desde el servidor hacia metadatos de nube [1/4]</description>
@@ -1287,7 +1232,7 @@
     <info type="text">playbook=web; severidad_thehive=4; origen=web_004_ssrf_metadatos_nube.yml</info>
   </rule>
 
-  <rule id="101101" level="14">
+  <rule id="101096" level="14">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)(2852039166|0xa9fea9fe|0251\.0376\.0251\.0376|169\.254\.169\.254\.nip\.io|::ffff:169\.254\.169\.254|%31%36%39%2e%32%35%34%2e%31%36%39%2e%32%35%34)</field>
     <description>WEB-004-SSRF: Peticion falsificada desde el servidor hacia metadatos de nube [2/4]</description>
@@ -1299,7 +1244,7 @@
     <info type="text">playbook=web; severidad_thehive=4; origen=web_004_ssrf_metadatos_nube.yml</info>
   </rule>
 
-  <rule id="101102" level="14">
+  <rule id="101097" level="14">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)=</field>
     <field name="data.c-uri" type="pcre2">(?i)(latest/meta\-data/iam/security\-credentials|latest/api/token|latest/user\-data|computemetadata/v1/instance/service\-accounts|metadata/identity/oauth2/token|/metadata/instance|/metadata/v1/)</field>
@@ -1312,7 +1257,7 @@
     <info type="text">playbook=web; severidad_thehive=4; origen=web_004_ssrf_metadatos_nube.yml</info>
   </rule>
 
-  <rule id="101103" level="14">
+  <rule id="101098" level="14">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)=</field>
     <field name="data.c-uri" type="pcre2">(?i)(=file:///|=gopher://|=dict://|=http://127\.0\.0\.1|=http://localhost|=http://\[::1\]|=http://0\.0\.0\.0)</field>
@@ -1325,7 +1270,7 @@
     <info type="text">playbook=web; severidad_thehive=4; origen=web_004_ssrf_metadatos_nube.yml</info>
   </rule>
 
-  <rule id="101104" level="14">
+  <rule id="101099" level="14">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)(rO0AB|aced0005|%ac%ed%00%05|rO0ABXNyA|javax\.management\.BadAttributeValueExpException)</field>
     <description>WEB-005-DESERIALIZACION: Deserializacion insegura de datos controlados por el cliente [1/6]</description>
@@ -1336,7 +1281,7 @@
     <info type="text">playbook=web; severidad_thehive=4; origen=web_005_deserializacion_insegura.yml</info>
   </rule>
 
-  <rule id="101105" level="14">
+  <rule id="101100" level="14">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)(AAEAAAD/////|AAEAAAD%2F%2F%2F%2F%2F|ObjectDataProvider|System\.Configuration\.Install\.AssemblyInstaller|TypeConfuseDelegate|\$type":"System\.)</field>
     <description>WEB-005-DESERIALIZACION: Deserializacion insegura de datos controlados por el cliente [2/6]</description>
@@ -1347,7 +1292,7 @@
     <info type="text">playbook=web; severidad_thehive=4; origen=web_005_deserializacion_insegura.yml</info>
   </rule>
 
-  <rule id="101106" level="14">
+  <rule id="101101" level="14">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)(_\$\$ND_FUNC\$\$_|!ruby/object:|!!python/object/apply|!!javax\.script\.ScriptEngineManager|!!com\.sun\.rowset\.JdbcRowSetImpl|c__builtin__|csubprocess)</field>
     <description>WEB-005-DESERIALIZACION: Deserializacion insegura de datos controlados por el cliente [3/6]</description>
@@ -1358,7 +1303,7 @@
     <info type="text">playbook=web; severidad_thehive=4; origen=web_005_deserializacion_insegura.yml</info>
   </rule>
 
-  <rule id="101107" level="14">
+  <rule id="101102" level="14">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)(__proto__|%5f%5fproto%5f%5f|constructor\[prototype\]|constructor%5bprototype%5d)</field>
     <description>WEB-005-DESERIALIZACION: Deserializacion insegura de datos controlados por el cliente [4/6]</description>
@@ -1369,7 +1314,7 @@
     <info type="text">playbook=web; severidad_thehive=4; origen=web_005_deserializacion_insegura.yml</info>
   </rule>
 
-  <rule id="101108" level="14">
+  <rule id="101103" level="14">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)=</field>
     <field name="data.c-uri" type="pcre2">(?i)O:[0-9]{1,3}:"</field>
@@ -1381,7 +1326,7 @@
     <info type="text">playbook=web; severidad_thehive=4; origen=web_005_deserializacion_insegura.yml</info>
   </rule>
 
-  <rule id="101109" level="14">
+  <rule id="101104" level="14">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)=</field>
     <field name="data.c-uri" type="pcre2">(?i)(__destruct|__wakeup|phar://|a:2:\{i:0;|O%3A8%3A%22)</field>
@@ -1393,7 +1338,7 @@
     <info type="text">playbook=web; severidad_thehive=4; origen=web_005_deserializacion_insegura.yml</info>
   </rule>
 
-  <rule id="101110" level="12">
+  <rule id="101105" level="12">
     <decoded_as>json</decoded_as>
     <field name="data.sc-status" type="pcre2">(?i)^(200|201|204)$</field>
     <field name="data.cs-method" type="pcre2">(?i)^(PUT|MOVE|COPY|MKCOL)$</field>
@@ -1407,7 +1352,7 @@
     <info type="text">playbook=web; severidad_thehive=3; origen=web_006_subida_fichero_ejecutable.yml</info>
   </rule>
 
-  <rule id="101111" level="12">
+  <rule id="101106" level="12">
     <decoded_as>json</decoded_as>
     <field name="data.sc-status" type="pcre2">(?i)^(200|201|204)$</field>
     <field name="data.cs-method" type="pcre2">(?i)^POST$</field>
@@ -1422,7 +1367,7 @@
     <info type="text">playbook=web; severidad_thehive=3; origen=web_006_subida_fichero_ejecutable.yml</info>
   </rule>
 
-  <rule id="101112" level="12">
+  <rule id="101107" level="12">
     <decoded_as>json</decoded_as>
     <field name="data.sc-status" type="pcre2">(?i)^(200|201|204)$</field>
     <field name="data.c-uri" type="pcre2">(?i)(\.php\.|\.php%00|\.php;|\.phtml\.|\.jsp\.|\.jsp%00|\.asp;|\.aspx;|\.asp%00|\.php%20)</field>
@@ -1435,7 +1380,7 @@
     <info type="text">playbook=web; severidad_thehive=3; origen=web_006_subida_fichero_ejecutable.yml</info>
   </rule>
 
-  <rule id="101113" level="12">
+  <rule id="101108" level="12">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)=</field>
     <field name="data.c-uri" type="pcre2">(?i)(;|%3b|\||%7c|\&amp;\&amp;|%26%26|\$\(|%24%28|%60|%0a|%0d%0a|%0asleep)</field>
@@ -1450,7 +1395,7 @@
     <info type="text">playbook=web; severidad_thehive=3; origen=web_007_inyeccion_de_comandos.yml</info>
   </rule>
 
-  <rule id="101114" level="14">
+  <rule id="101109" level="14">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)(\$\{jndi:|%24%7bjndi|%2524%257bjndi|jndi%3aldap|%6a%6e%64%69%3a|\$\{lower:j\}|\$\{upper:j\}|\$\{::\-j\}|\$\{\$\{)</field>
     <description>WEB-008-INYECCION: Inyeccion JNDI en peticion HTTP tipo Log4Shell [1/3]</description>
@@ -1462,7 +1407,7 @@
     <info type="text">playbook=web; severidad_thehive=4; origen=web_008_inyeccion_jndi_log4shell.yml</info>
   </rule>
 
-  <rule id="101115" level="14">
+  <rule id="101110" level="14">
     <decoded_as>json</decoded_as>
     <field name="data.c-useragent" type="pcre2">(?i)(\$\{jndi:|%24%7bjndi|jndi%3aldap|%6a%6e%64%69%3a|\$\{lower:j\}|\$\{upper:j\}|\$\{::\-j\}|\$\{\$\{)</field>
     <description>WEB-008-INYECCION: Inyeccion JNDI en peticion HTTP tipo Log4Shell [2/3]</description>
@@ -1474,7 +1419,7 @@
     <info type="text">playbook=web; severidad_thehive=4; origen=web_008_inyeccion_jndi_log4shell.yml</info>
   </rule>
 
-  <rule id="101116" level="14">
+  <rule id="101111" level="14">
     <decoded_as>json</decoded_as>
     <field name="data.cs-Referrer" type="pcre2">(?i)(\$\{jndi:|%24%7bjndi|jndi%3aldap|\$\{lower:j\}|\$\{::\-j\}|\$\{\$\{)</field>
     <description>WEB-008-INYECCION: Inyeccion JNDI en peticion HTTP tipo Log4Shell [3/3]</description>
@@ -1486,7 +1431,7 @@
     <info type="text">playbook=web; severidad_thehive=4; origen=web_008_inyeccion_jndi_log4shell.yml</info>
   </rule>
 
-  <rule id="101117" level="12">
+  <rule id="101112" level="12">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)(content\-length:|transfer\-encoding:|content\-length%3a|transfer\-encoding%3a|transfer\-encoding%20%3a|te:%20chunked|chunked%0d%0a)</field>
     <description>WEB-009-CONTRABANDO: Contrabando de peticiones HTTP entre proxy y servidor final [1/3]</description>
@@ -1497,7 +1442,7 @@
     <info type="text">playbook=web; severidad_thehive=3; origen=web_009_contrabando_peticiones.yml</info>
   </rule>
 
-  <rule id="101118" level="12">
+  <rule id="101113" level="12">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)(%0d%0a|%0a%0d|%250d%250a|%00%0d%0a|%e5%98%8a%e5%98%8d)</field>
     <description>WEB-009-CONTRABANDO: Contrabando de peticiones HTTP entre proxy y servidor final [2/3]</description>
@@ -1508,7 +1453,7 @@
     <info type="text">playbook=web; severidad_thehive=3; origen=web_009_contrabando_peticiones.yml</info>
   </rule>
 
-  <rule id="101119" level="12">
+  <rule id="101114" level="12">
     <decoded_as>json</decoded_as>
     <field name="data.sc-status" type="pcre2">(?i)^(400|408|501)$</field>
     <field name="data.cs-method" negate="yes" type="pcre2">(?i)^(GET|POST|HEAD|PUT|DELETE|OPTIONS|PATCH|CONNECT|TRACE|PROPFIND|PROPPATCH|MKCOL|COPY|MOVE|LOCK|UNLOCK)$</field>
@@ -1520,7 +1465,7 @@
     <info type="text">playbook=web; severidad_thehive=3; origen=web_009_contrabando_peticiones.yml</info>
   </rule>
 
-  <rule id="101120" level="8">
+  <rule id="101115" level="8">
     <decoded_as>json</decoded_as>
     <field name="data.c-useragent" type="pcre2">(?i)(sqlmap/|nikto|nuclei|feroxbuster|gobuster|dirbuster|dirsearch|wfuzz|ffuf|wpscan|acunetix|nessus|openvas|zgrab|masscan|nmap\ scripting\ engine|zaproxy|arachni|whatweb|commix)</field>
     <field name="data.c-useragent" negate="yes" type="pcre2">(?i)(googlebot|bingbot|applebot|duckduckbot|uptimerobot|pingdom|statuscake|ahrefsbot)</field>
@@ -1533,7 +1478,7 @@
     <info type="text">playbook=web; severidad_thehive=2; origen=web_010_escaneo_automatizado.yml</info>
   </rule>
 
-  <rule id="101121" level="8">
+  <rule id="101116" level="8">
     <decoded_as>json</decoded_as>
     <field name="data.c-useragent" type="pcre2">(?i)^(\-|)$</field>
     <field name="data.sc-status" type="pcre2">(?i)^404$</field>
@@ -1547,7 +1492,7 @@
     <info type="text">playbook=web; severidad_thehive=2; origen=web_010_escaneo_automatizado.yml</info>
   </rule>
 
-  <rule id="101122" level="12">
+  <rule id="101117" level="12">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)(eyJhbGciOiJub25l|eyJhbGciOiJOb25l|eyJhbGciOiJOT05F|eyJhbGciOiJuT25F|eyJ0eXAiOiJKV1QiLCJhbGciOiJub25l)</field>
     <field name="data.c-uri" negate="yes" type="pcre2">(?i)(/\.well\-known/jwks\.json|/swagger\-ui|/api\-docs)</field>
@@ -1560,7 +1505,7 @@
     <info type="text">playbook=web; severidad_thehive=3; origen=web_011_abuso_de_token_jwt.yml</info>
   </rule>
 
-  <rule id="101123" level="12">
+  <rule id="101118" level="12">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)(eyJhbGciOiJIUzI1NiIsImtpZCI6Ii4u|eyJhbGciOiJSUzI1NiIsImprdSI6Imh0|eyJhbGciOiJSUzI1NiIsIng1dSI6Imh0)</field>
     <field name="data.c-uri" negate="yes" type="pcre2">(?i)(/\.well\-known/jwks\.json|/swagger\-ui|/api\-docs)</field>
@@ -1573,7 +1518,7 @@
     <info type="text">playbook=web; severidad_thehive=3; origen=web_011_abuso_de_token_jwt.yml</info>
   </rule>
 
-  <rule id="101124" level="12">
+  <rule id="101119" level="12">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)("alg":"none"|%22alg%22%3a%22none%22|alg=none|algorithm=none)</field>
     <field name="data.c-uri" negate="yes" type="pcre2">(?i)(/\.well\-known/jwks\.json|/swagger\-ui|/api\-docs)</field>
@@ -1586,7 +1531,7 @@
     <info type="text">playbook=web; severidad_thehive=3; origen=web_011_abuso_de_token_jwt.yml</info>
   </rule>
 
-  <rule id="101125" level="12">
+  <rule id="101120" level="12">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)(eyJ|token=|jwt=|access_token=|id_token=)</field>
     <field name="data.c-uri" type="pcre2">(?i)(kid=\.\./|kid=\.\.%2f|kid=/dev/null|kid=/etc/passwd|jku=http|x5u=http)</field>
@@ -1600,7 +1545,7 @@
     <info type="text">playbook=web; severidad_thehive=3; origen=web_011_abuso_de_token_jwt.yml</info>
   </rule>
 
-  <rule id="101126" level="14">
+  <rule id="101121" level="14">
     <decoded_as>json</decoded_as>
     <field name="win.eventdata.parentImage" type="pcre2">(?i)(/nginx|/apache2|/httpd|/php\-fpm|/php\-cgi|/lighttpd|/caddy|/uwsgi|/gunicorn|/puma|/unicorn)</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(/nc|/ncat|/netcat|/socat|/telnet|/nmap|/ssh)$</field>
@@ -1615,7 +1560,7 @@
     <info type="text">playbook=web; severidad_thehive=4; origen=web_012_shell_tras_explotacion.yml</info>
   </rule>
 
-  <rule id="101127" level="14">
+  <rule id="101122" level="14">
     <decoded_as>json</decoded_as>
     <field name="win.eventdata.parentImage" type="pcre2">(?i)(/nginx|/apache2|/httpd|/php\-fpm|/php\-cgi|/lighttpd|/caddy|/uwsgi|/gunicorn|/puma|/unicorn)</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(/bash|/sh|/dash|/zsh|/ksh|/python|/python3|/perl|/ruby|/lua)$</field>
@@ -1631,7 +1576,7 @@
     <info type="text">playbook=web; severidad_thehive=4; origen=web_012_shell_tras_explotacion.yml</info>
   </rule>
 
-  <rule id="101128" level="14">
+  <rule id="101123" level="14">
     <decoded_as>json</decoded_as>
     <field name="win.eventdata.parentImage" type="pcre2">(?i)(/nginx|/apache2|/httpd|/php\-fpm|/php\-cgi|/lighttpd|/caddy|/uwsgi|/gunicorn|/puma|/unicorn)</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(/bash|/sh|/dash|/zsh|/ksh|/python|/python3|/perl|/ruby|/lua)$</field>
@@ -1647,7 +1592,7 @@
     <info type="text">playbook=web; severidad_thehive=4; origen=web_012_shell_tras_explotacion.yml</info>
   </rule>
 
-  <rule id="101129" level="14">
+  <rule id="101124" level="14">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)=</field>
     <field name="data.c-uri" type="pcre2">(?i)(\{\{7.*7\}\}|\{\{7.*'7'\}\}|%7b%7b7.*7%7d%7d|\$\{7.*7\}|\#\{7.*7\}|&lt;%=\ 7.*7|@\(7.*7\))</field>
@@ -1660,7 +1605,7 @@
     <info type="text">playbook=web; severidad_thehive=4; origen=web_013_inyeccion_plantillas_ssti.yml</info>
   </rule>
 
-  <rule id="101130" level="14">
+  <rule id="101125" level="14">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)=</field>
     <field name="data.c-uri" type="pcre2">(?i)(T\(java\.lang\.Runtime\)|java\.lang\.Runtime\.getRuntime|freemarker\.template\.utility\.Execute|class\.getClassLoader|\$class\.inspect|org\.apache\.commons\.collections)</field>
@@ -1673,7 +1618,7 @@
     <info type="text">playbook=web; severidad_thehive=4; origen=web_013_inyeccion_plantillas_ssti.yml</info>
   </rule>
 
-  <rule id="101131" level="14">
+  <rule id="101126" level="14">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)=</field>
     <field name="data.c-uri" type="pcre2">(?i)(__globals__|__subclasses__|__builtins__|__mro__|self\._TemplateReference|cycler\.__init__|lipsum\.__globals__)</field>
@@ -1686,7 +1631,7 @@
     <info type="text">playbook=web; severidad_thehive=4; origen=web_013_inyeccion_plantillas_ssti.yml</info>
   </rule>
 
-  <rule id="101132" level="14">
+  <rule id="101127" level="14">
     <decoded_as>json</decoded_as>
     <field name="data.c-uri" type="pcre2">(?i)=</field>
     <field name="data.c-uri" type="pcre2">(?i)(_self\.env\.registerUndefinedFilterCallback|system\('id'\)|\{php\}|&lt;%=\ `)</field>
@@ -1699,7 +1644,7 @@
     <info type="text">playbook=web; severidad_thehive=4; origen=web_013_inyeccion_plantillas_ssti.yml</info>
   </rule>
 
-  <rule id="101133" level="14">
+  <rule id="101128" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^4742$</field>
     <field name="win.eventdata.servicePrincipalNames" type="pcre2">(?i)(?=.*GC/)(?=.*E3514235\-4B06\-11D1\-AB04\-00C04FC2DCD2)</field>
@@ -1713,7 +1658,7 @@
     <info type="text">playbook=ad; severidad_thehive=4; origen=ad_013_dcshadow.yml</info>
   </rule>
 
-  <rule id="101134" level="14">
+  <rule id="101129" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^(4928|4929)$</field>
     <field name="win.eventdata.subjectUserName" negate="yes" type="pcre2">(?i)\$$</field>
@@ -1726,7 +1671,7 @@
     <info type="text">playbook=ad; severidad_thehive=4; origen=ad_013_dcshadow.yml</info>
   </rule>
 
-  <rule id="101135" level="14">
+  <rule id="101130" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^(4765|4766)$</field>
     <description>AD-014-SID: Inyeccion de SID history en una cuenta del dominio [1/2]</description>
@@ -1737,7 +1682,7 @@
     <info type="text">playbook=ad; severidad_thehive=4; origen=ad_014_sid_history.yml</info>
   </rule>
 
-  <rule id="101136" level="14">
+  <rule id="101131" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^(4738|4742)$</field>
     <field name="win.eventdata.sidHistory" type="pcre2">(?i)S\-1\-5\-21</field>
@@ -1749,7 +1694,7 @@
     <info type="text">playbook=ad; severidad_thehive=4; origen=ad_014_sid_history.yml</info>
   </rule>
 
-  <rule id="101137" level="14">
+  <rule id="101132" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^5136$</field>
     <field name="win.eventdata.attributeLDAPDisplayName" type="pcre2">(?i)^msDS\-AllowedToActOnBehalfOfOtherIdentity$</field>
@@ -1763,7 +1708,7 @@
     <info type="text">playbook=ad; severidad_thehive=4; origen=ad_015_delegacion_kerberos.yml</info>
   </rule>
 
-  <rule id="101138" level="14">
+  <rule id="101133" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^(4738|4742)$</field>
     <field name="win.eventdata.allowedToDelegateTo" type="pcre2">(?i)/</field>
@@ -1777,7 +1722,7 @@
     <info type="text">playbook=ad; severidad_thehive=4; origen=ad_015_delegacion_kerberos.yml</info>
   </rule>
 
-  <rule id="101139" level="14">
+  <rule id="101134" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^(4738|4742)$</field>
     <field name="win.eventdata.userAccountControl" type="pcre2">(?i)(%%2075|%%2084)</field>
@@ -1791,7 +1736,7 @@
     <info type="text">playbook=ad; severidad_thehive=4; origen=ad_015_delegacion_kerberos.yml</info>
   </rule>
 
-  <rule id="101140" level="14">
+  <rule id="101135" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^5136$</field>
     <field name="win.eventdata.objectDN" type="pcre2">(?i)CN=AdminSDHolder</field>
@@ -1806,7 +1751,7 @@
     <info type="text">playbook=ad; severidad_thehive=4; origen=ad_016_adminsdholder.yml</info>
   </rule>
 
-  <rule id="101141" level="14">
+  <rule id="101136" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^5136$</field>
     <field name="win.eventdata.attributeLDAPDisplayName" type="pcre2">(?i)^nTSecurityDescriptor$</field>
@@ -1821,7 +1766,7 @@
     <info type="text">playbook=ad; severidad_thehive=4; origen=ad_016_adminsdholder.yml</info>
   </rule>
 
-  <rule id="101142" level="12">
+  <rule id="101137" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(ms\-Mcs\-AdmPwd|msLAPS\-Password|msLAPS\-EncryptedPassword)</field>
@@ -1834,7 +1779,7 @@
     <info type="text">playbook=ad; severidad_thehive=3; origen=ad_017_lectura_laps.yml</info>
   </rule>
 
-  <rule id="101143" level="12">
+  <rule id="101138" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(Get\-AdmPwdPassword|Get\-LapsADPassword|Get\-LapsAADPassword)</field>
@@ -1847,7 +1792,7 @@
     <info type="text">playbook=ad; severidad_thehive=3; origen=ad_017_lectura_laps.yml</info>
   </rule>
 
-  <rule id="101144" level="12">
+  <rule id="101139" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(\\SharpLAPS\.exe|\\LAPSDumper\.exe)$</field>
@@ -1860,7 +1805,7 @@
     <info type="text">playbook=ad; severidad_thehive=3; origen=ad_017_lectura_laps.yml</info>
   </rule>
 
-  <rule id="101145" level="12">
+  <rule id="101140" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(SharpLAPS|lapsdumper|pyLAPS|\-M\ laps|\-\-laps)</field>
@@ -1873,7 +1818,7 @@
     <info type="text">playbook=ad; severidad_thehive=3; origen=ad_017_lectura_laps.yml</info>
   </rule>
 
-  <rule id="101146" level="14">
+  <rule id="101141" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\ntdsutil\.exe$</field>
@@ -1886,7 +1831,7 @@
     <info type="text">playbook=ad; severidad_thehive=4; origen=ad_018_extraccion_ntds.yml</info>
   </rule>
 
-  <rule id="101147" level="14">
+  <rule id="101142" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\vssadmin\.exe$</field>
@@ -1899,7 +1844,7 @@
     <info type="text">playbook=ad; severidad_thehive=4; origen=ad_018_extraccion_ntds.yml</info>
   </rule>
 
-  <rule id="101148" level="14">
+  <rule id="101143" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*shadowcopy)(?=.*create)</field>
@@ -1911,7 +1856,7 @@
     <info type="text">playbook=ad; severidad_thehive=4; origen=ad_018_extraccion_ntds.yml</info>
   </rule>
 
-  <rule id="101149" level="14">
+  <rule id="101144" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\diskshadow\.exe$</field>
@@ -1923,7 +1868,7 @@
     <info type="text">playbook=ad; severidad_thehive=4; origen=ad_018_extraccion_ntds.yml</info>
   </rule>
 
-  <rule id="101150" level="14">
+  <rule id="101145" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)diskshadow\ /s</field>
@@ -1935,7 +1880,7 @@
     <info type="text">playbook=ad; severidad_thehive=4; origen=ad_018_extraccion_ntds.yml</info>
   </rule>
 
-  <rule id="101151" level="14">
+  <rule id="101146" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)ntds\.dit</field>
@@ -1947,7 +1892,7 @@
     <info type="text">playbook=ad; severidad_thehive=4; origen=ad_018_extraccion_ntds.yml</info>
   </rule>
 
-  <rule id="101152" level="14">
+  <rule id="101147" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\NTDSDumpEx\.exe$</field>
@@ -1959,7 +1904,7 @@
     <info type="text">playbook=ad; severidad_thehive=4; origen=ad_018_extraccion_ntds.yml</info>
   </rule>
 
-  <rule id="101153" level="14">
+  <rule id="101148" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(NTDSDumpEx|Invoke\-NinjaCopy)</field>
@@ -1971,7 +1916,7 @@
     <info type="text">playbook=ad; severidad_thehive=4; origen=ad_018_extraccion_ntds.yml</info>
   </rule>
 
-  <rule id="101154" level="12">
+  <rule id="101149" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^5145$</field>
     <field name="win.eventdata.shareName" type="pcre2">(?i)IPC\$$</field>
@@ -1986,7 +1931,7 @@
     <info type="text">playbook=ad; severidad_thehive=3; origen=ad_019_coercion_ntlm.yml</info>
   </rule>
 
-  <rule id="101155" level="12">
+  <rule id="101150" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^5145$</field>
     <field name="win.eventdata.shareName" type="pcre2">(?i)IPC\$$</field>
@@ -2002,7 +1947,7 @@
     <info type="text">playbook=ad; severidad_thehive=3; origen=ad_019_coercion_ntlm.yml</info>
   </rule>
 
-  <rule id="101156" level="12">
+  <rule id="101151" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^4624$</field>
     <field name="win.eventdata.logonType" type="pcre2">(?i)^3$</field>
@@ -2018,7 +1963,7 @@
     <info type="text">playbook=ad; severidad_thehive=3; origen=ad_019_coercion_ntlm.yml</info>
   </rule>
 
-  <rule id="101157" level="14">
+  <rule id="101152" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\reg\.exe$</field>
@@ -2033,7 +1978,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=4; origen=cred_001_volcado_colmenas_registro.yml</info>
   </rule>
 
-  <rule id="101158" level="14">
+  <rule id="101153" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.originalFileName" type="pcre2">(?i)^reg\.exe$</field>
@@ -2048,7 +1993,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=4; origen=cred_001_volcado_colmenas_registro.yml</info>
   </rule>
 
-  <rule id="101159" level="14">
+  <rule id="101154" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\esentutl\.exe$</field>
@@ -2063,7 +2008,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=4; origen=cred_001_volcado_colmenas_registro.yml</info>
   </rule>
 
-  <rule id="101160" level="14">
+  <rule id="101155" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*HarddiskVolumeShadowCopy)(?=.*\\config\\)</field>
@@ -2076,7 +2021,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=4; origen=cred_001_volcado_colmenas_registro.yml</info>
   </rule>
 
-  <rule id="101161" level="14">
+  <rule id="101156" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(\\pwdump\.exe|\\pwdump7\.exe|\\gsecdump\.exe|\\samdump2\.exe)$</field>
@@ -2089,7 +2034,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=4; origen=cred_001_volcado_colmenas_registro.yml</info>
   </rule>
 
-  <rule id="101162" level="14">
+  <rule id="101157" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(lsadump::sam|lsadump::secrets|Invoke\-PowerDump)</field>
@@ -2102,7 +2047,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=4; origen=cred_001_volcado_colmenas_registro.yml</info>
   </rule>
 
-  <rule id="101163" level="12">
+  <rule id="101158" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(\\Login\ Data|\\User\ Data\\Local\ State|key4\.db|key3\.db|logins\.json|cert9\.db|cookies\.sqlite|signons\.sqlite)</field>
@@ -2116,7 +2061,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=3; origen=cred_002_credenciales_navegador.yml</info>
   </rule>
 
-  <rule id="101164" level="12">
+  <rule id="101159" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(\\SharpChrome\.exe|\\SharpWeb\.exe|\\HackBrowserData\.exe|\\WebBrowserPassView\.exe)$</field>
@@ -2129,7 +2074,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=3; origen=cred_002_credenciales_navegador.yml</info>
   </rule>
 
-  <rule id="101165" level="12">
+  <rule id="101160" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(SharpChrome|HackBrowserData|Invoke\-SharpChrome|firepwd)</field>
@@ -2142,7 +2087,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=3; origen=cred_002_credenciales_navegador.yml</info>
   </rule>
 
-  <rule id="101166" level="14">
+  <rule id="101161" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(dpapi::masterkey|dpapi::cred|dpapi::blob|dpapi::chrome|dpapi::wifi|lsadump::backupkeys|sekurlsa::dpapi)</field>
@@ -2155,7 +2100,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=4; origen=cred_003_abuso_dpapi.yml</info>
   </rule>
 
-  <rule id="101167" level="14">
+  <rule id="101162" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(\\SharpDPAPI\.exe|\\DonPAPI\.exe)$</field>
@@ -2168,7 +2113,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=4; origen=cred_003_abuso_dpapi.yml</info>
   </rule>
 
-  <rule id="101168" level="14">
+  <rule id="101163" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(SharpDPAPI|DonPAPI|dpapi\.py|Get\-LsaBackupKey|backupkeys\ /export)</field>
@@ -2181,7 +2126,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=4; origen=cred_003_abuso_dpapi.yml</info>
   </rule>
 
-  <rule id="101169" level="14">
+  <rule id="101164" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(\\AppData\\Roaming\\Microsoft\\Protect\\|\\AppData\\Local\\Microsoft\\Credentials\\|\\AppData\\Roaming\\Microsoft\\Credentials\\|\\Microsoft\\Protect\\S\-1\-5\-18)</field>
@@ -2194,7 +2139,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=4; origen=cred_003_abuso_dpapi.yml</info>
   </rule>
 
-  <rule id="101170" level="12">
+  <rule id="101165" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(12|13|14)$</field>
     <field name="win.eventdata.targetObject" type="pcre2">(?i)\\SecurityProviders\\WDigest\\UseLogonCredential$</field>
@@ -2208,7 +2153,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=3; origen=cred_004_descenso_wdigest.yml</info>
   </rule>
 
-  <rule id="101171" level="12">
+  <rule id="101166" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(12|13|14)$</field>
     <field name="win.eventdata.targetObject" type="pcre2">(?i)(\\Control\\Lsa\\RunAsPPL|\\Control\\Lsa\\LsaCfgFlags|\\Control\\Lsa\\DisableRestrictedAdmin)$</field>
@@ -2222,7 +2167,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=3; origen=cred_004_descenso_wdigest.yml</info>
   </rule>
 
-  <rule id="101172" level="12">
+  <rule id="101167" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(12|13|14)$</field>
     <field name="win.eventdata.targetObject" type="pcre2">(?i)\\Control\\Lsa\\TokenLeakDetectDelaySecs$</field>
@@ -2235,7 +2180,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=3; origen=cred_004_descenso_wdigest.yml</info>
   </rule>
 
-  <rule id="101173" level="12">
+  <rule id="101168" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(\\\.aws\\credentials|\\\.aws\\config|\\\.azure\\accessTokens\.json|\\\.azure\\azureProfile\.json|\\\.kube\\config|\\\.docker\\config\.json|\\\.ssh\\config|id_rsa|id_ed25519|credentials\.db)</field>
@@ -2249,7 +2194,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=3; origen=cred_005_credenciales_nube_ssh.yml</info>
   </rule>
 
-  <rule id="101174" level="12">
+  <rule id="101169" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*dir\ )(?=.*/s)</field>
@@ -2263,7 +2208,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=3; origen=cred_005_credenciales_nube_ssh.yml</info>
   </rule>
 
-  <rule id="101175" level="12">
+  <rule id="101170" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(\.kdbx|\.kdb|\.psafe3|\.opvault|KeePass\.config\.xml|\\Bitwarden\\data\.json|\\1Password\\|\\KeePassXC\\)</field>
@@ -2276,7 +2221,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=3; origen=cred_006_gestores_contrasenas.yml</info>
   </rule>
 
-  <rule id="101176" level="12">
+  <rule id="101171" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(\\KeeThief\.exe|\\KeeFarce\.exe|\\LaZagne\.exe)$</field>
@@ -2288,7 +2233,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=3; origen=cred_006_gestores_contrasenas.yml</info>
   </rule>
 
-  <rule id="101177" level="12">
+  <rule id="101172" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(KeeThief|KeeFarce|Get\-KeePassDatabaseKey|lazagne)</field>
@@ -2300,7 +2245,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=3; origen=cred_006_gestores_contrasenas.yml</info>
   </rule>
 
-  <rule id="101178" level="12">
+  <rule id="101173" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\cmdkey\.exe$</field>
@@ -2314,7 +2259,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=3; origen=cred_007_credenciales_cacheadas_vault.yml</info>
   </rule>
 
-  <rule id="101179" level="12">
+  <rule id="101174" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\vaultcmd\.exe$</field>
@@ -2328,7 +2273,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=3; origen=cred_007_credenciales_cacheadas_vault.yml</info>
   </rule>
 
-  <rule id="101180" level="12">
+  <rule id="101175" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(lsadump::cache|vault::cred|vault::list|sekurlsa::credman)</field>
@@ -2341,7 +2286,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=3; origen=cred_007_credenciales_cacheadas_vault.yml</info>
   </rule>
 
-  <rule id="101181" level="12">
+  <rule id="101176" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(SECURITY\\Cache|SECURITY\\Policy\\Secrets)</field>
@@ -2354,7 +2299,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=3; origen=cred_007_credenciales_cacheadas_vault.yml</info>
   </rule>
 
-  <rule id="101182" level="12">
+  <rule id="101177" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(\\CredentialsFileView\.exe|\\VaultPasswordView\.exe|\\netpass\.exe)$</field>
@@ -2367,7 +2312,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=3; origen=cred_007_credenciales_cacheadas_vault.yml</info>
   </rule>
 
-  <rule id="101183" level="12">
+  <rule id="101178" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(Invoke\-WCMDump|Get\-VaultCredential|CredentialsFileView|VaultPasswordView)</field>
@@ -2380,7 +2325,7 @@
     <info type="text">playbook=credenciales; severidad_thehive=3; origen=cred_007_credenciales_cacheadas_vault.yml</info>
   </rule>
 
-  <rule id="101184" level="8">
+  <rule id="101179" level="8">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(3)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(\\rundll32\.exe|\\regsvr32\.exe|\\mshta\.exe)$</field>
@@ -2393,83 +2338,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=2; origen=net_rare_process_external_conn.yml</info>
   </rule>
 
-  <rule id="101185" level="8">
-    <if_group>windows</if_group>
-    <field name="win.system.eventID" type="pcre2">^(1)$</field>
-    <field name="win.eventdata.image" type="pcre2">(?i)\\bitsadmin\.exe$</field>
-    <field name="win.eventdata.commandLine" type="pcre2">(?i)(/transfer|/create|/addfile)</field>
-    <description>PROC-BITSADMIN-TRANSFER: Descarga con BITSAdmin</description>
-    <mitre>
-      <id>T1197</id>
-    </mitre>
-    <group>detectionlab,soc_sigma,soc_endpoint,proc_bitsadmin_transfer,auto_analisis,sev_medium,</group>
-    <info type="text">playbook=endpoint; severidad_thehive=2; origen=proc_bitsadmin_transfer.yml</info>
-  </rule>
-
-  <rule id="101186" level="12">
-    <if_group>windows</if_group>
-    <field name="win.system.eventID" type="pcre2">^(1)$</field>
-    <field name="win.eventdata.image" type="pcre2">(?i)\\certutil\.exe$</field>
-    <field name="win.eventdata.commandLine" type="pcre2">(?i)(urlcache|\-decode|\-decodehex|split)</field>
-    <description>PROC-CERTUTIL-DOWNLOAD: Certutil usado para descargar o decodificar</description>
-    <mitre>
-      <id>T1105</id>
-      <id>T1140</id>
-    </mitre>
-    <group>detectionlab,soc_sigma,soc_endpoint,proc_certutil_download,auto_analisis,sev_high,</group>
-    <info type="text">playbook=endpoint; severidad_thehive=3; origen=proc_certutil_download_decode.yml</info>
-  </rule>
-
-  <rule id="101187" level="12">
-    <if_group>windows</if_group>
-    <field name="win.system.eventID" type="pcre2">^(1)$</field>
-    <field name="win.eventdata.commandLine" type="pcre2">(?i)(Set\-MpPreference|DisableRealtimeMonitoring|DisableAntiSpyware|MpPreference\ \-Exclusion|Add\-MpPreference)</field>
-    <description>PROC-DEFENDER-TAMPER: Manipulacion de Windows Defender</description>
-    <mitre>
-      <id>T1562.001</id>
-    </mitre>
-    <group>detectionlab,soc_sigma,soc_endpoint,proc_defender_tamper,auto_analisis,sev_high,</group>
-    <info type="text">playbook=endpoint; severidad_thehive=3; origen=proc_defender_tamper.yml</info>
-  </rule>
-
-  <rule id="101188" level="14">
-    <if_group>windows</if_group>
-    <field name="win.system.eventID" type="pcre2">^(1)$</field>
-    <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*comsvcs\.dll)(?=.*MiniDump)</field>
-    <description>PROC-LSASS-COMSVCS: Volcado de LSASS via comsvcs MiniDump</description>
-    <mitre>
-      <id>T1003.001</id>
-    </mitre>
-    <group>detectionlab,soc_sigma,soc_endpoint,proc_lsass_comsvcs,auto_contener,sev_critical,</group>
-    <info type="text">playbook=endpoint; severidad_thehive=4; origen=proc_lsass_comsvcs_minidump.yml</info>
-  </rule>
-
-  <rule id="101189" level="14">
-    <if_group>windows</if_group>
-    <field name="win.system.eventID" type="pcre2">^(1)$</field>
-    <field name="win.eventdata.commandLine" type="pcre2">(?i)(sekurlsa|logonpasswords|lsadump|privilege::debug|kerberos::)</field>
-    <description>PROC-MIMIKATZ-CMDLINE: Indicadores de Mimikatz en linea de comandos</description>
-    <mitre>
-      <id>T1003.001</id>
-    </mitre>
-    <group>detectionlab,soc_sigma,soc_endpoint,proc_mimikatz_cmdline,auto_contener,sev_critical,</group>
-    <info type="text">playbook=endpoint; severidad_thehive=4; origen=proc_mimikatz_cmdline.yml</info>
-  </rule>
-
-  <rule id="101190" level="12">
-    <if_group>windows</if_group>
-    <field name="win.system.eventID" type="pcre2">^(1)$</field>
-    <field name="win.eventdata.image" type="pcre2">(?i)\\mshta\.exe$</field>
-    <field name="win.eventdata.commandLine" type="pcre2">(?i)(http|javascript:|vbscript:)</field>
-    <description>PROC-MSHTA-EXECUTION: Ejecucion sospechosa de mshta</description>
-    <mitre>
-      <id>T1218.005</id>
-    </mitre>
-    <group>detectionlab,soc_sigma,soc_endpoint,proc_mshta_execution,auto_analisis,sev_high,</group>
-    <info type="text">playbook=endpoint; severidad_thehive=3; origen=proc_mshta_execution.yml</info>
-  </rule>
-
-  <rule id="101191" level="8">
+  <rule id="101180" level="8">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*net)(?=.*user)</field>
@@ -2482,7 +2351,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=2; origen=proc_net_user_add.yml</info>
   </rule>
 
-  <rule id="101192" level="12">
+  <rule id="101181" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.parentImage" type="pcre2">(?i)(\\winword\.exe|\\excel\.exe|\\powerpnt\.exe|\\outlook\.exe)$</field>
@@ -2496,60 +2365,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=3; origen=proc_office_spawning_shell.yml</info>
   </rule>
 
-  <rule id="101193" level="12">
-    <if_group>windows</if_group>
-    <field name="win.system.eventID" type="pcre2">^(1)$</field>
-    <field name="win.eventdata.image" type="pcre2">(?i)\\powershell\.exe$</field>
-    <field name="win.eventdata.commandLine" type="pcre2">(?i)(DownloadString|DownloadFile|Net\.WebClient|Invoke\-WebRequest|IEX|Invoke\-Expression)</field>
-    <description>PROC-POWERSHELL-DOWNLOAD: Cradle de descarga en PowerShell</description>
-    <mitre>
-      <id>T1059.001</id>
-      <id>T1105</id>
-    </mitre>
-    <group>detectionlab,soc_sigma,soc_endpoint,proc_powershell_download,auto_analisis,sev_high,</group>
-    <info type="text">playbook=endpoint; severidad_thehive=3; origen=proc_powershell_download_cradle.yml</info>
-  </rule>
-
-  <rule id="101194" level="12">
-    <if_group>windows</if_group>
-    <field name="win.system.eventID" type="pcre2">^(1)$</field>
-    <field name="win.eventdata.image" type="pcre2">(?i)\\powershell\.exe$</field>
-    <field name="win.eventdata.commandLine" type="pcre2">(?i)(\-enc|\-EncodedCommand|\ \-e\ )</field>
-    <description>PROC-POWERSHELL-ENCODED: PowerShell con comando codificado</description>
-    <mitre>
-      <id>T1059.001</id>
-    </mitre>
-    <group>detectionlab,soc_sigma,soc_endpoint,proc_powershell_encoded,auto_analisis,sev_high,</group>
-    <info type="text">playbook=endpoint; severidad_thehive=3; origen=proc_powershell_encoded.yml</info>
-  </rule>
-
-  <rule id="101195" level="12">
-    <if_group>windows</if_group>
-    <field name="win.system.eventID" type="pcre2">^(1)$</field>
-    <field name="win.eventdata.image" type="pcre2">(?i)\\regsvr32\.exe$</field>
-    <field name="win.eventdata.commandLine" type="pcre2">(?i)(/i:http|scrobj\.dll)</field>
-    <description>PROC-REGSVR32-SCRIPTLET: Regsvr32 ejecutando scriptlet remoto (Squiblydoo)</description>
-    <mitre>
-      <id>T1218.010</id>
-    </mitre>
-    <group>detectionlab,soc_sigma,soc_endpoint,proc_regsvr32_scriptlet,auto_analisis,sev_high,</group>
-    <info type="text">playbook=endpoint; severidad_thehive=3; origen=proc_regsvr32_scriptlet.yml</info>
-  </rule>
-
-  <rule id="101196" level="8">
-    <if_group>windows</if_group>
-    <field name="win.system.eventID" type="pcre2">^(1)$</field>
-    <field name="win.eventdata.image" type="pcre2">(?i)\\schtasks\.exe$</field>
-    <field name="win.eventdata.commandLine" type="pcre2">(?i)/create</field>
-    <description>PROC-SCHEDULED-TASK: Creacion de tarea programada via schtasks</description>
-    <mitre>
-      <id>T1053.005</id>
-    </mitre>
-    <group>detectionlab,soc_sigma,soc_endpoint,proc_scheduled_task,auto_analisis,sev_medium,</group>
-    <info type="text">playbook=endpoint; severidad_thehive=2; origen=proc_scheduled_task_create.yml</info>
-  </rule>
-
-  <rule id="101197" level="8">
+  <rule id="101182" level="8">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\sc\.exe$</field>
@@ -2563,31 +2379,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=2; origen=proc_service_create_scexe.yml</info>
   </rule>
 
-  <rule id="101198" level="14">
-    <if_group>windows</if_group>
-    <field name="win.system.eventID" type="pcre2">^(1)$</field>
-    <field name="win.eventdata.commandLine" type="pcre2">(?i)(delete\ shadows|shadowcopy\ delete|resize\ shadowstorage)</field>
-    <description>PROC-VSSADMIN-DELETE: Borrado de instantaneas (anti-recuperacion)</description>
-    <mitre>
-      <id>T1490</id>
-    </mitre>
-    <group>detectionlab,soc_sigma,soc_endpoint,proc_vssadmin_delete,auto_contener,sev_critical,</group>
-    <info type="text">playbook=endpoint; severidad_thehive=4; origen=proc_vssadmin_delete_shadows.yml</info>
-  </rule>
-
-  <rule id="101199" level="12">
-    <if_group>windows</if_group>
-    <field name="win.system.eventID" type="pcre2">^(1)$</field>
-    <field name="win.eventdata.commandLine" type="pcre2">(?i)(wevtutil\ cl|wevtutil\ clear\-log|Clear\-EventLog)</field>
-    <description>PROC-WEVTUTIL-CLEAR: Borrado de registros de eventos</description>
-    <mitre>
-      <id>T1070.001</id>
-    </mitre>
-    <group>detectionlab,soc_sigma,soc_endpoint,proc_wevtutil_clear,auto_analisis,sev_high,</group>
-    <info type="text">playbook=endpoint; severidad_thehive=3; origen=proc_wevtutil_clear_logs.yml</info>
-  </rule>
-
-  <rule id="101200" level="8">
+  <rule id="101183" level="8">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\wmic\.exe$</field>
@@ -2600,19 +2392,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=2; origen=proc_wmic_process_call_create.yml</info>
   </rule>
 
-  <rule id="101201" level="8">
-    <if_group>windows</if_group>
-    <field name="win.system.eventID" type="pcre2">^(13)$</field>
-    <field name="win.eventdata.targetObject" type="pcre2">(?i)(\\CurrentVersion\\Run\\|\\CurrentVersion\\RunOnce\\)</field>
-    <description>REG-RUN-KEY: Persistencia por clave Run (registro)</description>
-    <mitre>
-      <id>T1547.001</id>
-    </mitre>
-    <group>detectionlab,soc_sigma,soc_endpoint,reg_run_key,auto_analisis,sev_medium,</group>
-    <info type="text">playbook=endpoint; severidad_thehive=2; origen=reg_run_key_persistence.yml</info>
-  </rule>
-
-  <rule id="101202" level="12">
+  <rule id="101184" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^4769$</field>
     <field name="win.eventdata.ticketOptions" type="pcre2">(?i)^0x40810000$</field>
@@ -2627,7 +2407,7 @@
     <info type="text">playbook=ad; severidad_thehive=3; origen=soc_ad_001_kerberoasting.yml</info>
   </rule>
 
-  <rule id="101203" level="12">
+  <rule id="101185" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^4768$</field>
     <field name="win.eventdata.preAuthType" type="pcre2">(?i)^0$</field>
@@ -2641,7 +2421,7 @@
     <info type="text">playbook=ad; severidad_thehive=3; origen=soc_ad_002_asrep_roasting.yml</info>
   </rule>
 
-  <rule id="101204" level="14">
+  <rule id="101186" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^4662$</field>
     <field name="win.eventdata.properties" type="pcre2">(?i)(1131f6aa\-9c07\-11d1\-f79f\-00c04fc2dcd2|1131f6ad\-9c07\-11d1\-f79f\-00c04fc2dcd2|89e95b76\-444d\-4c62\-991a\-0facbeda640c)</field>
@@ -2655,7 +2435,7 @@
     <info type="text">playbook=ad; severidad_thehive=4; origen=soc_ad_003_dcsync.yml</info>
   </rule>
 
-  <rule id="101205" level="14">
+  <rule id="101187" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^4769$</field>
     <field name="win.eventdata.serviceName" type="pcre2">(?i)^krbtgt</field>
@@ -2668,7 +2448,7 @@
     <info type="text">playbook=ad; severidad_thehive=4; origen=soc_ad_004_golden_ticket.yml</info>
   </rule>
 
-  <rule id="101206" level="14">
+  <rule id="101188" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(\\Rubeus\.exe|\\mimikatz\.exe|\\kekeo\.exe|\\GetUserSPNs\.exe)$</field>
@@ -2681,7 +2461,7 @@
     <info type="text">playbook=ad; severidad_thehive=4; origen=soc_ad_005_herramientas_kerberos.yml</info>
   </rule>
 
-  <rule id="101207" level="14">
+  <rule id="101189" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.originalFileName" type="pcre2">(?i)^(Rubeus\.exe|mimikatz\.exe)$</field>
@@ -2694,7 +2474,7 @@
     <info type="text">playbook=ad; severidad_thehive=4; origen=soc_ad_005_herramientas_kerberos.yml</info>
   </rule>
 
-  <rule id="101208" level="14">
+  <rule id="101190" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(kerberoast|asreproast|lsadump::dcsync|sekurlsa::logonpasswords|sekurlsa::tickets|kerberos::golden|kerberos::ptt|GetUserSPNs\.py|GetNPUsers\.py|secretsdump\.py)</field>
@@ -2707,7 +2487,7 @@
     <info type="text">playbook=ad; severidad_thehive=4; origen=soc_ad_005_herramientas_kerberos.yml</info>
   </rule>
 
-  <rule id="101209" level="12">
+  <rule id="101191" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^4624$</field>
     <field name="win.eventdata.logonType" type="pcre2">(?i)^9$</field>
@@ -2722,7 +2502,7 @@
     <info type="text">playbook=ad; severidad_thehive=3; origen=soc_ad_006_pass_the_hash.yml</info>
   </rule>
 
-  <rule id="101210" level="8">
+  <rule id="101192" level="8">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(\\SharpHound\.exe|\\AzureHound\.exe)$</field>
@@ -2735,7 +2515,7 @@
     <info type="text">playbook=ad; severidad_thehive=2; origen=soc_ad_007_enumeracion_dominio.yml</info>
   </rule>
 
-  <rule id="101211" level="8">
+  <rule id="101193" level="8">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(Invoke\-BloodHound|SharpHound\.ps1|\-CollectionMethod\ All)</field>
@@ -2748,7 +2528,7 @@
     <info type="text">playbook=ad; severidad_thehive=2; origen=soc_ad_007_enumeracion_dominio.yml</info>
   </rule>
 
-  <rule id="101212" level="8">
+  <rule id="101194" level="8">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(\\net\.exe|\\net1\.exe)$</field>
@@ -2762,7 +2542,7 @@
     <info type="text">playbook=ad; severidad_thehive=2; origen=soc_ad_007_enumeracion_dominio.yml</info>
   </rule>
 
-  <rule id="101213" level="8">
+  <rule id="101195" level="8">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\dsquery\.exe$</field>
@@ -2776,7 +2556,7 @@
     <info type="text">playbook=ad; severidad_thehive=2; origen=soc_ad_007_enumeracion_dominio.yml</info>
   </rule>
 
-  <rule id="101214" level="12">
+  <rule id="101196" level="12">
     <if_group>windows</if_group>
     <field name="win.system.providerName" type="pcre2">(?i)^Service\ Control\ Manager$</field>
     <field name="win.system.eventID" type="pcre2">(?i)^7045$</field>
@@ -2789,7 +2569,7 @@
     <info type="text">playbook=ad; severidad_thehive=3; origen=soc_ad_008_psexec_remoto.yml</info>
   </rule>
 
-  <rule id="101215" level="12">
+  <rule id="101197" level="12">
     <if_group>windows</if_group>
     <field name="win.system.providerName" type="pcre2">(?i)^Service\ Control\ Manager$</field>
     <field name="win.system.eventID" type="pcre2">(?i)^7045$</field>
@@ -2802,7 +2582,7 @@
     <info type="text">playbook=ad; severidad_thehive=3; origen=soc_ad_008_psexec_remoto.yml</info>
   </rule>
 
-  <rule id="101216" level="12">
+  <rule id="101198" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.parentImage" type="pcre2">(?i)(\\WmiPrvSE\.exe|\\wsmprovhost\.exe|\\winrshost\.exe)$</field>
@@ -2816,7 +2596,7 @@
     <info type="text">playbook=ad; severidad_thehive=3; origen=soc_ad_009_wmi_winrm_remoto.yml</info>
   </rule>
 
-  <rule id="101217" level="12">
+  <rule id="101199" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(\\SharpGPOAbuse\.exe|\\pyGPOAbuse\.py)$</field>
@@ -2828,7 +2608,7 @@
     <info type="text">playbook=ad; severidad_thehive=3; origen=soc_ad_010_abuso_gpo.yml</info>
   </rule>
 
-  <rule id="101218" level="12">
+  <rule id="101200" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(SharpGPOAbuse|New\-GPOImmediateTask|\-\-AddComputerTask|\-\-AddUserTask)</field>
@@ -2840,7 +2620,7 @@
     <info type="text">playbook=ad; severidad_thehive=3; origen=soc_ad_010_abuso_gpo.yml</info>
   </rule>
 
-  <rule id="101219" level="12">
+  <rule id="101201" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*\\SYSVOL\\)(?=.*\\Policies\\)</field>
@@ -2853,7 +2633,7 @@
     <info type="text">playbook=ad; severidad_thehive=3; origen=soc_ad_010_abuso_gpo.yml</info>
   </rule>
 
-  <rule id="101220" level="8">
+  <rule id="101202" level="8">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^4741$</field>
     <field name="win.eventdata.subjectUserName" negate="yes" type="pcre2">(?i)\$$</field>
@@ -2865,7 +2645,7 @@
     <info type="text">playbook=ad; severidad_thehive=2; origen=soc_ad_011_cuenta_equipo_creada.yml</info>
   </rule>
 
-  <rule id="101221" level="14">
+  <rule id="101203" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(\\Certify\.exe|\\Certipy\.exe)$</field>
@@ -2877,7 +2657,7 @@
     <info type="text">playbook=ad; severidad_thehive=4; origen=soc_ad_012_abuso_adcs.yml</info>
   </rule>
 
-  <rule id="101222" level="14">
+  <rule id="101204" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(Certify\.exe\ request|certipy\ req|certipy\ auth|Rubeus\.exe\ asktgt)</field>
@@ -2889,7 +2669,7 @@
     <info type="text">playbook=ad; severidad_thehive=4; origen=soc_ad_012_abuso_adcs.yml</info>
   </rule>
 
-  <rule id="101223" level="14">
+  <rule id="101205" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*certreq)(?=.*san:)</field>
@@ -2901,7 +2681,7 @@
     <info type="text">playbook=ad; severidad_thehive=4; origen=soc_ad_012_abuso_adcs.yml</info>
   </rule>
 
-  <rule id="101224" level="14">
+  <rule id="101206" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*comsvcs\.dll)(?=.*MiniDump)</field>
@@ -2913,7 +2693,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=4; origen=soc_edr_001_volcado_lsass.yml</info>
   </rule>
 
-  <rule id="101225" level="14">
+  <rule id="101207" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(\\procdump\.exe|\\procdump64\.exe|\\dumpert\.exe|\\nanodump\.exe)$</field>
@@ -2926,7 +2706,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=4; origen=soc_edr_001_volcado_lsass.yml</info>
   </rule>
 
-  <rule id="101226" level="14">
+  <rule id="101208" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.originalFileName" type="pcre2">(?i)^(procdump|procdump64\.exe)$</field>
@@ -2939,7 +2719,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=4; origen=soc_edr_001_volcado_lsass.yml</info>
   </rule>
 
-  <rule id="101227" level="14">
+  <rule id="101209" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*rundll32)(?=.*dbghelp)(?=.*MiniDumpWriteDump)</field>
@@ -2951,7 +2731,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=4; origen=soc_edr_001_volcado_lsass.yml</info>
   </rule>
 
-  <rule id="101228" level="12">
+  <rule id="101210" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(10)$</field>
     <field name="win.eventdata.targetImage" type="pcre2">(?i)\\lsass\.exe$</field>
@@ -2965,7 +2745,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=3; origen=soc_edr_002_acceso_lsass_sysmon.yml</info>
   </rule>
 
-  <rule id="101229" level="14">
+  <rule id="101211" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\vssadmin\.exe$</field>
@@ -2978,7 +2758,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=4; origen=soc_edr_003_borrado_copias_sombra.yml</info>
   </rule>
 
-  <rule id="101230" level="14">
+  <rule id="101212" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\wmic\.exe$</field>
@@ -2991,7 +2771,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=4; origen=soc_edr_003_borrado_copias_sombra.yml</info>
   </rule>
 
-  <rule id="101231" level="14">
+  <rule id="101213" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\wbadmin\.exe$</field>
@@ -3004,7 +2784,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=4; origen=soc_edr_003_borrado_copias_sombra.yml</info>
   </rule>
 
-  <rule id="101232" level="14">
+  <rule id="101214" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\bcdedit\.exe$</field>
@@ -3017,7 +2797,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=4; origen=soc_edr_003_borrado_copias_sombra.yml</info>
   </rule>
 
-  <rule id="101233" level="14">
+  <rule id="101215" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(Get\-WmiObject\ Win32_Shadowcopy|Remove\-Item\ \-Path\ C:\\Windows\\System32\\Recovery)</field>
@@ -3029,7 +2809,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=4; origen=soc_edr_003_borrado_copias_sombra.yml</info>
   </rule>
 
-  <rule id="101234" level="12">
+  <rule id="101216" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(Set\-MpPreference\ \-DisableRealtimeMonitoring\ \$true|Set\-MpPreference\ \-DisableBehaviorMonitoring\ \$true|Set\-MpPreference\ \-DisableIOAVProtection\ \$true|Add\-MpPreference\ \-ExclusionPath|DisableAntiSpyware|DisableAntiVirus)</field>
@@ -3042,7 +2822,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=3; origen=soc_edr_004_defensas_deshabilitadas.yml</info>
   </rule>
 
-  <rule id="101235" level="12">
+  <rule id="101217" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(netsh\ advfirewall\ set\ allprofiles\ state\ off|netsh\ firewall\ set\ opmode\ disable)</field>
@@ -3055,7 +2835,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=3; origen=soc_edr_004_defensas_deshabilitadas.yml</info>
   </rule>
 
-  <rule id="101236" level="12">
+  <rule id="101218" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(sc\ stop\ WinDefend|sc\ config\ WinDefend\ start=\ disabled|sc\ stop\ Sense|sc\ stop\ wazuh|Stop\-Service\ \-Name\ Sense|net\ stop\ "Windows\ Defender)</field>
@@ -3068,7 +2848,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=3; origen=soc_edr_004_defensas_deshabilitadas.yml</info>
   </rule>
 
-  <rule id="101237" level="12">
+  <rule id="101219" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(auditpol\ /clear|auditpol\ /set\ /category:.*\ /success:disable|wevtutil\ cl\ |wevtutil\ sl\ )</field>
@@ -3081,7 +2861,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=3; origen=soc_edr_004_defensas_deshabilitadas.yml</info>
   </rule>
 
-  <rule id="101238" level="12">
+  <rule id="101220" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\certutil\.exe$</field>
@@ -3099,7 +2879,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=3; origen=soc_edr_005_lolbins_descarga.yml</info>
   </rule>
 
-  <rule id="101239" level="12">
+  <rule id="101221" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\bitsadmin\.exe$</field>
@@ -3117,7 +2897,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=3; origen=soc_edr_005_lolbins_descarga.yml</info>
   </rule>
 
-  <rule id="101240" level="12">
+  <rule id="101222" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\mshta\.exe$</field>
@@ -3135,7 +2915,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=3; origen=soc_edr_005_lolbins_descarga.yml</info>
   </rule>
 
-  <rule id="101241" level="12">
+  <rule id="101223" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\regsvr32\.exe$</field>
@@ -3153,7 +2933,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=3; origen=soc_edr_005_lolbins_descarga.yml</info>
   </rule>
 
-  <rule id="101242" level="12">
+  <rule id="101224" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(DownloadString\(|DownloadFile\(|Invoke\-WebRequest|Net\.WebClient|Start\-BitsTransfer)</field>
@@ -3171,7 +2951,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=3; origen=soc_edr_005_lolbins_descarga.yml</info>
   </rule>
 
-  <rule id="101243" level="12">
+  <rule id="101225" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(\\powershell\.exe|\\pwsh\.exe)$</field>
@@ -3185,7 +2965,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=3; origen=soc_edr_006_powershell_ofuscado.yml</info>
   </rule>
 
-  <rule id="101244" level="14">
+  <rule id="101226" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(11|23)$</field>
     <field name="win.eventdata.targetFilename" type="pcre2">(?i)(\.locked|\.encrypted|\.crypt|\.lockbit|\.blackcat|\.royal|\.akira|\.basta|\.cactus|\.play)$</field>
@@ -3197,7 +2977,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=4; origen=soc_edr_007_cifrado_masivo.yml</info>
   </rule>
 
-  <rule id="101245" level="14">
+  <rule id="101227" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(11|23)$</field>
     <field name="win.eventdata.targetFilename" type="pcre2">(?i)(readme_for_decrypt|how_to_decrypt|recover_your_files|restore\-my\-files|_readme\.txt|HOW\ TO\ BACK\ FILES|RESTORE_FILES_INFO)</field>
@@ -3209,7 +2989,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=4; origen=soc_edr_007_cifrado_masivo.yml</info>
   </rule>
 
-  <rule id="101246" level="12">
+  <rule id="101228" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\schtasks\.exe$</field>
@@ -3223,7 +3003,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=3; origen=soc_edr_008_persistencia_tarea.yml</info>
   </rule>
 
-  <rule id="101247" level="12">
+  <rule id="101229" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)\\schtasks\.exe$</field>
@@ -3237,7 +3017,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=3; origen=soc_edr_008_persistencia_tarea.yml</info>
   </rule>
 
-  <rule id="101248" level="12">
+  <rule id="101230" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(12|13|14)$</field>
     <field name="win.eventdata.targetObject" type="pcre2">(?i)(\\CurrentVersion\\Run|\\CurrentVersion\\RunOnce|\\Winlogon\\Shell|\\Winlogon\\Userinit|\\CurrentVersion\\Explorer\\User\ Shell\ Folders)</field>
@@ -3250,7 +3030,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=3; origen=soc_edr_009_persistencia_registro.yml</info>
   </rule>
 
-  <rule id="101249" level="12">
+  <rule id="101231" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(8)$</field>
     <field name="win.eventdata.targetImage" type="pcre2">(?i)(\\explorer\.exe|\\svchost\.exe|\\winlogon\.exe|\\lsass\.exe|\\rundll32\.exe|\\dllhost\.exe|\\notepad\.exe|\\werfault\.exe)$</field>
@@ -3263,7 +3043,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=3; origen=soc_edr_010_inyeccion_procesos.yml</info>
   </rule>
 
-  <rule id="101250" level="12">
+  <rule id="101232" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(8)$</field>
     <field name="win.eventdata.targetImage" type="pcre2">(?i)(\\explorer\.exe|\\svchost\.exe|\\winlogon\.exe|\\lsass\.exe|\\rundll32\.exe|\\dllhost\.exe|\\notepad\.exe|\\werfault\.exe)$</field>
@@ -3276,7 +3056,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=3; origen=soc_edr_010_inyeccion_procesos.yml</info>
   </rule>
 
-  <rule id="101251" level="14">
+  <rule id="101233" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(17|18)$</field>
     <field name="win.eventdata.pipeName" type="pcre2">(?i)^(\\msagent_|\\postex_|\\postex_ssh_|\\status_|\\mojo_|\\wkssvc_|\\ntsvcs_|\\sliver\-|\\MSSE\-)</field>
@@ -3288,7 +3068,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=4; origen=soc_edr_011_pipe_c2.yml</info>
   </rule>
 
-  <rule id="101252" level="8">
+  <rule id="101234" level="8">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.image" type="pcre2">(?i)(\\AppData\\Local\\Temp\\|\\Windows\\Temp\\|\\Users\\Public\\|\\\$Recycle\.Bin\\|\\AppData\\Roaming\\)</field>
@@ -3302,7 +3082,7 @@
     <info type="text">playbook=endpoint; severidad_thehive=2; origen=soc_edr_012_ejecucion_desde_temp.yml</info>
   </rule>
 
-  <rule id="101253" level="14">
+  <rule id="101235" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(WinDefend|WdNisSvc|MsSense|SenseIR|CSFalconService|CSFalconContainer|CsUninstallTool|CrowdStrike|WindowsSensor|SentinelAgent|SentinelOne|sentinelctl|CyveraService|cyserver|cytool|Cortex\ XDR|WazuhSvc|wazuh\-agent|OssecSvc|CarbonBlack|CbDefense|SAVService|Sysmon64)</field>
@@ -3316,7 +3096,7 @@
     <info type="text">playbook=xdr; severidad_thehive=4; origen=xdr_001_desinstalacion_sensor_edr.yml</info>
   </rule>
 
-  <rule id="101254" level="12">
+  <rule id="101236" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(12|13|14)$</field>
     <field name="win.eventdata.targetObject" type="pcre2">(?i)(\\Windows\ Defender\\Exclusions\\Paths\\|\\Windows\ Defender\\Exclusions\\Processes\\|\\Windows\ Defender\\Exclusions\\Extensions\\|\\Windows\ Defender\\Exclusions\\IpAddresses\\|\\Windows\ Defender\\Exclusions\\TemporaryPaths\\|\\Windows\ Defender\ Exploit\ Guard\\ASR\\ASROnlyExclusions\\)</field>
@@ -3330,7 +3110,7 @@
     <info type="text">playbook=xdr; severidad_thehive=3; origen=xdr_002_exclusiones_antivirus.yml</info>
   </rule>
 
-  <rule id="101255" level="12">
+  <rule id="101237" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)AttackSurfaceReductionRules_Actions</field>
@@ -3344,7 +3124,7 @@
     <info type="text">playbook=xdr; severidad_thehive=3; origen=xdr_003_reglas_asr_desactivadas.yml</info>
   </rule>
 
-  <rule id="101256" level="12">
+  <rule id="101238" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(Remove\-MpPreference\ \-AttackSurfaceReductionRules_Ids|AttackSurfaceReductionOnlyExclusions)</field>
@@ -3357,7 +3137,7 @@
     <info type="text">playbook=xdr; severidad_thehive=3; origen=xdr_003_reglas_asr_desactivadas.yml</info>
   </rule>
 
-  <rule id="101257" level="12">
+  <rule id="101239" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(Windows\ Defender\ Exploit\ Guard\\ASR\\Rules|Windows\ Defender\ Exploit\ Guard\\Controlled\ Folder\ Access|Windows\ Defender\ Exploit\ Guard\\Network\ Protection|EnableControlledFolderAccess|EnableNetworkProtection)</field>
@@ -3370,7 +3150,7 @@
     <info type="text">playbook=xdr; severidad_thehive=3; origen=xdr_003_reglas_asr_desactivadas.yml</info>
   </rule>
 
-  <rule id="101258" level="14">
+  <rule id="101240" level="14">
     <if_group>windows</if_group>
     <field name="win.eventdata.imageLoaded" type="pcre2">(?i)(\\RTCore64\.sys|\\DBUtil_2_3\.sys|\\gdrv\.sys|\\iqvw64e\.sys|\\procexp152\.sys|\\aswArPot\.sys|\\kprocesshacker\.sys|\\viragt64\.sys|\\truesight\.sys|\\mhyprot2\.sys|\\dbk64\.sys|\\WinRing0x64\.sys|\\speedfan\.sys|\\ucorew64\.sys)$</field>
     <description>XDR-004-DRIVER: Carga de driver vulnerable conocido [1/2]</description>
@@ -3382,7 +3162,7 @@
     <info type="text">playbook=xdr; severidad_thehive=4; origen=xdr_004_driver_vulnerable_byovd.yml</info>
   </rule>
 
-  <rule id="101259" level="14">
+  <rule id="101241" level="14">
     <if_group>windows</if_group>
     <field name="win.eventdata.imageLoaded" type="pcre2">(?i)(\\Users\\|\\AppData\\|\\Temp\\|\\ProgramData\\|\\PerfLogs\\|\\\$Recycle\.Bin\\)</field>
     <field name="win.eventdata.signatureStatus" type="pcre2">(?i)^(Unavailable|Expired|Revoked|Untrusted|Invalid)$</field>
@@ -3395,7 +3175,7 @@
     <info type="text">playbook=xdr; severidad_thehive=4; origen=xdr_004_driver_vulnerable_byovd.yml</info>
   </rule>
 
-  <rule id="101260" level="12">
+  <rule id="101242" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(stop\ DiagTrack|delete\ DiagTrack|config\ DiagTrack|Stop\-Service\ DiagTrack|Set\-Service\ DiagTrack|stop\ diagnosticshub\.standardcollector\.service)</field>
@@ -3408,7 +3188,7 @@
     <info type="text">playbook=xdr; severidad_thehive=3; origen=xdr_005_telemetria_etw_manipulada.yml</info>
   </rule>
 
-  <rule id="101261" level="12">
+  <rule id="101243" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(\\WMI\\Autologger\\|Autologger\\EventLog\-|Autologger\\DefenderApiLogger|Autologger\\DefenderAuditLogger|Autologger\\SenseEventLog|Autologger\\Diagtrack\-Listener)</field>
@@ -3421,7 +3201,7 @@
     <info type="text">playbook=xdr; severidad_thehive=3; origen=xdr_005_telemetria_etw_manipulada.yml</info>
   </rule>
 
-  <rule id="101262" level="12">
+  <rule id="101244" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(Set\-EtwTraceProvider|Remove\-EtwTraceProvider|Remove\-EtwTraceSession)</field>
@@ -3434,7 +3214,7 @@
     <info type="text">playbook=xdr; severidad_thehive=3; origen=xdr_005_telemetria_etw_manipulada.yml</info>
   </rule>
 
-  <rule id="101263" level="12">
+  <rule id="101245" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(wevtutil\ sl|wevtutil\.exe\ sl|Set\-LogProperties)</field>
@@ -3448,7 +3228,7 @@
     <info type="text">playbook=xdr; severidad_thehive=3; origen=xdr_005_telemetria_etw_manipulada.yml</info>
   </rule>
 
-  <rule id="101264" level="12">
+  <rule id="101246" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(logman\ stop|logman\.exe\ stop|logman\ update\ trace|logman\.exe\ update\ trace)</field>
@@ -3462,7 +3242,7 @@
     <info type="text">playbook=xdr; severidad_thehive=3; origen=xdr_005_telemetria_etw_manipulada.yml</info>
   </rule>
 
-  <rule id="101265" level="14">
+  <rule id="101247" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(/set\ safeboot|/set\ \{default\}\ safeboot|/set\ \{current\}\ safeboot|safeboot\ minimal|safeboot\ network|Set\-BcdElement\ \-Element\ safeboot|safebootalternateshell)</field>
@@ -3475,7 +3255,7 @@
     <info type="text">playbook=xdr; severidad_thehive=4; origen=xdr_006_arranque_modo_seguro.yml</info>
   </rule>
 
-  <rule id="101266" level="14">
+  <rule id="101248" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(1)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(Control\\SafeBoot\\Minimal|Control\\SafeBoot\\Network)</field>
@@ -3489,7 +3269,7 @@
     <info type="text">playbook=xdr; severidad_thehive=4; origen=xdr_006_arranque_modo_seguro.yml</info>
   </rule>
 
-  <rule id="101267" level="8">
+  <rule id="101249" level="8">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^6416$</field>
     <field name="win.eventdata.className" type="pcre2">(?i)(DiskDrive|USB|WPD)</field>
@@ -3502,7 +3282,7 @@
     <info type="text">playbook=zta; severidad_thehive=2; origen=zta_dev_001_almacenamiento_extraible.yml</info>
   </rule>
 
-  <rule id="101268" level="12">
+  <rule id="101250" level="12">
     <decoded_as>json</decoded_as>
     <field name="data.ResultType" type="pcre2">(?i)^0$</field>
     <field name="data.ClientAppUsed" type="pcre2">(?i)^(IMAP4|POP3|SMTP|MAPI\ Over\ HTTP|Exchange\ ActiveSync|Other\ clients|Authenticated\ SMTP|Exchange\ Web\ Services)$</field>
@@ -3515,7 +3295,7 @@
     <info type="text">playbook=zta; severidad_thehive=3; origen=zta_id_001_autenticacion_heredada.yml</info>
   </rule>
 
-  <rule id="101269" level="12">
+  <rule id="101251" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^4624$</field>
     <field name="win.eventdata.logonType" type="pcre2">(?i)^(2|7|10|11)$</field>
@@ -3529,7 +3309,7 @@
     <info type="text">playbook=zta; severidad_thehive=3; origen=zta_id_002_cuenta_servicio_interactiva.yml</info>
   </rule>
 
-  <rule id="101270" level="8">
+  <rule id="101252" level="8">
     <decoded_as>json</decoded_as>
     <field name="win.eventdata.destinationPort" type="pcre2">(?i)^(21|23|69|110|143|389|512|513|514)$</field>
     <field name="win.eventdata.initiated" type="pcre2">(?i)^true$</field>
@@ -3541,7 +3321,7 @@
     <info type="text">playbook=zta; severidad_thehive=2; origen=zta_net_001_protocolo_en_claro.yml</info>
   </rule>
 
-  <rule id="101271" level="12">
+  <rule id="101253" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(7)$</field>
     <field name="win.eventdata.imageLoaded" type="pcre2">(?i)(\\AppData\\Local\\Temp\\|\\AppData\\Roaming\\|\\Users\\Public\\|\\ProgramData\\|\\Windows\\Temp\\|\\\$Recycle\.Bin\\)</field>
@@ -3557,7 +3337,7 @@
     <info type="text">playbook=zta; severidad_thehive=3; origen=zta_sup_001_libreria_ruta_no_estandar.yml</info>
   </rule>
 
-  <rule id="101272" level="12">
+  <rule id="101254" level="12">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">^(7)$</field>
     <field name="win.eventdata.imageLoaded" type="pcre2">(?i)(\\AppData\\Local\\Temp\\|\\AppData\\Roaming\\|\\Users\\Public\\|\\ProgramData\\|\\Windows\\Temp\\|\\\$Recycle\.Bin\\)</field>
@@ -3573,7 +3353,7 @@
     <info type="text">playbook=zta; severidad_thehive=3; origen=zta_sup_001_libreria_ruta_no_estandar.yml</info>
   </rule>
 
-  <rule id="101273" level="8">
+  <rule id="101255" level="8">
     <decoded_as>json</decoded_as>
     <field name="win.eventdata.image" type="pcre2">(?i)(/pip|/pip3|/npm|/yarn|/gem|/go|/cargo|/composer)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(install\ git\+|install\ http://|install\ https://|\-\-index\-url|\-\-extra\-index\-url|\-\-registry|install\ github\.com/)</field>
@@ -3587,7 +3367,7 @@
     <info type="text">playbook=zta; severidad_thehive=2; origen=zta_sup_002_paquete_repositorio_no_aprobado.yml</info>
   </rule>
 
-  <rule id="101274" level="8">
+  <rule id="101256" level="8">
     <decoded_as>json</decoded_as>
     <field name="win.eventdata.image" type="pcre2">(?i)(/pip|/pip3|/npm|/yarn|/gem|/go|/cargo|/composer)$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(?=.*curl)(?=.*install)</field>
@@ -3601,7 +3381,7 @@
     <info type="text">playbook=zta; severidad_thehive=2; origen=zta_sup_002_paquete_repositorio_no_aprobado.yml</info>
   </rule>
 
-  <rule id="101275" level="8">
+  <rule id="101257" level="8">
     <decoded_as>json</decoded_as>
     <field name="win.eventdata.targetFilename" type="pcre2">(?i)(/package\-lock\.json|/yarn\.lock|/pnpm\-lock\.yaml|/poetry\.lock|/Pipfile\.lock|/requirements\.txt|/go\.sum|/Cargo\.lock|/composer\.lock|/Gemfile\.lock)$</field>
     <field name="win.eventdata.image" negate="yes" type="pcre2">(?i)(/git|/npm|/yarn|/pnpm|/poetry|/pip|/pip3|/go|/cargo|/composer|/bundle)$</field>
@@ -3613,7 +3393,7 @@
     <info type="text">playbook=zta; severidad_thehive=2; origen=zta_sup_003_fichero_dependencias_modificado.yml</info>
   </rule>
 
-  <rule id="101276" level="14">
+  <rule id="101258" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^(1102|1100)$</field>
     <description>ZTA-VIS-001: Borrado o reduccion del registro de auditoria [1/2]</description>
@@ -3625,7 +3405,7 @@
     <info type="text">playbook=zta; severidad_thehive=4; origen=zta_vis_001_borrado_registro_auditoria.yml</info>
   </rule>
 
-  <rule id="101277" level="14">
+  <rule id="101259" level="14">
     <if_group>windows</if_group>
     <field name="win.system.eventID" type="pcre2">(?i)^4719$</field>
     <description>ZTA-VIS-001: Borrado o reduccion del registro de auditoria [2/2]</description>

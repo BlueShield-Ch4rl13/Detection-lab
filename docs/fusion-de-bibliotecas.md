@@ -147,7 +147,7 @@ ZTA/SOC + 8 de macOS + 8 de contenedores + 8 de arquitectura Zero Trust = **87**
 
 <!-- INICIO:CATALOGO -->
 
-# Las 141 reglas, una por una
+# Las 127 reglas, una por una
 
 Generado por `tools/generar_catalogo.py` desde `rules/`. Cada entrada sale
 de la propia regla, asi que anadir una la mete aqui y cambiarle la logica
@@ -501,7 +501,7 @@ Shadow IT con dato dentro. Detecta la carga de ficheros hacia aplicaciones en la
 
 ## Windows y Active Directory
 
-**56 reglas** · Sysmon, canal Security, Defender XDR
+**43 reglas** · Sysmon, canal Security, Defender XDR
 
 El grueso de la biblioteca. Ejecucion, persistencia, credenciales y movimiento lateral en dominio.
 
@@ -655,66 +655,6 @@ Binarios que no suelen hacer red (rundll32/regsvr32/mshta) conectando fuera.
 
 **Origen:** `network_connection / windows` · **ATT&CK:** [T1071.001](https://attack.mitre.org/techniques/T1071/001/) · **NIST:** SC-7, SI-4 · **ISO 27001:** A.8.20, A.8.23
 
-### 🟡 Descarga con BITSAdmin
-
-`proc_bitsadmin_transfer.yml`
-
-bitsadmin /transfer para descargar ficheros (LOLBin de C2).
-
-**Lo que hay que descartar primero:** Actualizaciones legitimas via BITS
-
-**Origen:** `process_creation / windows` · **ATT&CK:** [T1197](https://attack.mitre.org/techniques/T1197/) · **NIST:** CM-7 · **ISO 27001:** A.8.7
-
-### 🟠 Certutil usado para descargar o decodificar
-
-`proc_certutil_download_decode.yml`
-
-certutil -urlcache (descarga) o -decode (LOLBin de descarga/ofuscacion).
-
-**Lo que hay que descartar primero:** Uso administrativo legitimo de certutil (poco comun)
-
-**Origen:** `process_creation / windows` · **ATT&CK:** [T1105](https://attack.mitre.org/techniques/T1105/), [T1140](https://attack.mitre.org/techniques/T1140/) · **NIST:** SC-7, SI-3 · **ISO 27001:** A.8.7
-
-### 🟠 Manipulacion de Windows Defender
-
-`proc_defender_tamper.yml`
-
-Set-MpPreference -Disable... o exclusiones, evasion de defensas.
-
-**Lo que hay que descartar primero:** Administradores que ajustan Defender puntualmente
-
-**Origen:** `process_creation / windows` · **ATT&CK:** [T1562.001](https://attack.mitre.org/techniques/T1562/001/) · **NIST:** AU-9, CM-7, SI-3 · **ISO 27001:** A.8.7
-
-### 🔴 Volcado de LSASS via comsvcs MiniDump
-
-`proc_lsass_comsvcs_minidump.yml`
-
-rundll32 comsvcs.dll MiniDump sobre LSASS para robar credenciales.
-
-**Lo que hay que descartar primero:** Ninguno esperado
-
-**Origen:** `process_creation / windows` · **ATT&CK:** [T1003.001](https://attack.mitre.org/techniques/T1003/001/) · **NIST:** AC-6, IA-5 · **ISO 27001:** A.5.17, A.8.5
-
-### 🔴 Indicadores de Mimikatz en linea de comandos
-
-`proc_mimikatz_cmdline.yml`
-
-Comandos tipicos de Mimikatz (sekurlsa, logonpasswords, etc.).
-
-**Lo que hay que descartar primero:** Ninguno esperado
-
-**Origen:** `process_creation / windows` · **ATT&CK:** [T1003.001](https://attack.mitre.org/techniques/T1003/001/) · **NIST:** AC-6, IA-5 · **ISO 27001:** A.5.17, A.8.5
-
-### 🟠 Ejecucion sospechosa de mshta
-
-`proc_mshta_execution.yml`
-
-mshta ejecutando HTA remoto o javascript/vbscript inline.
-
-**Lo que hay que descartar primero:** Aplicaciones legacy que usan HTA
-
-**Origen:** `process_creation / windows` · **ATT&CK:** [T1218.005](https://attack.mitre.org/techniques/T1218/005/) · **NIST:** CM-7, SI-3 · **ISO 27001:** A.8.7
-
 ### 🟡 Creacion de cuenta local
 
 `proc_net_user_add.yml`
@@ -735,46 +675,6 @@ Word/Excel/Outlook creando cmd/powershell/wscript: tipico de phishing con macros
 
 **Origen:** `process_creation / windows` · **ATT&CK:** [T1204.002](https://attack.mitre.org/techniques/T1204/002/), [T1566.001](https://attack.mitre.org/techniques/T1566/001/) · **NIST:** AT-2, SI-3, SI-8 · **ISO 27001:** A.6.3, A.8.23, A.8.7
 
-### 🟠 Cradle de descarga en PowerShell
-
-`proc_powershell_download_cradle.yml`
-
-PowerShell descargando y ejecutando codigo desde red (DownloadString/IEX).
-
-**Lo que hay que descartar primero:** Instaladores legitimos que usan PowerShell
-
-**Origen:** `process_creation / windows` · **ATT&CK:** [T1059.001](https://attack.mitre.org/techniques/T1059/001/), [T1105](https://attack.mitre.org/techniques/T1105/) · **NIST:** CM-7, SC-7, SI-3 · **ISO 27001:** A.8.7
-
-### 🟠 PowerShell con comando codificado
-
-`proc_powershell_encoded.yml`
-
-Detecta powershell.exe con -EncodedCommand/-enc, comun en cargas ofuscadas.
-
-**Lo que hay que descartar primero:** Scripts de administracion codificados (raro)
-
-**Origen:** `process_creation / windows` · **ATT&CK:** [T1059.001](https://attack.mitre.org/techniques/T1059/001/) · **NIST:** CM-7, SI-3 · **ISO 27001:** A.8.7
-
-### 🟠 Regsvr32 ejecutando scriptlet remoto (Squiblydoo)
-
-`proc_regsvr32_scriptlet.yml`
-
-regsvr32 /i:http ... scrobj.dll para ejecutar codigo remoto evadiendo controles.
-
-**Lo que hay que descartar primero:** Ninguno esperado
-
-**Origen:** `process_creation / windows` · **ATT&CK:** [T1218.010](https://attack.mitre.org/techniques/T1218/010/) · **NIST:** CM-7, SI-3 · **ISO 27001:** A.8.7
-
-### 🟡 Creacion de tarea programada via schtasks
-
-`proc_scheduled_task_create.yml`
-
-schtasks /create, tecnica comun de persistencia y ejecucion.
-
-**Lo que hay que descartar primero:** Software legitimo que crea tareas
-
-**Origen:** `process_creation / windows` · **ATT&CK:** [T1053.005](https://attack.mitre.org/techniques/T1053/005/) · **NIST:** CM-5, CM-7 · **ISO 27001:** A.8.9
-
 ### 🟡 Creacion de servicio via sc.exe
 
 `proc_service_create_scexe.yml`
@@ -785,26 +685,6 @@ sc.exe create, usado para persistencia y movimiento lateral.
 
 **Origen:** `process_creation / windows` · **ATT&CK:** [T1543.003](https://attack.mitre.org/techniques/T1543/003/) · **NIST:** CM-5, CM-6 · **ISO 27001:** A.8.9
 
-### 🔴 Borrado de instantaneas (anti-recuperacion)
-
-`proc_vssadmin_delete_shadows.yml`
-
-vssadmin/wmic delete shadows, tipico de ransomware antes de cifrar.
-
-**Lo que hay que descartar primero:** Mantenimiento legitimo (muy raro)
-
-**Origen:** `process_creation / windows` · **ATT&CK:** [T1490](https://attack.mitre.org/techniques/T1490/) · **NIST:** CP-10, CP-9 · **ISO 27001:** A.8.13
-
-### 🟠 Borrado de registros de eventos
-
-`proc_wevtutil_clear_logs.yml`
-
-wevtutil cl / Clear-EventLog, anti-forense (T1070.001).
-
-**Lo que hay que descartar primero:** Ninguno esperado en produccion
-
-**Origen:** `process_creation / windows` · **ATT&CK:** [T1070.001](https://attack.mitre.org/techniques/T1070/001/) · **NIST:** AU-11, AU-9 · **ISO 27001:** A.8.15
-
 ### 🟡 Ejecucion via WMIC process call create
 
 `proc_wmic_process_call_create.yml`
@@ -814,16 +694,6 @@ wmic process call create, ejecucion y a veces movimiento lateral.
 **Lo que hay que descartar primero:** Scripts de administracion
 
 **Origen:** `process_creation / windows` · **ATT&CK:** [T1047](https://attack.mitre.org/techniques/T1047/) · **NIST:** AC-17, CM-7 · **ISO 27001:** A.8.20
-
-### 🟡 Persistencia por clave Run (registro)
-
-`reg_run_key_persistence.yml`
-
-Escritura en CurrentVersion\Run/RunOnce para autoarranque.
-
-**Lo que hay que descartar primero:** Software legitimo que se registra para autoarranque
-
-**Origen:** `registry_set / windows` · **ATT&CK:** [T1547.001](https://attack.mitre.org/techniques/T1547/001/) · **NIST:** CM-5, CM-6 · **ISO 27001:** A.8.9
 
 ### 🟠 Kerberoasting - solicitud masiva de tickets de servicio con RC4
 
@@ -1353,7 +1223,7 @@ Un contenedor con privileged true comparte los dispositivos y capacidades del no
 
 ## Red
 
-**6 reglas** · Proxy, DNS y NetFlow
+**5 reglas** · Proxy, DNS y NetFlow
 
 Lo que se ve del trafico cuando el endpoint no dice nada.
 
@@ -1386,16 +1256,6 @@ El DNS sale de casi cualquier red, lo que lo convierte en canal de reserva para 
 **Lo que hay que descartar primero:** Listas de reputacion y antispam que consultan por TXT, y algunos productos de seguridad
 
 **Origen:** `dns` · **ATT&CK:** [T1071.004](https://attack.mitre.org/techniques/T1071/004/) · **NIST:** SC-7, SI-4 · **ISO 27001:** A.8.20, A.8.23
-
-### 🟠 Explotacion de vulnerabilidad web contra un servicio publicado
-
-`soc_net_004_explotacion_web.yml`
-
-Patrones de explotacion en la peticion HTTP: inyeccion SQL, traversal, deserializacion, JNDI y ejecucion de plantilla. Pensada para el log del WAF o del proxy inverso, que es donde llega la peticion completa.
-
-**Lo que hay que descartar primero:** Escaneres de vulnerabilidad autorizados, que deben estar acotados por IP origen y ventana
-
-**Origen:** `webserver` · **ATT&CK:** [T1190](https://attack.mitre.org/techniques/T1190/) · **NIST:** RA-5, SC-7, SI-10 · **ISO 27001:** A.8.28, A.8.8
 
 ### 🔴 Interaccion con webshell
 

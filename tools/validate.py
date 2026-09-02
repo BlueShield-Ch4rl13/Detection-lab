@@ -276,19 +276,32 @@ def revisar_deploy(reglas) -> list[str]:
         if not (base / "consultas").is_dir() or not any((base / "consultas").iterdir()):
             problemas.append(f"deploy/{siem}/consultas/ vacia o inexistente")
 
-    # La capa de respuesta: que exista, y que el nodo compilado no este viejo.
+    # La capa de respuesta: que exista, y que el nodo compilado lleve la misma
+    # tabla que los playbooks.
+    #
+    # Antes esto comparaba fechas de modificacion, y era un error: git no
+    # conserva mtimes, asi que en un clon limpio el resultado dependia del
+    # orden en que el checkout escribio los ficheros. Fallaba en CI y pasaba en
+    # local, que es la peor combinacion posible. Ahora se compara el contenido.
     pbs = RAIZ / "respuesta" / "playbooks"
     if pbs.is_dir():
         nodo = RAIZ / "integracion" / "shuffle" / "enrutador.py"
+        tabla = RAIZ / "respuesta" / "tabla_decision.json"
         if not nodo.exists():
             problemas.append("falta integracion/shuffle/enrutador.py "
                              "(ejecuta tools/generar_enrutador.py)")
+        elif not tabla.exists():
+            problemas.append("falta respuesta/tabla_decision.json "
+                             "(ejecuta tools/generar_enrutador.py)")
         else:
-            mas_nuevo = max(f.stat().st_mtime for f in pbs.glob("*.yml"))
-            if mas_nuevo > nodo.stat().st_mtime:
-                problemas.append("el nodo de Shuffle es mas viejo que los playbooks: "
-                                 "regeneralo con tools/generar_enrutador.py y "
-                                 "vuelve a pegarlo en Shuffle")
+            import json as _json
+            compacta = _json.dumps(_json.loads(tabla.read_text(encoding="utf-8")),
+                                   ensure_ascii=False, separators=(",", ":"))
+            if compacta not in nodo.read_text(encoding="utf-8"):
+                problemas.append("el nodo de Shuffle no lleva la tabla de "
+                                 "respuesta/tabla_decision.json: regeneralo con "
+                                 "tools/generar_enrutador.py y vuelve a pegarlo "
+                                 "en Shuffle")
 
     # Las listas de inteligencia caducan; si estan, se avisa de su antiguedad.
     resumen = RAIZ / "intel" / "listas" / "RESUMEN.md"
