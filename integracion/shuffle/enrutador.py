@@ -5,7 +5,7 @@
 #  playbook pertenece, si va al LLM, si se puede cerrar sola y
 #  que contencion esta autorizada sin persona.
 #
-#  GENERADO por tools/generar_enrutador.py el 2026-09-01
+#  GENERADO por tools/generar_enrutador.py el 2026-09-02
 #  15 playbooks, 55 acciones de contencion.
 #  Si el repositorio tiene mas playbooks que estos, este nodo
 #  esta desfasado: regeneralo y vuelve a pegarlo.

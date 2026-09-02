@@ -663,7 +663,7 @@ bitsadmin /transfer para descargar ficheros (LOLBin de C2).
 
 **Lo que hay que descartar primero:** Actualizaciones legitimas via BITS
 
-**Origen:** `process_creation / windows` · **ATT&CK:** [T1197](https://attack.mitre.org/techniques/T1197/)
+**Origen:** `process_creation / windows` · **ATT&CK:** [T1197](https://attack.mitre.org/techniques/T1197/) · **NIST:** CM-7 · **ISO 27001:** A.8.7
 
 ### 🟠 Certutil usado para descargar o decodificar
 
@@ -673,7 +673,7 @@ certutil -urlcache (descarga) o -decode (LOLBin de descarga/ofuscacion).
 
 **Lo que hay que descartar primero:** Uso administrativo legitimo de certutil (poco comun)
 
-**Origen:** `process_creation / windows` · **ATT&CK:** [T1105](https://attack.mitre.org/techniques/T1105/), [T1140](https://attack.mitre.org/techniques/T1140/)
+**Origen:** `process_creation / windows` · **ATT&CK:** [T1105](https://attack.mitre.org/techniques/T1105/), [T1140](https://attack.mitre.org/techniques/T1140/) · **NIST:** SC-7, SI-3 · **ISO 27001:** A.8.7
 
 ### 🟠 Manipulacion de Windows Defender
 
@@ -683,7 +683,7 @@ Set-MpPreference -Disable... o exclusiones, evasion de defensas.
 
 **Lo que hay que descartar primero:** Administradores que ajustan Defender puntualmente
 
-**Origen:** `process_creation / windows` · **ATT&CK:** [T1562.001](https://attack.mitre.org/techniques/T1562/001/)
+**Origen:** `process_creation / windows` · **ATT&CK:** [T1562.001](https://attack.mitre.org/techniques/T1562/001/) · **NIST:** AU-9, CM-7, SI-3 · **ISO 27001:** A.8.7
 
 ### 🔴 Volcado de LSASS via comsvcs MiniDump
 
@@ -693,7 +693,7 @@ rundll32 comsvcs.dll MiniDump sobre LSASS para robar credenciales.
 
 **Lo que hay que descartar primero:** Ninguno esperado
 
-**Origen:** `process_creation / windows` · **ATT&CK:** [T1003.001](https://attack.mitre.org/techniques/T1003/001/)
+**Origen:** `process_creation / windows` · **ATT&CK:** [T1003.001](https://attack.mitre.org/techniques/T1003/001/) · **NIST:** AC-6, IA-5 · **ISO 27001:** A.5.17, A.8.5
 
 ### 🔴 Indicadores de Mimikatz en linea de comandos
 
@@ -703,7 +703,7 @@ Comandos tipicos de Mimikatz (sekurlsa, logonpasswords, etc.).
 
 **Lo que hay que descartar primero:** Ninguno esperado
 
-**Origen:** `process_creation / windows` · **ATT&CK:** [T1003.001](https://attack.mitre.org/techniques/T1003/001/)
+**Origen:** `process_creation / windows` · **ATT&CK:** [T1003.001](https://attack.mitre.org/techniques/T1003/001/) · **NIST:** AC-6, IA-5 · **ISO 27001:** A.5.17, A.8.5
 
 ### 🟠 Ejecucion sospechosa de mshta
 
@@ -713,7 +713,7 @@ mshta ejecutando HTA remoto o javascript/vbscript inline.
 
 **Lo que hay que descartar primero:** Aplicaciones legacy que usan HTA
 
-**Origen:** `process_creation / windows` · **ATT&CK:** [T1218.005](https://attack.mitre.org/techniques/T1218/005/)
+**Origen:** `process_creation / windows` · **ATT&CK:** [T1218.005](https://attack.mitre.org/techniques/T1218/005/) · **NIST:** CM-7, SI-3 · **ISO 27001:** A.8.7
 
 ### 🟡 Creacion de cuenta local
 
@@ -743,7 +743,7 @@ PowerShell descargando y ejecutando codigo desde red (DownloadString/IEX).
 
 **Lo que hay que descartar primero:** Instaladores legitimos que usan PowerShell
 
-**Origen:** `process_creation / windows` · **ATT&CK:** [T1059.001](https://attack.mitre.org/techniques/T1059/001/), [T1105](https://attack.mitre.org/techniques/T1105/)
+**Origen:** `process_creation / windows` · **ATT&CK:** [T1059.001](https://attack.mitre.org/techniques/T1059/001/), [T1105](https://attack.mitre.org/techniques/T1105/) · **NIST:** CM-7, SC-7, SI-3 · **ISO 27001:** A.8.7
 
 ### 🟠 PowerShell con comando codificado
 
@@ -753,7 +753,7 @@ Detecta powershell.exe con -EncodedCommand/-enc, comun en cargas ofuscadas.
 
 **Lo que hay que descartar primero:** Scripts de administracion codificados (raro)
 
-**Origen:** `process_creation / windows` · **ATT&CK:** [T1059.001](https://attack.mitre.org/techniques/T1059/001/)
+**Origen:** `process_creation / windows` · **ATT&CK:** [T1059.001](https://attack.mitre.org/techniques/T1059/001/) · **NIST:** CM-7, SI-3 · **ISO 27001:** A.8.7
 
 ### 🟠 Regsvr32 ejecutando scriptlet remoto (Squiblydoo)
 
@@ -763,7 +763,7 @@ regsvr32 /i:http ... scrobj.dll para ejecutar codigo remoto evadiendo controles.
 
 **Lo que hay que descartar primero:** Ninguno esperado
 
-**Origen:** `process_creation / windows` · **ATT&CK:** [T1218.010](https://attack.mitre.org/techniques/T1218/010/)
+**Origen:** `process_creation / windows` · **ATT&CK:** [T1218.010](https://attack.mitre.org/techniques/T1218/010/) · **NIST:** CM-7, SI-3 · **ISO 27001:** A.8.7
 
 ### 🟡 Creacion de tarea programada via schtasks
 
@@ -773,7 +773,7 @@ schtasks /create, tecnica comun de persistencia y ejecucion.
 
 **Lo que hay que descartar primero:** Software legitimo que crea tareas
 
-**Origen:** `process_creation / windows` · **ATT&CK:** [T1053.005](https://attack.mitre.org/techniques/T1053/005/)
+**Origen:** `process_creation / windows` · **ATT&CK:** [T1053.005](https://attack.mitre.org/techniques/T1053/005/) · **NIST:** CM-5, CM-7 · **ISO 27001:** A.8.9
 
 ### 🟡 Creacion de servicio via sc.exe
 
@@ -793,7 +793,7 @@ vssadmin/wmic delete shadows, tipico de ransomware antes de cifrar.
 
 **Lo que hay que descartar primero:** Mantenimiento legitimo (muy raro)
 
-**Origen:** `process_creation / windows` · **ATT&CK:** [T1490](https://attack.mitre.org/techniques/T1490/)
+**Origen:** `process_creation / windows` · **ATT&CK:** [T1490](https://attack.mitre.org/techniques/T1490/) · **NIST:** CP-10, CP-9 · **ISO 27001:** A.8.13
 
 ### 🟠 Borrado de registros de eventos
 
@@ -803,7 +803,7 @@ wevtutil cl / Clear-EventLog, anti-forense (T1070.001).
 
 **Lo que hay que descartar primero:** Ninguno esperado en produccion
 
-**Origen:** `process_creation / windows` · **ATT&CK:** [T1070.001](https://attack.mitre.org/techniques/T1070/001/)
+**Origen:** `process_creation / windows` · **ATT&CK:** [T1070.001](https://attack.mitre.org/techniques/T1070/001/) · **NIST:** AU-11, AU-9 · **ISO 27001:** A.8.15
 
 ### 🟡 Ejecucion via WMIC process call create
 
@@ -823,7 +823,7 @@ Escritura en CurrentVersion\Run/RunOnce para autoarranque.
 
 **Lo que hay que descartar primero:** Software legitimo que se registra para autoarranque
 
-**Origen:** `registry_set / windows` · **ATT&CK:** [T1547.001](https://attack.mitre.org/techniques/T1547/001/)
+**Origen:** `registry_set / windows` · **ATT&CK:** [T1547.001](https://attack.mitre.org/techniques/T1547/001/) · **NIST:** CM-5, CM-6 · **ISO 27001:** A.8.9
 
 ### 🟠 Kerberoasting - solicitud masiva de tickets de servicio con RC4
 
@@ -1395,7 +1395,7 @@ Patrones de explotacion en la peticion HTTP: inyeccion SQL, traversal, deseriali
 
 **Lo que hay que descartar primero:** Escaneres de vulnerabilidad autorizados, que deben estar acotados por IP origen y ventana
 
-**Origen:** `webserver` · **ATT&CK:** [T1190](https://attack.mitre.org/techniques/T1190/)
+**Origen:** `webserver` · **ATT&CK:** [T1190](https://attack.mitre.org/techniques/T1190/) · **NIST:** RA-5, SC-7, SI-10 · **ISO 27001:** A.8.28, A.8.8
 
 ### 🔴 Interaccion con webshell
 
