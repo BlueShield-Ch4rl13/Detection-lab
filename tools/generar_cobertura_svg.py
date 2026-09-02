@@ -17,6 +17,19 @@ from collections import defaultdict
 from pathlib import Path
 
 import yaml
+import sys
+
+# En Windows la consola usa cp1252 y no puede imprimir ni los bloques de los
+# graficos ni los simbolos de estado. Sin esto, la herramienta muere con
+# UnicodeEncodeError a mitad del informe: hace el trabajo y luego revienta al
+# contarlo, que es la peor forma de fallar.
+for _flujo in (sys.stdout, sys.stderr):
+    if hasattr(_flujo, "reconfigure"):
+        try:
+            _flujo.reconfigure(encoding="utf-8", errors="replace")
+        except (ValueError, OSError):
+            pass
+
 
 RAIZ = Path(__file__).resolve().parent.parent
 SALIDA = RAIZ / "docs" / "img" / "cobertura-attack.svg"

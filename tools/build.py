@@ -47,6 +47,18 @@ from sigma.collection import SigmaCollection
 from sigma.plugins import InstalledSigmaPlugins
 from sigma.processing.resolver import ProcessingPipelineResolver
 
+# En Windows la consola usa cp1252 y no puede imprimir ni los bloques de los
+# graficos ni los simbolos de estado. Sin esto, la herramienta muere con
+# UnicodeEncodeError a mitad del informe: hace el trabajo y luego revienta al
+# contarlo, que es la peor forma de fallar.
+for _flujo in (sys.stdout, sys.stderr):
+    if hasattr(_flujo, "reconfigure"):
+        try:
+            _flujo.reconfigure(encoding="utf-8", errors="replace")
+        except (ValueError, OSError):
+            pass
+
+
 _PLUGINS = InstalledSigmaPlugins.autodiscover()
 _RESOLVER = ProcessingPipelineResolver(_PLUGINS.pipelines)
 
