@@ -3,19 +3,19 @@
 <!-- Generado por tools/sync_cti.py desde ScriptNewsCTI - no editar a mano -->
 
 **Origen:** [ScriptNewsCTI](https://github.com/BlueShield-Ch4rl13/ScriptNewsCTI)  
-**Feed generado:** 2026-09-01 11:37 UTC  
-**Listas generadas:** 2026-09-01T14:43:00Z  
+**Feed generado:** 2026-09-02 04:06 UTC  
+**Listas generadas:** 2026-09-02T10:19:17Z  
 **Filtro aplicado:** nivel minimo `media`, maximo `30` dias de antiguedad
 
 ## Que hay en cada lista
 
 | Indicador | Entradas | Uso previsto |
 |---|---:|---|
-| IP | 154 | Caza programada, no alerta directa |
-| Dominio | 199 | Caza programada, no alerta directa |
-| URL | 135 | Caza programada, no alerta directa |
-| Hash | 69 | **Alerta directa**: un hash coincide o no |
-| CVE en KEV | 21 | Priorizacion de parcheo y caza de explotacion |
+| IP | 206 | Caza programada, no alerta directa |
+| Dominio | 184 | Caza programada, no alerta directa |
+| URL | 165 | Caza programada, no alerta directa |
+| Hash | 85 | **Alerta directa**: un hash coincide o no |
+| CVE en KEV | 17 | Priorizacion de parcheo y caza de explotacion |
 
 ## Por que las IP y los dominios no alertan
 
@@ -29,52 +29,52 @@ mirar. Se despliegan como **consultas de caza programadas con umbral**, en
 El hash es distinto: no comparte infraestructura con nada legitimo, asi que
 va como alerta y ademas sin caducidad.
 
-## Que se descarto del feed (314 de 916)
+## Que se descarto del feed (262 de 961)
 
 | Motivo | Descartados |
 |---|---:|
-| tipo no usado | 189 |
-| nivel bajo | 125 |
+| tipo no usado | 150 |
+| nivel bajo | 112 |
 
 ## Familias mas presentes
 
 | Amenaza | Indicadores |
 |---|---:|
 | malware_download | 100 |
-| php.shin_webshell | 98 |
-| ClearFake | 76 |
+| php.shin_webshell | 100 |
+| ClearFake | 63 |
+| Sliver | 53 |
+| Unknown malware | 35 |
 | Anatomy of BraZetsu: How Cybercriminals Fuel the Underground Ecosystem | 26 |
-| Aisuru | 25 |
 | Vidar | 23 |
 | Financially Motivated Threat Actor Targets Brazil | 22 |
-| IClickFix | 17 |
-| PureRAT | 16 |
-| VShell | 15 |
-| Unknown malware | 13 |
-| AsyncRAT | 13 |
+| PureRAT | 20 |
+| Aisuru | 20 |
+| Remus | 19 |
+| Switches to Node.js and JavaScript malware | 16 |
 
 ## Ficheros generados
 
 | Fichero | Entradas |
 |---|---:|
-| `wazuh/cti_ip` | 154 |
-| `wazuh/cti_dominio` | 199 |
-| `wazuh/cti_url` | 135 |
-| `wazuh/cti_hash` | 69 |
-| `wazuh/cti_cve_kev` | 21 |
-| `splunk/cti_ip.csv` | 154 |
-| `splunk/cti_dominio.csv` | 199 |
-| `splunk/cti_url.csv` | 135 |
-| `splunk/cti_hash.csv` | 69 |
-| `splunk/cti_cve_kev.csv` | 21 |
-| `sentinel/CTI_Ip.csv` | 154 |
-| `sentinel/CTI_Dominio.csv` | 199 |
-| `sentinel/CTI_Url.csv` | 135 |
-| `sentinel/CTI_Hash.csv` | 69 |
-| `elastic/cti_ip.ndjson` | 154 |
-| `elastic/cti_dominio.ndjson` | 199 |
-| `elastic/cti_url.ndjson` | 135 |
-| `elastic/cti_hash.ndjson` | 69 |
+| `wazuh/cti_ip` | 206 |
+| `wazuh/cti_dominio` | 184 |
+| `wazuh/cti_url` | 165 |
+| `wazuh/cti_hash` | 85 |
+| `wazuh/cti_cve_kev` | 17 |
+| `splunk/cti_ip.csv` | 206 |
+| `splunk/cti_dominio.csv` | 184 |
+| `splunk/cti_url.csv` | 165 |
+| `splunk/cti_hash.csv` | 85 |
+| `splunk/cti_cve_kev.csv` | 17 |
+| `sentinel/CTI_Ip.csv` | 206 |
+| `sentinel/CTI_Dominio.csv` | 184 |
+| `sentinel/CTI_Url.csv` | 165 |
+| `sentinel/CTI_Hash.csv` | 85 |
+| `elastic/cti_ip.ndjson` | 206 |
+| `elastic/cti_dominio.ndjson` | 184 |
+| `elastic/cti_url.ndjson` | 165 |
+| `elastic/cti_hash.ndjson` | 85 |
 
 ## Como se instala cada una
 

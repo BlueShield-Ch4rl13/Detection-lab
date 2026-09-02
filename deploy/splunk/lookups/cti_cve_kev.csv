@@ -16,7 +16,3 @@ CVE-2026-73570,Synacor,Zimbra Collaboration Suite (ZCS),Zimbra Collaboration Sui
 CVE-2026-72530,TrueConf,Server,TrueConf Server Code Injection Vulnerability,2026-08-20,Unknown
 CVE-2026-72529,TrueConf,Server,TrueConf Server Missing Authentication for Critical Function Vulnerability,2026-08-20,Unknown
 CVE-2026-64849,MLflow,MLflow,MLflow Server-Side Request Forgery Vulnerability,2026-08-19,Unknown
-CVE-2026-33824,Microsoft,Internet Key Exchange (IKE) Service Extensions,Microsoft Internet Key Exchange (IKE) Service Extensions Double Free Vulnerability,2026-08-18,Unknown
-CVE-2026-59310,Broadcom,VMware vCenter,Broadcom VMware vCenter Path Traversal Vulnerability,2026-08-18,Unknown
-CVE-2026-55040,Microsoft,SharePoint,Microsoft SharePoint Weak Authentication Vulnerability,2026-08-18,Unknown
-CVE-2026-65400,Apple,macOS,Apple macOS Improper Authentication Vulnerability,2026-08-18,Unknown

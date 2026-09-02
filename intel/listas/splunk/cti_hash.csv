@@ -1,4 +1,20 @@
 valor,tipo,amenaza,nivel,score,confianza,pais,fuente,visto,edad_dias
+810f8e3b88eb05f710c09552941d6f56,filehash-md5,Switches to Node.js and JavaScript malware,baja,25,,,OTX,2026-09-01T08:49:16,0
+da11679653ef33952c3dc8d8850e43d7b8ac884a,filehash-sha1,Switches to Node.js and JavaScript malware,baja,25,,,OTX,2026-09-01T08:49:16,0
+0db36a04d304ad96f9e6f97b531934594cd95a5cea9ff2c9af249201089dc864,filehash-sha256,Switches to Node.js and JavaScript malware,baja,25,,,OTX,2026-09-01T08:49:16,0
+1ea83e4e4592b01e4acab63eb867bee5,filehash-md5,Switches to Node.js and JavaScript malware,baja,25,,,OTX,2026-09-01T08:49:16,0
+cbaaf0900a13f28e380f49adecec932c,filehash-md5,Switches to Node.js and JavaScript malware,baja,25,,,OTX,2026-09-01T08:49:16,0
+366515822d5ac1cc500711ef57a2e32e,filehash-md5,Switches to Node.js and JavaScript malware,baja,25,,,OTX,2026-09-01T08:49:16,0
+cf449f1992c2819e62ac44a0b06ac2e7,filehash-md5,Switches to Node.js and JavaScript malware,baja,25,,,OTX,2026-09-01T08:49:16,0
+e95a4366686e3f786ea3c056fab5b0da,filehash-md5,Switches to Node.js and JavaScript malware,baja,25,,,OTX,2026-09-01T08:49:16,0
+de5af16a3757ef700b01dc34d67079ae,filehash-md5,Switches to Node.js and JavaScript malware,baja,25,,,OTX,2026-09-01T08:49:16,0
+be086789568441d0d7e4679aee51f566,filehash-md5,Switches to Node.js and JavaScript malware,baja,25,,,OTX,2026-09-01T08:49:16,0
+e259c5edf158aac4cfe14f77ddd0b196,filehash-md5,Switches to Node.js and JavaScript malware,baja,25,,,OTX,2026-09-01T08:49:16,0
+291ac3abe73c5158e59a437b75d5f0aa,filehash-md5,Switches to Node.js and JavaScript malware,baja,25,,,OTX,2026-09-01T08:49:16,0
+0962f56d7ec69f4f2a0162dcbe22116b,filehash-md5,Switches to Node.js and JavaScript malware,baja,25,,,OTX,2026-09-01T08:49:16,0
+795e053a990a1569ffdcb57f48f6d085,filehash-md5,Switches to Node.js and JavaScript malware,baja,25,,,OTX,2026-09-01T08:49:16,0
+f0c8db403231d478f67df0355328c58384027677,filehash-sha1,Switches to Node.js and JavaScript malware,baja,25,,,OTX,2026-09-01T08:49:16,0
+307ce2448211a5f5d122643f2a739aff33ede72c1858518c8de098f3148bbd00,filehash-sha256,Switches to Node.js and JavaScript malware,baja,25,,,OTX,2026-09-01T08:49:16,0
 599f80a79efdc584c70f4f763c663b06d432393c,filehash-sha1,Financially Motivated Threat Actor Targets Brazil,baja,25,,,OTX,2026-09-01T07:05:41,0
 51fdd83b3737add7f3832bd0ad0b56863c0a8f7cf9bcc16fd787d1ae4b403ce6,filehash-sha256,Financially Motivated Threat Actor Targets Brazil,baja,25,,,OTX,2026-09-01T07:05:41,0
 833368e3029a38a4f87207acd537070e,filehash-md5,Financially Motivated Threat Actor Targets Brazil,baja,25,,,OTX,2026-09-01T07:05:41,0
@@ -59,12 +75,12 @@ f775fe06a4c2563cb03e1aa42eb4e9532840cce9dc168ea2ca97cee7972e6b17,filehash-sha256
 365d4eb738d3146583431948d3ba6e27a32556be,filehash-sha1,Shai-Hulud Trinitite Hits @7nohe/openapi-react-query-codegen,baja,25,,,OTX,2026-08-31T15:26:42,1
 ec7876d6c917dad516ba69bbfafc948b834bf0ab,filehash-sha1,Shai-Hulud Trinitite Hits @7nohe/openapi-react-query-codegen,baja,25,,,OTX,2026-08-31T15:26:42,1
 043fb46d1a93c77aae656e7c1c64a875d1fc6a0a,filehash-sha1,Shai-Hulud Trinitite Hits @7nohe/openapi-react-query-codegen,baja,25,,,OTX,2026-08-31T15:26:42,0
-03f4e47b9c2283c32bb8f8f042ce6e41,filehash-md5,Breaking the Seal: Static Deobfuscation of JSCeal's Compiled V8 Bytecode,baja,25,,,OTX,2026-08-31T14:00:19,0
-0d1fce0cb2b9dec26a10f0822aeffb19,filehash-md5,Breaking the Seal: Static Deobfuscation of JSCeal's Compiled V8 Bytecode,baja,25,,,OTX,2026-08-31T14:00:19,0
-581e2e2265d0c1509b3799c5a9039374,filehash-md5,Breaking the Seal: Static Deobfuscation of JSCeal's Compiled V8 Bytecode,baja,25,,,OTX,2026-08-31T14:00:19,0
-91038aebe528a065c3e995a418db6826,filehash-md5,Breaking the Seal: Static Deobfuscation of JSCeal's Compiled V8 Bytecode,baja,25,,,OTX,2026-08-31T14:00:19,0
-de10c6b3dc4619f59bc9c80a0aa15e6a,filehash-md5,Breaking the Seal: Static Deobfuscation of JSCeal's Compiled V8 Bytecode,baja,25,,,OTX,2026-08-31T14:00:19,0
-e27ae65977287bdfb7b0e15fd3603f85,filehash-md5,Breaking the Seal: Static Deobfuscation of JSCeal's Compiled V8 Bytecode,baja,25,,,OTX,2026-08-31T14:00:19,0
-c928dbf37ed5b799d3a78bd6449e0d74535ef1db,filehash-sha1,Breaking the Seal: Static Deobfuscation of JSCeal's Compiled V8 Bytecode,baja,25,,,OTX,2026-08-31T14:00:19,0
-b73c3d732bb6bff8b9088cc0dcbadb35eea0802056324f1b6295cb9277c62755,filehash-sha256,Breaking the Seal: Static Deobfuscation of JSCeal's Compiled V8 Bytecode,baja,25,,,OTX,2026-08-31T14:00:19,0
-24ab9fe5d5be62d3bf055a0ca4508e8bca2996b6d78649dce8145d8a27bc1c5b,filehash-sha256,An Inside Look at Voice Phishing Campaigns in Microsoft Teams,baja,25,,,OTX,2026-08-31T11:06:37,0
+03f4e47b9c2283c32bb8f8f042ce6e41,filehash-md5,Breaking the Seal: Static Deobfuscation of JSCeal's Compiled V8 Bytecode,baja,25,,,OTX,2026-08-31T14:00:19,1
+0d1fce0cb2b9dec26a10f0822aeffb19,filehash-md5,Breaking the Seal: Static Deobfuscation of JSCeal's Compiled V8 Bytecode,baja,25,,,OTX,2026-08-31T14:00:19,1
+581e2e2265d0c1509b3799c5a9039374,filehash-md5,Breaking the Seal: Static Deobfuscation of JSCeal's Compiled V8 Bytecode,baja,25,,,OTX,2026-08-31T14:00:19,1
+91038aebe528a065c3e995a418db6826,filehash-md5,Breaking the Seal: Static Deobfuscation of JSCeal's Compiled V8 Bytecode,baja,25,,,OTX,2026-08-31T14:00:19,1
+de10c6b3dc4619f59bc9c80a0aa15e6a,filehash-md5,Breaking the Seal: Static Deobfuscation of JSCeal's Compiled V8 Bytecode,baja,25,,,OTX,2026-08-31T14:00:19,1
+c24e99f9437feacaa63766a3cde3fe3d,filehash-md5,ValleyRAT is spreading disguised as adware,baja,25,,,OTX,2026-08-31T11:11:50,1
+07ddbbe2c71c45577a7a4fbcdba0df91,filehash-md5,ValleyRAT is spreading disguised as adware,baja,25,,,OTX,2026-08-31T11:11:50,1
+8a626d844943da3456b044f38deae3a2,filehash-md5,ValleyRAT is spreading disguised as adware,baja,25,,,OTX,2026-08-31T11:11:50,1
+24ab9fe5d5be62d3bf055a0ca4508e8bca2996b6d78649dce8145d8a27bc1c5b,filehash-sha256,An Inside Look at Voice Phishing Campaigns in Microsoft Teams,baja,25,,,OTX,2026-08-31T11:06:37,1
