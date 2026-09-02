@@ -175,6 +175,14 @@ def escapar_conf(spl: str) -> str:
 
 
 def generar_splunk(reglas, resultados) -> str:
+    """Las rutas van con .as_posix() a proposito.
+
+    Una Path en Windows se imprime con barra invertida y en Linux con barra
+    normal. Si esa ruta acaba dentro de un fichero generado, el mismo comando
+    produce ficheros distintos segun quien lo ejecute: quien genera en Windows
+    y quien valida en CI nunca coinciden, y el CI falla por 127 lineas que solo
+    se diferencian en el separador. Es exactamente lo que paso aqui.
+    """
     partes = [
         MARCA,
         "# Fuente: rules/  ·  pipeline: tools/pipelines/splunk.yml",
@@ -209,7 +217,7 @@ action.notable.param.security_domain = threat
 action.notable.param.severity = {nivel}
 action.notable.param.drilldown_name = Ver eventos de la deteccion
 # MITRE ATT&CK: {tec}
-# Regla Sigma: {f.relative_to(RAIZ)}
+# Regla Sigma: {f.relative_to(RAIZ).as_posix()}
 # UUID: {doc.get('id', '-')}
 """)
     return "\n".join(partes)
@@ -264,7 +272,7 @@ def generar_kql(reglas, resultados, fallos) -> dict[str, str]:
                 f"// ─────────────────────────────────────────────────────────\n"
                 f"// {doc.get('title', f.stem)}\n"
                 f"// Severidad: {doc.get('level', 'medium')}  ·  ATT&CK: {tec}\n"
-                f"// Origen: {f.relative_to(RAIZ)}\n"
+                f"// Origen: {f.relative_to(RAIZ).as_posix()}\n"
                 f"{consulta}\n"
             )
         # los fallos de este dominio se declaran en el propio fichero

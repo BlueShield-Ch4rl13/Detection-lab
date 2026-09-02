@@ -49,14 +49,19 @@ jobs:
       # Solo se compara deploy/*/reglas/: las listas de inteligencia cambian en
       # cada sincronizacion con News CTI y compararlas haria fallar el CI a
       # diario por un motivo que no es un error.
+      # OJO con el pathspec: 'deploy/*/reglas/' entrecomillado NO casa con
+      # ningun fichero. git interpreta el glob el mismo, y con la barra final
+      # exige que la ruta termine en barra, cosa que ningun fichero hace. El
+      # check parecia pasar y en realidad no miraba deploy/ en absoluto.
       - name: Comprobar que las reglas generadas estaban al dia
         run: |
-          if ! git diff --quiet -- 'deploy/*/reglas/' purple/atomic-map.md docs/fusion-de-bibliotecas.md; then
-            echo "::error::Las reglas generadas no coinciden con rules/. Ejecuta 'python tools/build.py' y haz commit del resultado."
-            git diff --stat -- 'deploy/*/reglas/' purple/atomic-map.md docs/fusion-de-bibliotecas.md
+          RUTAS="deploy purple/atomic-map.md docs/fusion-de-bibliotecas.md"
+          if ! git diff --quiet -- $RUTAS; then
+            echo "::error::Lo generado no coincide con rules/. Ejecuta 'python tools/build.py' y haz commit del resultado."
+            git diff --stat -- $RUTAS
             exit 1
           fi
-          echo "deploy/*/reglas/ esta sincronizado con rules/"
+          echo "El contenido generado esta sincronizado con rules/"
 
       - name: Comprobar que el mapeo a NIST e ISO esta al dia
         run: |
