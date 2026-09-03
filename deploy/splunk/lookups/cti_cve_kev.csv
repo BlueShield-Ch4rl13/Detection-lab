@@ -1,4 +1,11 @@
 cve,vendor,product,name,date_added,ransomware
+CVE-2026-59822,BerriAI,LiteLLM,BerriAI LiteLLM Improper Authentication Vulnerability,2026-09-02,Unknown
+CVE-2026-48710,Kludex,Starlette,Kludex Starlette HTTP Request/Response Smuggling Vulnerability,2026-09-02,Unknown
+CVE-2026-49869,Kestra,Kestra OSS,Kestra OSS OS Command Injection Vulnerability,2026-09-02,Unknown
+CVE-2026-82329,JFrog,Artifactory,JFrog Artifactory Improper Authentication Vulnerability,2026-09-02,Unknown
+CVE-2026-9586,Sangoma,Switchvox,Sangoma Switchvox SQL Injection Vulnerability,2026-09-02,Unknown
+CVE-2026-83548,SonicWall,SMA1000 Appliances,SonicWall SMA1000 Appliances Server-Side Request Forgery Vulnerability,2026-09-02,Unknown
+CVE-2026-83549,SonicWall,SMA1000 Appliances,SonicWall SMA1000 Appliances OS Command Injection Vulnerability,2026-09-02,Unknown
 CVE-2026-82078,PaperCut,NG/MF,PaperCut NG/MF Unsafe Reflection Vulnerability,2026-08-31,Unknown
 CVE-2026-81578,PaperCut,NG/MF,PaperCut NG/MF Missing Authentication for Critical Function Vulnerability,2026-08-31,Unknown
 CVE-2023-49105,ownCloud,ownCloud,ownCloud Improper Authentication Vulnerability,2026-08-27,Unknown
@@ -15,4 +22,3 @@ CVE-2026-21962,Oracle,HTTP Server and Oracle Weblogic Server Proxy Plug-in,Oracl
 CVE-2026-73570,Synacor,Zimbra Collaboration Suite (ZCS),Zimbra Collaboration Suite (ZCS) OS Command Injection Vulnerability,2026-08-21,Unknown
 CVE-2026-72530,TrueConf,Server,TrueConf Server Code Injection Vulnerability,2026-08-20,Unknown
 CVE-2026-72529,TrueConf,Server,TrueConf Server Missing Authentication for Critical Function Vulnerability,2026-08-20,Unknown
-CVE-2026-64849,MLflow,MLflow,MLflow Server-Side Request Forgery Vulnerability,2026-08-19,Unknown
